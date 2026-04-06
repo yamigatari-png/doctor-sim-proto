@@ -229,6 +229,22 @@ export const case01: CaseProfile = {
       resultText: "血糖 104 mg/dL",
     },
 
+    TP: {
+  key: "TP",
+  label: "総蛋白",
+  category: "blood",
+  minutes: 60,
+  resultText: "総蛋白 7.1 g/dL",
+},
+
+ALB: {
+  key: "ALB",
+  label: "アルブミン",
+  category: "blood",
+  minutes: 60,
+  resultText: "アルブミン 4.2 g/dL",
+},
+
     CXR: {
       key: "CXR",
       label: "胸部X線写真",

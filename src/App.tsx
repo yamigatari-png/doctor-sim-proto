@@ -142,6 +142,8 @@ const TEST_TURNAROUND_MINUTES: Partial<Record<TestKey, number>> = {
   K: 60,
   CL: 60,
   GLU: 60,
+  TP: 60,
+  ALB: 60,
 
   KL_6: 75,
   SP_D: 60,
@@ -428,28 +430,29 @@ const CULTURE_BLOOD_KEYS: TestKey[] = [
 ];
 
 const BLOOD_BIOCHEM_1: TestKey[] = [
-  "CRP",
-  "AST",
-  "ALT",
-  "LDH",
-  "CR",
-  "BUN",
   "NA",
   "K",
   "CL",
   "CA",
   "IP",
   "MG",
-  "GLU",
+  "TP",
+  "ALB",
+  "TBIL",
+  "DBIL",
+  "AST",
+  "ALT",
+  "LDH",
+  "ALP",
+  "GGT",
+  "BUN",
+  "CR",
+  "CK",
 ];
 
 const BLOOD_BIOCHEM_2: TestKey[] = [
-  "ALP",
-  "GGT",
-  "CK",
-  "TBIL",
-  "DBIL",
-  "AMMONIA",
+  "CRP",
+  "GLU",
   "UA",
   "TCHO",
   "HDL_C",
@@ -467,6 +470,7 @@ const BLOOD_BIOCHEM_3: TestKey[] = [
   "NT_PROBNP",
   "PCT",
   "BETA_D_GLUCAN",
+  "AMMONIA",
 ];
 
 const OTHER_GROUP_TUMOR: TestKey[] = [
@@ -551,6 +555,8 @@ const TEST_HELP_TEXT: Partial<Record<TestKey, string>> = {
   K: "カリウム異常の評価に用います。",
   CL: "クロール異常の評価に用います。",
   GLU: "血糖の評価に用います。",
+  TP: "血清中の総蛋白量を評価し、栄養状態や慢性炎症、肝機能の指標として用います。",
+  ALB: "主要な血清蛋白であり、栄養状態や肝機能、炎症の影響を評価する指標です。",
 
   KL_6: "間質性肺疾患などで上昇しうる肺由来マーカーです。",
   SP_D: "肺障害や間質性肺炎の評価で参考になることがあります。",
@@ -836,6 +842,21 @@ const [viewportWidth, setViewportWidth] = useState<number>(
 
 const isResultCompact = viewportWidth <= 980;
 const isResultPhone = viewportWidth <= 640;
+
+const isPhone = viewportWidth <= 820;
+const isTablet = viewportWidth <= 1180;
+
+const modalCols3 = isPhone
+  ? "1fr"
+  : isTablet
+  ? "repeat(2, minmax(0, 1fr))"
+  : "repeat(3, minmax(0, 1fr))";
+
+const modalCols4 = isPhone
+  ? "1fr"
+  : isTablet
+  ? "repeat(2, minmax(0, 1fr))"
+  : "repeat(4, minmax(0, 1fr))";
 
 const [audioUnlocked, setAudioUnlocked] = useState(false);
 const [splashPhase, setSplashPhase] = useState<"logo" | "notice">("logo");
@@ -3243,34 +3264,40 @@ return (
       if (!gameOver) startTimerIfNeeded();
     }}
     style={{
-  height: "100vh",
-  overflow: "hidden",
-  padding: 12,
+  minHeight: "100vh",
+  height: isPhone ? "auto" : "100vh",
+  overflowX: "hidden",
+  overflowY: isPhone ? "auto" : "hidden",
+  padding: isPhone ? 8 : 12,
   display: "grid",
-  gridTemplateColumns: "320px minmax(520px, 1fr) 420px",
-  gridTemplateRows: "1fr 120px",
-  gap: 12,
+  gridTemplateColumns: isPhone ? "1fr" : "320px minmax(520px, 1fr) 420px",
+  gridTemplateRows: isPhone
+    ? "auto minmax(320px, 46vh) minmax(220px, 30vh) auto"
+    : "1fr 120px",
+  gap: isPhone ? 8 : 12,
   background: "#0b0d12",
   cursor:
-  examMode === "auscultation"
-    ? `url(${STETHOSCOPE_CURSOR_SRC}) 16 16, auto`
-    : examMode === "inspection"
-    ? "zoom-in"
-    : examMode === "palpation" || examMode === "percussion"
-    ? "pointer"
-    : "default",
+    examMode === "auscultation"
+      ? `url(${STETHOSCOPE_CURSOR_SRC}) 16 16, auto`
+      : examMode === "inspection"
+      ? "zoom-in"
+      : examMode === "palpation" || examMode === "percussion"
+      ? "pointer"
+      : "default",
+  boxSizing: "border-box",
 }}
   >
       {/* LEFT */}
       <div
         className="card"
         style={{
-  padding: 12,
+  padding: isPhone ? 10 : 12,
   display: "grid",
   gridTemplateRows: "auto auto auto 1fr auto auto",
-  gap: 10,
+  gap: isPhone ? 8 : 10,
   minHeight: 0,
-  gridRow: "1 / span 2",
+  gridRow: isPhone ? "auto" : "1 / span 2",
+  order: isPhone ? 1 : undefined,
 }}
       >
         <div style={{ fontSize: 22, fontWeight: 900 }}>28歳男性　主訴：発熱</div>
@@ -3544,13 +3571,14 @@ return (
       <div
         className="card"
         style={{
-          minHeight: 0,
-          overflow: "hidden",
-          display: "grid",
-          gridTemplateRows: "auto 1fr auto",
-          padding: 16,
-          gap: 12,
-        }}
+  minHeight: 0,
+  overflow: "hidden",
+  display: "grid",
+  gridTemplateRows: "auto 1fr auto",
+  padding: isPhone ? 10 : 16,
+  gap: isPhone ? 8 : 12,
+  order: isPhone ? 2 : undefined,
+}}
       >
         <div
           style={{
@@ -3564,17 +3592,18 @@ return (
 
         <div
           style={{
-            position: "relative",
-            minHeight: 0,
-            borderRadius: 18,
-            border: "1px solid rgba(255,255,255,0.10)",
-            backgroundImage: `url(${EXAM_ROOM_BG_SRC})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            backgroundColor: "#141821",
-            overflow: "hidden",
-          }}
+  position: "relative",
+  minHeight: 0,
+  height: isPhone ? "46vh" : "auto",
+  borderRadius: 18,
+  border: "1px solid rgba(255,255,255,0.10)",
+  backgroundImage: `url(${EXAM_ROOM_BG_SRC})`,
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
+  backgroundColor: "#141821",
+  overflow: "hidden",
+}}
         >
           {/* 患者本体表示エリア */}
 <div
@@ -3621,17 +3650,17 @@ return (
 >
     <div
     style={{
-      position: "absolute",
-      left: "50%",
-      bottom: 0,
-      transform: "translateX(-50%)",
-      width: "min(500%, 700px)",
-      height: "92%",
-      display: "flex",
-      alignItems: "flex-end",
-      justifyContent: "center",
-      pointerEvents: "none",
-    }}
+  position: "absolute",
+  left: "50%",
+  bottom: 0,
+  transform: "translateX(-50%)",
+  width: isPhone ? "min(92%, 520px)" : "min(92%, 700px)",
+  height: "92%",
+  display: "flex",
+  alignItems: "flex-end",
+  justifyContent: "center",
+  pointerEvents: "none",
+}}
   >
     <img
       src={patientDisplayImageSrc}
@@ -3674,14 +3703,14 @@ return (
 {(latestPatientMessage || doctorMonologueVisible) && (
   <div
     style={{
-      position: "absolute",
-      left: 24,
-      top: 24,
-      maxWidth: "62%",
-      display: "grid",
-      gap: 12,
-      zIndex: 6,
-    }}
+  position: "absolute",
+  left: isPhone ? 12 : 24,
+  top: isPhone ? 12 : 24,
+  maxWidth: isPhone ? "84%" : "62%",
+  display: "grid",
+  gap: isPhone ? 8 : 12,
+  zIndex: 6,
+}}
   >
     {latestPatientMessage && (
       <div
@@ -3728,11 +3757,13 @@ return (
       <div
         className="card"
         style={{
-          minHeight: 0,
-          overflow: "hidden",
-          display: "grid",
-          gridTemplateRows: "auto 1fr",
-        }}
+  minHeight: 0,
+  overflow: "hidden",
+  display: "grid",
+  gridTemplateRows: "auto 1fr",
+  order: isPhone ? 3 : undefined,
+  height: isPhone ? "30vh" : "auto",
+}}
       >
         <div
           style={{
@@ -3754,14 +3785,15 @@ return (
       <div
         className="card"
         style={{
-          gridColumn: "2 / 4",
-          minHeight: 0,
-          padding: 12,
-          display: "grid",
-          gridTemplateColumns: "1fr auto",
-          gap: 10,
-          alignItems: "stretch",
-        }}
+  gridColumn: isPhone ? "auto" : "2 / 4",
+  minHeight: 0,
+  padding: isPhone ? 10 : 12,
+  display: "grid",
+  gridTemplateColumns: isPhone ? "1fr" : "1fr auto",
+  gap: isPhone ? 8 : 10,
+  alignItems: "stretch",
+  order: isPhone ? 4 : undefined,
+}}
       >
         <textarea
           disabled={!!gameOver}
@@ -3770,10 +3802,11 @@ return (
           placeholder="問診を入力"
           rows={3}
           style={{
-            resize: "none",
-            minHeight: 90,
-            lineHeight: 1.5,
-          }}
+  width: "100%",
+  minWidth: 0,
+  padding: isPhone ? "14px 16px" : undefined,
+  fontSize: isPhone ? 18 : undefined,
+}}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -3802,7 +3835,7 @@ return (
           <div
   style={{
     display: "grid",
-    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gridTemplateColumns: modalCols3,
     gap: 10,
     maxHeight: "60vh",
     overflow: "auto",
@@ -3869,7 +3902,7 @@ return (
     <div
   style={{
     display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr 1fr",
+    gridTemplateColumns: modalCols4,
     gap: 12,
     alignItems: "start",
   }}
@@ -4221,7 +4254,7 @@ return (
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+        gridTemplateColumns: modalCols3,
         gap: 12,
         alignItems: "start",
       }}
@@ -4430,7 +4463,7 @@ return (
             <div
   style={{
     display: "grid",
-    gridTemplateColumns: "1.15fr 1fr 1fr",
+    gridTemplateColumns: modalCols3,
     gap: 12,
     alignItems: "start",
     maxHeight: "62vh",
@@ -4575,7 +4608,7 @@ return (
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                gridTemplateColumns: modalCols3,
                 gap: 12,
                 alignItems: "start",
               }}
@@ -4728,7 +4761,7 @@ return (
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                gridTemplateColumns: modalCols3,
                 gap: 10,
                 maxHeight: "60vh",
                 overflow: "auto",
@@ -4831,7 +4864,7 @@ return (
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                gridTemplateColumns: modalCols3,
                 gap: 10,
                 maxHeight: "40vh",
                 overflow: "auto",
@@ -5141,7 +5174,7 @@ return (
                     <div
   style={{
     display: "grid",
-    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gridTemplateColumns: modalCols3,
     gap: 10,
     alignItems: "start",
   }}

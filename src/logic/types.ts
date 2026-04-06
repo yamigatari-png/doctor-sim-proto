@@ -206,6 +206,8 @@ export type TestKey =
 | "TIBC"
 | "UIBC"
 | "FERRITIN"
+| "TP"
+| "ALB"
 
 // 内分泌（外注）
 | "ACTH"
