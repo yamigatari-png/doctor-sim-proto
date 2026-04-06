@@ -830,6 +830,13 @@ const [doctorMonologueVisible, setDoctorMonologueVisible] = useState(false);
   return [...messages].reverse().find((m) => m.speaker === "PATIENT") ?? null;
 }, [messages]);
 
+const [viewportWidth, setViewportWidth] = useState<number>(
+  typeof window !== "undefined" ? window.innerWidth : 1280
+);
+
+const isResultCompact = viewportWidth <= 980;
+const isResultPhone = viewportWidth <= 640;
+
 const [audioUnlocked, setAudioUnlocked] = useState(false);
 const [splashPhase, setSplashPhase] = useState<"logo" | "notice">("logo");
 const [splashLogoVisible, setSplashLogoVisible] = useState(true);
@@ -980,6 +987,8 @@ const [endingPreviewId, setEndingPreviewId] = useState<EndingId | null>(null);
 const [isEndingLibraryMode, setIsEndingLibraryMode] = useState(false);
 const [hintTargetEndingId, setHintTargetEndingId] = useState<EndingId | null>(null);
 const [hintModalOpen, setHintModalOpen] = useState(false);
+const [chartReviewText, setChartReviewText] = useState("");
+const [chartReviewPosted, setChartReviewPosted] = useState(false);
 
 // 制限用
 const [questionCount, setQuestionCount] = useState(0);
@@ -1084,6 +1093,13 @@ useEffect(() => {
     stopAllBgm();
   }
 }, [screen, audioUnlocked, playBgm, stopAllBgm, titleBgm, gameBgm, resultBgm]);
+
+useEffect(() => {
+  const onResize = () => setViewportWidth(window.innerWidth);
+  onResize();
+  window.addEventListener("resize", onResize);
+  return () => window.removeEventListener("resize", onResize);
+}, []);
 
 useEffect(() => {
   const onVisibilityChange = () => {
@@ -1353,6 +1369,51 @@ function highlightAbnormalResultText(r: TestResult): React.ReactNode {
   }, 1000);
 }
 
+function getDiagnosisShareLabel() {
+  if (selectedDiagnosis?.label) return selectedDiagnosis.label;
+  if (endingId === "honeytrap_scam") return "恋の病";
+  return "診断未入力";
+}
+
+function buildChartShareText() {
+  const endingTitle = endingId ? ENDING_TITLE_MAP[endingId] : "不明";
+  const diagnosisLabel = getDiagnosisShareLabel();
+  const memo = chartReviewText.trim();
+
+  return [
+    "【症例カルテ】",
+    `エンド：${endingTitle}`,
+    `診断：${diagnosisLabel}`,
+    `経過時間：${clockText}`,
+    memo ? `メモ：${memo}` : "",
+    "#問診シミュレーター",
+    "#この患者おかしい",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+function shareChartToX() {
+  const text = encodeURIComponent(buildChartShareText());
+  window.open(
+    `https://twitter.com/intent/tweet?text=${text}`,
+    "_blank",
+    "noopener,noreferrer"
+  );
+  setChartReviewPosted(true);
+}
+
+function shareChartToFacebook() {
+  const shareUrl = encodeURIComponent(window.location.href);
+  const quote = encodeURIComponent(buildChartShareText());
+  window.open(
+    `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}&quote=${quote}`,
+    "_blank",
+    "noopener,noreferrer"
+  );
+  setChartReviewPosted(true);
+}
+
 function triggerGameOver(reason: EndingId) {
   beginEnding(reason);
 }
@@ -1476,6 +1537,8 @@ function pushMessage(
   setDoctorMonologueVisible(false);
   setDoctorMonologueFullText("");
   setDoctorMonologueBubbleText("");
+  setChartReviewText("");
+  setChartReviewPosted(false);
 }
 
 function startGameFromTitle() {
@@ -2881,108 +2944,290 @@ return (
 }
 
   if (screen === "result" && endingId) {
-  const endingTitleMap: Record<EndingId, string> = {
-    normal_pneumonia: "エンド１：診断的中！",
-    admission_condition: "バッドエンド１：緊急入院",
-    admission_time: "バッドエンド２：時間オーバー",
-    trust_break: "バッドエンド３：失礼だな！",
-    misdiagnosis: "バッドエンド４：誤診",
-    father_truth: "エンド２：父の真実",
-    honeytrap_scam: "エンド３：恋の落とし穴",
-    soccer_end: "エンド４：先生に出会えたことが奇跡",
-  };
-
   return (
     <div
       style={{
-        width: "100vw",
-        height: "100vh",
+        minHeight: "100vh",
         backgroundImage: `url(${RESULT_BG_SRC})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        color: "#fff",
         display: "grid",
         placeItems: "center",
-        padding: 24,
+        padding: isResultPhone ? 10 : 18,
+        boxSizing: "border-box",
       }}
     >
       <div
+        className="card"
         style={{
-          width: "min(920px, 92vw)",
+          width: "min(1080px, 96vw)",
+          maxHeight: "90vh",
+          overflowY: "auto",
+          padding: isResultPhone ? 14 : isResultCompact ? 18 : 22,
           display: "grid",
-          gap: 20,
-          textAlign: "center",
-          padding: 32,
-          borderRadius: 24,
-          background: "rgba(12, 16, 24, 0.78)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.45)",
+          gap: isResultPhone ? 10 : 14,
+          background: "rgba(7,12,24,0.72)",
+          border: "1px solid rgba(255,255,255,0.10)",
+          borderRadius: isResultPhone ? 18 : 24,
+          boxShadow: "0 18px 50px rgba(0,0,0,0.28)",
+          color: "#fff",
           backdropFilter: "blur(4px)",
+          boxSizing: "border-box",
         }}
       >
-        <div style={{ fontSize: 48, fontWeight: 900, letterSpacing: "0.08em" }}>
+        <div
+          style={{
+            textAlign: "center",
+            fontSize: isResultPhone ? 34 : isResultCompact ? 44 : 54,
+            fontWeight: 1000,
+            letterSpacing: "0.08em",
+            lineHeight: 1,
+          }}
+        >
           RESULT
-        </div>
-
-        <div style={{ fontSize: 30, fontWeight: 800, lineHeight: 1.4 }}>
-          {endingTitleMap[endingId]}
         </div>
 
         <div
           style={{
             display: "grid",
-            gap: 10,
-            fontSize: 22,
-            lineHeight: 1.7,
-            opacity: 0.95,
+            gridTemplateColumns: isResultCompact ? "1fr" : "1fr 360px",
+            gap: isResultPhone ? 10 : 12,
+            alignItems: "stretch",
           }}
         >
-          <div>経過時間: {clockText}</div>
-          <div>問診数: {questionCount}</div>
-          <div>検査数: {results.length}</div>
+          <div
+            style={{
+              display: "grid",
+              gap: isResultPhone ? 8 : 10,
+              alignContent: "start",
+              justifyItems: "center",
+              textAlign: "center",
+              padding: isResultPhone ? "4px 2px" : "8px 4px",
+            }}
+          >
+            <div
+              style={{
+                fontSize: isResultPhone ? 28 : isResultCompact ? 36 : 44,
+                fontWeight: 1000,
+                lineHeight: 1.3,
+                textShadow: "0 2px 10px rgba(0,0,0,0.28)",
+                wordBreak: "keep-all",
+              }}
+            >
+              {ENDING_TITLE_MAP[endingId]}
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gap: isResultPhone ? 6 : 8,
+                fontSize: isResultPhone ? 18 : isResultCompact ? 21 : 24,
+                lineHeight: 1.7,
+                opacity: 0.96,
+              }}
+            >
+              <div>経過時間: {clockText}</div>
+              <div>問診数: {questionCount}</div>
+              <div>検査数: {results.length}</div>
+              <div>診断: {getDiagnosisShareLabel()}</div>
+            </div>
+          </div>
+
+          <div
+            className="card"
+            style={{
+              padding: isResultPhone ? 12 : 14,
+              display: "grid",
+              gap: isResultPhone ? 8 : 10,
+              width: "100%",
+              margin: "0 auto",
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.10)",
+              borderRadius: 18,
+              boxSizing: "border-box",
+            }}
+          >
+            <div
+              style={{
+                fontWeight: 900,
+                fontSize: isResultPhone ? 20 : 24,
+                textAlign: "center",
+              }}
+            >
+              状態
+            </div>
+
+            <div style={{ display: "grid", gap: isResultPhone ? 8 : 10 }}>
+              {PARAMETER_LABELS.map((item) => (
+                <StatBar
+                  key={item.key}
+                  label={item.label}
+                  value={stats[item.key]}
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
         <div
           className="card"
           style={{
-            padding: 14,
+            padding: isResultPhone ? 12 : 16,
             display: "grid",
-            gap: 10,
-            width: "min(420px, 90%)",
-            margin: "0 auto",
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 16,
+            gap: isResultPhone ? 10 : 14,
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.10)",
+            borderRadius: 18,
+            boxSizing: "border-box",
           }}
         >
-          <div style={{ fontWeight: 800, fontSize: 22 }}>状態</div>
+          <div style={{ display: "grid", gap: 6 }}>
+            <div
+              style={{
+                fontSize: isResultPhone ? 22 : 28,
+                fontWeight: 1000,
+                letterSpacing: "0.04em",
+              }}
+            >
+              症例カルテ
+            </div>
 
-          <div style={{ display: "grid", gap: 10 }}>
-            {PARAMETER_LABELS.map((item) => (
-              <StatBar
-                key={item.key}
-                label={item.label}
-                value={stats[item.key]}
-              />
-            ))}
+            <div
+              style={{
+                fontSize: isResultPhone ? 14 : 18,
+                lineHeight: 1.8,
+                opacity: 0.9,
+                whiteSpace: isResultPhone ? "normal" : "pre-wrap",
+              }}
+            >
+              <div
+  style={{
+    display: "flex",
+    flexWrap: "wrap",
+    gap: isResultPhone ? 8 : 12,
+    fontSize: isResultPhone ? 14 : 18,
+    lineHeight: 1.6,
+    opacity: 0.9,
+  }}
+>
+  <span>・違和感があった会話</span>
+  <span>    ・もっと聞きたかったこと</span>
+  <span>    ・この患者ヤバいと思った瞬間</span>
+</div>
+            </div>
+          </div>
+
+          <textarea
+            value={chartReviewText}
+            onChange={(e) => setChartReviewText(e.target.value.slice(0, 180))}
+            placeholder="例：〇〇について質問したが、関係ないことについて返答をした。"
+            style={{
+              width: "100%",
+              minHeight: isResultPhone ? 96 : 120,
+              resize: "vertical",
+              borderRadius: 16,
+              border: "1px solid rgba(255,255,255,0.18)",
+              background: "rgba(0,0,0,0.22)",
+              color: "#fff",
+              padding: isResultPhone ? "12px 14px" : "16px 18px",
+              fontSize: isResultPhone ? 16 : 20,
+              lineHeight: 1.6,
+              boxSizing: "border-box",
+              outline: "none",
+            }}
+          />
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: isResultPhone ? "1fr" : "1fr auto",
+              gap: isResultPhone ? 10 : 12,
+              alignItems: isResultPhone ? "stretch" : "center",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 15,
+                opacity: 0.76,
+                textAlign: isResultPhone ? "left" : "left",
+              }}
+            >
+              {chartReviewText.length} / 180
+              {chartReviewPosted ? "　投稿済み" : ""}
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: isResultPhone ? "1fr" : "repeat(2, auto)",
+                gap: 10,
+                justifyContent: isResultPhone ? "stretch" : "end",
+              }}
+            >
+              <button
+                onClick={() => {
+                  playSe(buttonSe);
+                  shareChartToX();
+                }}
+                style={{
+                  minWidth: isResultPhone ? "100%" : 170,
+                  padding: isResultPhone ? "12px 14px" : "14px 18px",
+                  borderRadius: 14,
+                  border: "1px solid rgba(255,255,255,0.14)",
+                  background: "#111",
+                  color: "#fff",
+                  cursor: "pointer",
+                  fontWeight: 900,
+                  fontSize: isResultPhone ? 16 : 18,
+                }}
+              >
+                Xで共有
+              </button>
+
+              <button
+                onClick={() => {
+                  playSe(buttonSe);
+                  shareChartToFacebook();
+                }}
+                style={{
+                  minWidth: isResultPhone ? "100%" : 210,
+                  padding: isResultPhone ? "12px 14px" : "14px 18px",
+                  borderRadius: 14,
+                  border: "1px solid rgba(255,255,255,0.14)",
+                  background: "#4267B2",
+                  color: "#fff",
+                  cursor: "pointer",
+                  fontWeight: 900,
+                  fontSize: isResultPhone ? 16 : 18,
+                }}
+              >
+                Facebookで共有
+              </button>
+            </div>
           </div>
         </div>
 
         <button
-          onClick={resetToTitle}
+          onClick={() => {
+            playSe(buttonSe);
+            resetToTitle();
+          }}
           style={{
-            marginTop: 12,
+            marginTop: 2,
             justifySelf: "center",
-            minWidth: 260,
-            padding: "16px 24px",
+            width: isResultPhone ? "100%" : "auto",
+            minWidth: isResultPhone ? 0 : 280,
+            maxWidth: isResultPhone ? "100%" : "none",
+            padding: isResultPhone ? "14px 18px" : "16px 24px",
             borderRadius: 14,
             border: "1px solid rgba(255,255,255,0.18)",
             background: "rgba(43,50,66,0.92)",
             color: "#fff",
             cursor: "pointer",
-            fontWeight: 800,
-            fontSize: 22,
+            fontWeight: 900,
+            fontSize: isResultPhone ? 20 : 24,
+            boxSizing: "border-box",
           }}
         >
           タイトルへ戻る
