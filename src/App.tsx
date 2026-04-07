@@ -1011,6 +1011,44 @@ const [hintModalOpen, setHintModalOpen] = useState(false);
 const [chartReviewText, setChartReviewText] = useState("");
 const [chartReviewPosted, setChartReviewPosted] = useState(false);
 
+const PORTAL_URL = "https://doctor-portal.pages.dev/";
+
+type ResultFeedback = "interesting" | "difficult" | "confusing" | null;
+type DevLogAction =
+  | "start"
+  | "chat"
+  | "body_exam"
+  | "open_order_modal"
+  | "submit_order"
+  | "run_test"
+  | "open_diagnosis"
+  | "confirm_diagnosis"
+  | "ending"
+  | "result"
+  | "title_return";
+
+type DevPlayLog = {
+  sessionId: string;
+  startedAt: number;
+  endedAt?: number;
+  durationSec?: number;
+  endingId?: EndingId | null;
+  diagnosisLabel?: string;
+  questionCount: number;
+  testsCount: number;
+  hasAnyExam: boolean;
+  hasAnyTest: boolean;
+  chartReviewLength: number;
+  chartReviewPosted: boolean;
+  feedback: ResultFeedback;
+  lastAction: DevLogAction;
+  dropPoint?: string;
+};
+
+const [sessionId, setSessionId] = useState<string>(() => uid());
+const [resultFeedback, setResultFeedback] = useState<ResultFeedback>(null);
+const [lastAction, setLastAction] = useState<DevLogAction>("start");
+
 // 制限用
 const [questionCount, setQuestionCount] = useState(0);
 const [hasAnyExam, setHasAnyExam] = useState(false);
@@ -1091,6 +1129,19 @@ useEffect(() => {
   });
 };
 }, [bgmList, seList]);
+
+useEffect(() => {
+  if (screen !== "result") return;
+
+  setLastAction("result");
+  saveDevLog({
+    endedAt: Date.now(),
+    durationSec: seconds,
+    endingId,
+    diagnosisLabel: getDiagnosisShareLabel(),
+    lastAction: "result",
+  });
+}, [screen]);
 
 useEffect(() => {
   if (!audioUnlocked) return;
@@ -1384,10 +1435,86 @@ function highlightAbnormalResultText(r: TestResult): React.ReactNode {
   setEndingId(reason);
   setIsBlackout(true);
 
+    saveDevLog({
+    endingId: reason,
+    endedAt: Date.now(),
+    durationSec: seconds,
+    diagnosisLabel: getDiagnosisShareLabel(),
+    dropPoint: reason,
+    lastAction: "ending",
+  });
+
   window.setTimeout(() => {
     setIsBlackout(false);
     setScreen("ending");
   }, 1000);
+}
+
+function getDevLogs(): DevPlayLog[] {
+  try {
+    const raw = localStorage.getItem("sim_dev_logs");
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveDevLog(partial: Partial<DevPlayLog>) {
+  const logs = getDevLogs();
+
+  const currentBase: DevPlayLog = {
+    sessionId,
+    startedAt: Date.now(),
+    questionCount,
+    testsCount: results.length,
+    hasAnyExam,
+    hasAnyTest,
+    chartReviewLength: chartReviewText.trim().length,
+    chartReviewPosted,
+    feedback: resultFeedback,
+    lastAction,
+  };
+
+  const nextLog: DevPlayLog = {
+    ...currentBase,
+    ...partial,
+    sessionId,
+    questionCount,
+    testsCount: results.length,
+    hasAnyExam,
+    hasAnyTest,
+    chartReviewLength: chartReviewText.trim().length,
+    chartReviewPosted,
+    feedback: resultFeedback,
+    lastAction: partial.lastAction ?? lastAction,
+  };
+
+  const idx = logs.findIndex((x) => x.sessionId === sessionId);
+  if (idx >= 0) {
+    logs[idx] = {
+      ...logs[idx],
+      ...nextLog,
+    };
+  } else {
+    logs.push(nextLog);
+  }
+
+  localStorage.setItem("sim_dev_logs", JSON.stringify(logs.slice(-200)));
+}
+
+function getFeedbackLabel(value: ResultFeedback) {
+  switch (value) {
+    case "interesting":
+      return "面白かった";
+    case "difficult":
+      return "難しかった";
+    case "confusing":
+      return "よく分からなかった";
+    default:
+      return "未評価";
+  }
 }
 
 function getDiagnosisShareLabel() {
@@ -1402,11 +1529,12 @@ function buildChartShareText() {
   const memo = chartReviewText.trim();
 
   return [
-    "【症例カルテ】",
+    "【症例考察ノート】",
     `エンド：${endingTitle}`,
     `診断：${diagnosisLabel}`,
     `経過時間：${clockText}`,
-    memo ? `メモ：${memo}` : "",
+    memo ? `診療メモ：${memo}` : "",
+    resultFeedback ? `評価：${getFeedbackLabel(resultFeedback)}` : "",
     "#問診シミュレーター",
     "#この患者おかしい",
   ]
@@ -1416,23 +1544,30 @@ function buildChartShareText() {
 
 function shareChartToX() {
   const text = encodeURIComponent(buildChartShareText());
+  const url = encodeURIComponent(PORTAL_URL);
+
   window.open(
-    `https://twitter.com/intent/tweet?text=${text}`,
+    `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
     "_blank",
     "noopener,noreferrer"
   );
+
   setChartReviewPosted(true);
+  saveDevLog({ chartReviewPosted: true, lastAction: "result" });
 }
 
 function shareChartToFacebook() {
-  const shareUrl = encodeURIComponent(window.location.href);
+  const shareUrl = encodeURIComponent(PORTAL_URL);
   const quote = encodeURIComponent(buildChartShareText());
+
   window.open(
     `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}&quote=${quote}`,
     "_blank",
     "noopener,noreferrer"
   );
+
   setChartReviewPosted(true);
+  saveDevLog({ chartReviewPosted: true, lastAction: "result" });
 }
 
 function triggerGameOver(reason: EndingId) {
@@ -1494,6 +1629,10 @@ function pushMessage(
 
   setMessages((prev) => [...prev, message]);
 
+    if (speaker === "DOCTOR") {
+    setLastAction("chat");
+  }
+
   if (speaker === "PATIENT") {
     setDoctorMonologueVisible(false);
     setDoctorMonologueFullText("");
@@ -1504,6 +1643,15 @@ function pushMessage(
 
   function resetToTitle() {
   playSe(buttonSe);
+
+    saveDevLog({
+    endedAt: Date.now(),
+    durationSec: seconds,
+    endingId,
+    diagnosisLabel: getDiagnosisShareLabel(),
+    dropPoint: screen === "result" ? "result_return" : "manual_return",
+    lastAction: "title_return",
+  });
 
   setStats({ ...cp.initialStats });
   setFlags({ ...cp.initialFlags });
@@ -1560,6 +1708,11 @@ function pushMessage(
   setDoctorMonologueBubbleText("");
   setChartReviewText("");
   setChartReviewPosted(false);
+  setChartReviewText("");
+  setChartReviewPosted(false);
+  setResultFeedback(null);
+  setLastAction("start");
+  setSessionId(uid());
 }
 
 function startGameFromTitle() {
@@ -1712,6 +1865,9 @@ function addDraftToPendingOrders() {
   const merged = mergeUniqueTestKeys(nextPending, draftOrderKeys);
   setPendingOrderKeys(merged);
 
+  setLastAction("submit_order");
+  saveDevLog({ lastAction: "submit_order" });
+
   setOrderModalOpen(false);
   setOrderCategory(null);
   setDraftOrderKeys([]);
@@ -1736,6 +1892,9 @@ function submitOrders(keys: TestKey[]) {
   setHasAnyTest(true);
   if (gameOver) return;
   if (keys.length === 0) return;
+
+  setLastAction("run_test");
+  saveDevLog({ lastAction: "run_test" });
 
   startTimerIfNeeded();
 
@@ -1834,6 +1993,7 @@ function openDiagnosisModal() {
   setDiagnosisCandidates([...ICD_MASTER].sort((a, b) => compareIcdCode(a.code, b.code)));
   setSelectedDiagnosis(null);
   setDiagnosisModalOpen(true);
+  setLastAction("open_diagnosis");
 }
 
 function queuePatientEndingLines(lines: string[], onDone: () => void) {
@@ -1937,6 +2097,12 @@ evaluateEndConditions(nextStats, seconds);
 
 function confirmDiagnosis() {
   if (!selectedDiagnosis) return;
+
+  setLastAction("confirm_diagnosis");
+saveDevLog({
+  diagnosisLabel: selectedDiagnosis?.label ?? getDiagnosisShareLabel(),
+  lastAction: "confirm_diagnosis",
+});
 
   const insufficient =
     questionCount <= 2 &&
@@ -2975,22 +3141,22 @@ return (
         backgroundRepeat: "no-repeat",
         display: "grid",
         placeItems: "center",
-        padding: isResultPhone ? 10 : 18,
+        padding: isResultPhone ? 8 : 14,
         boxSizing: "border-box",
       }}
     >
       <div
         className="card"
         style={{
-          width: "min(1080px, 96vw)",
-          maxHeight: "90vh",
+          width: "min(1100px, 96vw)",
+          maxHeight: "94vh",
           overflowY: "auto",
-          padding: isResultPhone ? 14 : isResultCompact ? 18 : 22,
+          padding: isResultPhone ? 12 : isResultCompact ? 16 : 18,
           display: "grid",
-          gap: isResultPhone ? 10 : 14,
-          background: "rgba(7,12,24,0.72)",
+          gap: isResultPhone ? 10 : 12,
+          background: "rgba(7,12,24,0.74)",
           border: "1px solid rgba(255,255,255,0.10)",
-          borderRadius: isResultPhone ? 18 : 24,
+          borderRadius: isResultPhone ? 16 : 22,
           boxShadow: "0 18px 50px rgba(0,0,0,0.28)",
           color: "#fff",
           backdropFilter: "blur(4px)",
@@ -3000,7 +3166,7 @@ return (
         <div
           style={{
             textAlign: "center",
-            fontSize: isResultPhone ? 34 : isResultCompact ? 44 : 54,
+            fontSize: isResultPhone ? 28 : isResultCompact ? 38 : 46,
             fontWeight: 1000,
             letterSpacing: "0.08em",
             lineHeight: 1,
@@ -3012,7 +3178,7 @@ return (
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: isResultCompact ? "1fr" : "1fr 360px",
+            gridTemplateColumns: isResultCompact ? "1fr" : "1fr 320px",
             gap: isResultPhone ? 10 : 12,
             alignItems: "stretch",
           }}
@@ -3020,20 +3186,21 @@ return (
           <div
             style={{
               display: "grid",
-              gap: isResultPhone ? 8 : 10,
+              gap: isResultPhone ? 6 : 8,
               alignContent: "start",
               justifyItems: "center",
               textAlign: "center",
-              padding: isResultPhone ? "4px 2px" : "8px 4px",
+              padding: isResultPhone ? "2px" : "4px",
+              minWidth: 0,
             }}
           >
             <div
               style={{
-                fontSize: isResultPhone ? 28 : isResultCompact ? 36 : 44,
+                fontSize: isResultPhone ? 24 : isResultCompact ? 32 : 38,
                 fontWeight: 1000,
                 lineHeight: 1.3,
                 textShadow: "0 2px 10px rgba(0,0,0,0.28)",
-                wordBreak: "keep-all",
+                whiteSpace: isResultPhone ? "normal" : "nowrap",
               }}
             >
               {ENDING_TITLE_MAP[endingId]}
@@ -3042,9 +3209,9 @@ return (
             <div
               style={{
                 display: "grid",
-                gap: isResultPhone ? 6 : 8,
-                fontSize: isResultPhone ? 18 : isResultCompact ? 21 : 24,
-                lineHeight: 1.7,
+                gap: isResultPhone ? 4 : 6,
+                fontSize: isResultPhone ? 16 : isResultCompact ? 18 : 20,
+                lineHeight: 1.55,
                 opacity: 0.96,
               }}
             >
@@ -3058,28 +3225,29 @@ return (
           <div
             className="card"
             style={{
-              padding: isResultPhone ? 12 : 14,
+              padding: isResultPhone ? 10 : 12,
               display: "grid",
-              gap: isResultPhone ? 8 : 10,
+              gap: isResultPhone ? 6 : 8,
               width: "100%",
               margin: "0 auto",
               background: "rgba(255,255,255,0.05)",
               border: "1px solid rgba(255,255,255,0.10)",
-              borderRadius: 18,
+              borderRadius: 16,
               boxSizing: "border-box",
+              minWidth: 0,
             }}
           >
             <div
               style={{
                 fontWeight: 900,
-                fontSize: isResultPhone ? 20 : 24,
+                fontSize: isResultPhone ? 18 : 22,
                 textAlign: "center",
               }}
             >
               状態
             </div>
 
-            <div style={{ display: "grid", gap: isResultPhone ? 8 : 10 }}>
+            <div style={{ display: "grid", gap: isResultPhone ? 6 : 8 }}>
               {PARAMETER_LABELS.map((item) => (
                 <StatBar
                   key={item.key}
@@ -3094,19 +3262,20 @@ return (
         <div
           className="card"
           style={{
-            padding: isResultPhone ? 12 : 16,
+            padding: isResultPhone ? 12 : 14,
             display: "grid",
-            gap: isResultPhone ? 10 : 14,
+            gap: isResultPhone ? 10 : 12,
             background: "rgba(255,255,255,0.05)",
             border: "1px solid rgba(255,255,255,0.10)",
-            borderRadius: 18,
+            borderRadius: 16,
             boxSizing: "border-box",
+            minWidth: 0,
           }}
         >
           <div style={{ display: "grid", gap: 6 }}>
             <div
               style={{
-                fontSize: isResultPhone ? 22 : 28,
+                fontSize: isResultPhone ? 20 : 24,
                 fontWeight: 1000,
                 letterSpacing: "0.04em",
               }}
@@ -3116,145 +3285,261 @@ return (
 
             <div
               style={{
-                fontSize: isResultPhone ? 14 : 18,
-                lineHeight: 1.8,
+                display: "flex",
+                flexWrap: "wrap",
+                gap: isResultPhone ? 8 : 12,
+                fontSize: isResultPhone ? 13 : 15,
+                lineHeight: 1.6,
                 opacity: 0.9,
-                whiteSpace: isResultPhone ? "normal" : "pre-wrap",
               }}
             >
-              <div
-  style={{
-    display: "flex",
-    flexWrap: "wrap",
-    gap: isResultPhone ? 8 : 12,
-    fontSize: isResultPhone ? 14 : 18,
-    lineHeight: 1.6,
-    opacity: 0.9,
-  }}
->
-  <span>・違和感があった会話</span>
-  <span>    ・もっと聞きたかったこと</span>
-  <span>    ・この患者ヤバいと思った瞬間</span>
-</div>
+              <span>・見逃したかもしれないポイント</span>
+              <span>・判断が難しかった場面</span>
+              <span>・追加で知りたかった情報</span>
             </div>
           </div>
 
           <textarea
             value={chartReviewText}
             onChange={(e) => setChartReviewText(e.target.value.slice(0, 180))}
-            placeholder="例：〇〇について質問したが、関係ないことについて返答をした。"
+            placeholder="例：発症時期をもう少し詳しく聞くべきだった。咳と痰の経過を時系列で確認したかった。"
             style={{
               width: "100%",
-              minHeight: isResultPhone ? 96 : 120,
-              resize: "vertical",
-              borderRadius: 16,
+              minHeight: isResultPhone ? 82 : 96,
+              resize: "none",
+              borderRadius: 14,
               border: "1px solid rgba(255,255,255,0.18)",
               background: "rgba(0,0,0,0.22)",
               color: "#fff",
-              padding: isResultPhone ? "12px 14px" : "16px 18px",
-              fontSize: isResultPhone ? 16 : 20,
-              lineHeight: 1.6,
+              padding: isResultPhone ? "10px 12px" : "12px 14px",
+              fontSize: isResultPhone ? 15 : 17,
+              lineHeight: 1.55,
               boxSizing: "border-box",
               outline: "none",
             }}
           />
 
           <div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 12,
+    fontSize: isResultPhone ? 12 : 15,
+    lineHeight: 1.7,
+    opacity: 0.76,
+    minWidth: 0,
+  }}
+>
+  <div style={{ minWidth: 0 }}>
+    この症例は、プレイヤーの考察や記録の積み重ねによって少しずつ理解が深まっていきます。
+    {chartReviewPosted ? "　投稿済み" : ""}
+  </div>
+
+  <div
+    style={{
+      whiteSpace: "nowrap",
+      flexShrink: 0,
+    }}
+  >
+    （{chartReviewText.length} / 180）
+  </div>
+</div>
+
+         <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: isResultCompact ? "1fr" : "1.7fr 0.8fr 0.8fr",
+    gap: 10,
+    alignItems: "center",
+  }}
+>
+  <div
+    style={{
+      display: "grid",
+      gap: 8,
+      padding: isResultPhone ? "10px" : "12px",
+      borderRadius: 14,
+      background: "rgba(255,255,255,0.04)",
+      border: "1px solid rgba(255,255,255,0.08)",
+      minWidth: 0,
+    }}
+  >
+    <div
+      style={{
+        fontSize: isResultPhone ? 15 : 16,
+        fontWeight: 900,
+        whiteSpace: "nowrap",
+      }}
+    >
+      この症例どうだった？
+    </div>
+
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+        gap: 8,
+      }}
+    >
+      {[
+        { key: "interesting", label: "👍 面白かった" },
+        { key: "difficult", label: "🤔 難しかった" },
+        { key: "confusing", label: "😵 よく分からない" },
+      ].map((item) => {
+        const active = resultFeedback === item.key;
+        return (
+          <button
+            key={item.key}
+            onClick={() => {
+              playSe(buttonSe);
+              setResultFeedback(item.key as ResultFeedback);
+              saveDevLog({
+                feedback: item.key as ResultFeedback,
+                lastAction: "result",
+              });
+            }}
             style={{
-              display: "grid",
-              gridTemplateColumns: isResultPhone ? "1fr" : "1fr auto",
-              gap: isResultPhone ? 10 : 12,
-              alignItems: isResultPhone ? "stretch" : "center",
+              width: "100%",
+              padding: isResultPhone ? "8px 8px" : "9px 10px",
+              borderRadius: 999,
+              border: active
+                ? "1px solid rgba(96,165,250,0.9)"
+                : "1px solid rgba(255,255,255,0.14)",
+              background: active
+                ? "rgba(59,130,246,0.22)"
+                : "rgba(255,255,255,0.06)",
+              color: "#fff",
+              fontWeight: 800,
+              fontSize: isResultPhone ? 12 : 13,
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
             }}
           >
-            <div
-              style={{
-                fontSize: 15,
-                opacity: 0.76,
-                textAlign: isResultPhone ? "left" : "left",
-              }}
-            >
-              {chartReviewText.length} / 180
-              {chartReviewPosted ? "　投稿済み" : ""}
-            </div>
+            {item.label}
+          </button>
+        );
+      })}
+    </div>
+  </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: isResultPhone ? "1fr" : "repeat(2, auto)",
-                gap: 10,
-                justifyContent: isResultPhone ? "stretch" : "end",
-              }}
-            >
-              <button
-                onClick={() => {
-                  playSe(buttonSe);
-                  shareChartToX();
-                }}
-                style={{
-                  minWidth: isResultPhone ? "100%" : 170,
-                  padding: isResultPhone ? "12px 14px" : "14px 18px",
-                  borderRadius: 14,
-                  border: "1px solid rgba(255,255,255,0.14)",
-                  background: "#111",
-                  color: "#fff",
-                  cursor: "pointer",
-                  fontWeight: 900,
-                  fontSize: isResultPhone ? 16 : 18,
-                }}
-              >
-                Xで共有
-              </button>
+  <button
+    onClick={() => {
+      playSe(buttonSe);
+      shareChartToX();
+    }}
+    style={{
+      width: "100%",
+      height: isResultPhone ? 48 : 50,
+      padding: "0 10px",
+      borderRadius: 12,
+      border: "1px solid rgba(255,255,255,0.14)",
+      background: "#111",
+      color: "#fff",
+      cursor: "pointer",
+      fontWeight: 900,
+      fontSize: isResultPhone ? 14 : 15,
+      whiteSpace: "nowrap",
+    }}
+  >
+    Xで共有
+  </button>
 
-              <button
-                onClick={() => {
-                  playSe(buttonSe);
-                  shareChartToFacebook();
-                }}
-                style={{
-                  minWidth: isResultPhone ? "100%" : 210,
-                  padding: isResultPhone ? "12px 14px" : "14px 18px",
-                  borderRadius: 14,
-                  border: "1px solid rgba(255,255,255,0.14)",
-                  background: "#4267B2",
-                  color: "#fff",
-                  cursor: "pointer",
-                  fontWeight: 900,
-                  fontSize: isResultPhone ? 16 : 18,
-                }}
-              >
-                Facebookで共有
-              </button>
-            </div>
+  <button
+    onClick={() => {
+      playSe(buttonSe);
+      shareChartToFacebook();
+    }}
+    style={{
+      width: "100%",
+      height: isResultPhone ? 48 : 50,
+      padding: "0 10px",
+      borderRadius: 12,
+      border: "1px solid rgba(255,255,255,0.14)",
+      background: "#4267B2",
+      color: "#fff",
+      cursor: "pointer",
+      fontWeight: 900,
+      fontSize: isResultPhone ? 14 : 15,
+      whiteSpace: "nowrap",
+    }}
+  >
+    Facebookで共有
+  </button>
+</div>
+</div>
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: isResultCompact ? "1fr" : "1fr auto auto",
+    gap: 12,
+    alignItems: "center",
+    padding: isResultPhone ? "12px 4px 0" : "14px 4px 0",
+    minWidth: 0,
+  }}
+>
+  <div
+    style={{
+      fontSize: isResultPhone ? 14 : 18,
+      lineHeight: 1.6,
+      opacity: 0.92,
+      minWidth: 0,
+      textAlign: "right",
+      justifySelf: "end",
+    }}
+  >
+    医療知識を使って戦うカードゲーム『レギュレア』も公開中
+  </div>
+
+  <button
+    onClick={() => {
+      playSe(buttonSe);
+      window.open(PORTAL_URL, "_blank", "noopener,noreferrer");
+      saveDevLog({ lastAction: "result" });
+    }}
+    style={{
+      padding: isResultPhone ? "10px 18px" : "11px 22px",
+      borderRadius: 12,
+      border: "1px solid rgba(96,165,250,0.36)",
+      background:
+        "linear-gradient(135deg, rgba(37,99,235,0.92), rgba(29,78,216,0.92))",
+      color: "#fff",
+      fontWeight: 900,
+      fontSize: isResultPhone ? 14 : 15,
+      cursor: "pointer",
+      whiteSpace: "nowrap",
+      minWidth: isResultPhone ? 108 : 160,
+    }}
+  >
+    作品一覧
+  </button>
+
+  <button
+    onClick={() => {
+      playSe(buttonSe);
+      resetToTitle();
+    }}
+    style={{
+      padding: isResultPhone ? "10px 18px" : "11px 22px",
+      borderRadius: 12,
+      border: "1px solid rgba(255,255,255,0.18)",
+      background: "rgba(43,50,66,0.92)",
+      color: "#fff",
+      cursor: "pointer",
+      fontWeight: 900,
+      fontSize: isResultPhone ? 14 : 15,
+      whiteSpace: "nowrap",
+      minWidth: isResultPhone ? 108 : 160,
+    }}
+  >
+    タイトルへ
+  </button>
+</div>
           </div>
         </div>
 
-        <button
-          onClick={() => {
-            playSe(buttonSe);
-            resetToTitle();
-          }}
-          style={{
-            marginTop: 2,
-            justifySelf: "center",
-            width: isResultPhone ? "100%" : "auto",
-            minWidth: isResultPhone ? 0 : 280,
-            maxWidth: isResultPhone ? "100%" : "none",
-            padding: isResultPhone ? "14px 18px" : "16px 24px",
-            borderRadius: 14,
-            border: "1px solid rgba(255,255,255,0.18)",
-            background: "rgba(43,50,66,0.92)",
-            color: "#fff",
-            cursor: "pointer",
-            fontWeight: 900,
-            fontSize: isResultPhone ? 20 : 24,
-            boxSizing: "border-box",
-          }}
-        >
-          タイトルへ戻る
-        </button>
-      </div>
-    </div>
   );
 }
 
@@ -3341,6 +3626,7 @@ return (
     if (selectedCategory === "physical") {
       setSelectedCategory(null);
       setExamMode(null);
+      setLastAction("body_exam");
       setExamSide("front");
     } else {
       setSelectedCategory("physical");
@@ -3864,6 +4150,7 @@ return (
       playSe(buttonSe);
       addDraftToPendingOrders();
       setOrderModalOpen(false);
+      setLastAction("open_order_modal");
       setOrderCategory(null);
       setDraftOrderKeys([]);
       setOtherLabGroup(null);

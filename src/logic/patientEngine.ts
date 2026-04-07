@@ -705,23 +705,23 @@ export function patientReplyEngine(input: EngineInput): EngineOutput {
     const greeting = isGreeting(normalized);
 
   if (greeting) {
-    stats = {
-      ...stats,
-      validation: Math.min(100, stats.validation + 3),
-      defense: Math.max(0, stats.defense - 2),
-    };
+  stats = {
+    ...stats,
+    validation: Math.min(100, stats.validation + 3),
+    defense: Math.max(0, stats.defense - 2),
+  };
 
-    return replyWith(
-      pickOne([
-        "はじめまして。今日はよろしくお願いします。ちょっとしんどいですけど、答えられることは答えます。",
-        "こんにちは。よろしくお願いします。今日は熱と咳があって来ました。",
-        "どうも。よろしくお願いします。正直ちょっとしんどいです。",
-      ]),
-      stats,
-      withTopic(flags, "generic_sick", "挨拶に応答して診察へ入る"),
-      internalEvents
-    );
-  }
+  return replyWith(
+    pickOne([
+      "こんにちは。今日は熱と咳があって来ました。",
+      "よろしくお願いします。ここ数日、熱と咳があってしんどいです。",
+      "こんにちは。熱と咳が続いていて、ちょっとつらいです。",
+    ]),
+    stats,
+    withTopic(flags, "chief_complaint", "熱と咳が主訴"),
+    internalEvents
+  );
+}
 
 // 暴言は最優先で処理する
 if ((aggressive || rudeTalk) && !medicalWorstContext) {
