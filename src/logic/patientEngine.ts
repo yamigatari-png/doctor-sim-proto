@@ -243,7 +243,14 @@ const AGGRESSIVE_WORDS = [
   "折るぞ",
   "目潰す",
   "ちぎるぞ",
+  "つまんない",
+  "つまらない",
+  "つまらん",
+  "つまんね",
+  "つまんねー",
+  "おもしろくない",
 ];
+
 function detectAggression(normalized: string): boolean {
   // 暴言そのものではなく、「バカだと思う行動を教えて」系の質問は除外
   if (
@@ -462,6 +469,8 @@ function isYesNoQuestion(normalized: string): boolean {
     "はいる",
     "問題ない",
     "大丈夫",
+    "元気？",
+    "元気?",
   ]);
 }
 
@@ -745,6 +754,17 @@ const specificConditionAsk =
     "体調",
   ]);
 
+  const apologyTalk = includesAny(normalized, [
+  "すいません",
+  "すみません",
+  "すみませんでした",
+  "ごめん",
+  "ごめんなさい",
+  "申し訳ない",
+  "申し訳ありません",
+  "失礼しました",
+]);
+
   const greeting = isGreeting(normalized);
 
   if (genkiChallenge) {
@@ -763,6 +783,26 @@ const specificConditionAsk =
     "あー…",
     stats,
     withTopic(flags, "funny_story", "元気ルート失敗"),
+    internalEvents
+  );
+}
+
+if (apologyTalk) {
+  stats = {
+    ...stats,
+    validation: Math.min(100, stats.validation + 3),
+    defense: Math.max(0, stats.defense - 2),
+  };
+
+  return replyWith(
+    pickOne([
+      "いいっすよ。",
+      "全然気にしてないっす。",
+      "大丈夫っすよ。",
+      "気にしなくていいっす。",
+    ]),
+    stats,
+    withTopic(flags, "generic_sick", "謝罪を受け流す"),
     internalEvents
   );
 }
@@ -839,9 +879,9 @@ if ((aggressive || rudeTalk) && !medicalWorstContext) {
 
   return replyWith(
     pickOne([
-      "そういう言い方はやめてください。症状や体調のことを中心に聞いてもらえると助かります。",
-      "きつい言い方はやめてください。今日は体調の話を優先したいです。",
-      "そういう言い方をされると答えづらいです。診察に必要なことを聞いてください。",
+      "そういう言い方はやめてください。",
+      "きつい言い方はやめてください。",
+      "そういう言い方をされると答えづらいです。",
     ]),
     stats,
     withTopic(flags, "generic_sick", "暴言に対して診察に戻す"),
@@ -1073,6 +1113,16 @@ const toiletEmbarrassingAsk = includesAny(normalized, [
   "しょんべん漏らしたことある",
 ]);
 
+const whatVideoAsk = includesAny(normalized, [
+  "どんな動画",
+  "どんな動画見る",
+  "何見る",
+  "何の動画見る",
+  "普段何見る",
+  "youtube何見る",
+  "youtube何見てる",
+]);
+
 const concreteExampleAsk =
   lastPatientTopic !== "" &&
   includesAny(normalized, [
@@ -1127,6 +1177,18 @@ const funnyThingAsk = includesAny(normalized, [
   "おもしろいこと言って",
   "なんか面白い話して",
   "笑える話して",
+]);
+
+const inokiTsukkomi = includesAny(normalized, [
+  "猪木じゃん",
+  "猪木だろ",
+  "アントニオ猪木",
+]);
+
+const proWrestlingAsk = includesAny(normalized, [
+  "プロレス好き",
+  "プロレス見る",
+  "プロレス好きですか",
 ]);
 
 const funnyStoryContinueAsk =
@@ -1198,11 +1260,12 @@ const recentHappyAsk = includesAny(normalized, [
 const shrineWhereFollowUp =
   lastPatientTopic === "travel_okinawa" &&
   includesAny(normalized, [
-    "どこ",
     "神社の名前",
-    "どこでした",
-    "ここでは",
-    "それって",
+    "どこの神社",
+    "神社はどこ",
+    "神社どこ",
+    "神社の場所",
+    "その神社",
   ]);
 
 const fortuneAsk = includesAny(normalized, [
@@ -1770,6 +1833,19 @@ if (toiletEmbarrassingAsk) {
         internalEvents
       );
   }
+}
+
+if (whatVideoAsk) {
+  return replyWith(
+    pickOne([
+      "サッカーのハイライトとかスーパープレー集はよく見ますね。",
+      "切り抜きとか短い動画が多いっすね。",
+      "プレミア関連とか、配信者の面白いシーンの切り抜きとか見ます。",
+    ]),
+    stats,
+    withTopic(flags, "tv_youtube", "YouTube視聴内容"),
+    internalEvents
+  );
 }
 
   const repeatSameTopic =
@@ -3698,6 +3774,24 @@ if (acknowledgement && lastPatientTopic) {
     }
   }
 
+  if (inokiTsukkomi) {
+  return replyWith(
+    "ボンバイエ！",
+    stats,
+    withTopic(flags, "funny_story", "猪木ネタ"),
+    internalEvents
+  );
+}
+
+if (proWrestlingAsk) {
+  return replyWith(
+    "全然見た事ないっす。",
+    stats,
+    withTopic(flags, "funny_story", "プロレスは知らない"),
+    internalEvents
+  );
+}
+
 if (smallTalk && !deepSmallTalk) {
   stats = {
     ...stats,
@@ -4219,7 +4313,7 @@ if (recentHappyAsk) {
 
 if (shrineWhereFollowUp) {
   return replyWith(
-    "神社の名前ですか？すみません、そこはあんまり覚えてないです。先",
+    "神社の名前ですか？すみません、そこはあんまり覚えてないです。",
     stats,
     withTopic(flags, "travel_okinawa", "神社名は曖昧にごまかす"),
     internalEvents
@@ -4934,6 +5028,17 @@ const travelSeaAsk =
     "海入る",
     "シュノーケリング好き",
     "マリンスポーツ",
+  ]);
+
+  const travelSeaWhereAsk =
+  lastPatientTopic === "travel_okinawa" &&
+  includesAny(normalized, [
+    "どこの海",
+    "海はどこ",
+    "どこの海が好き",
+    "どこの海がよかった",
+    "海ってどこ",
+    "どの海",
   ]);
 
 const travelAgainAsk =
@@ -8763,11 +8868,15 @@ if (travelBestPartAsk) {
   );
 }
 
-if (travelSeaAsk) {
+if (travelSeaWhereAsk) {
   return replyWith(
-    "海は好きです。見るだけでもいいですけど、入れるなら入るほうが楽しいっす。",
+    pickOne([
+      "海全般好きですけど、印象に残ってるのは沖縄っすね。あの青さは普通にテンション上がります。",
+      "やっぱ沖縄の海は良かったっす。見るだけでもかなり気分上がりました。",
+      "去年行った沖縄の海は良かったっす。ビーチ名までは覚えてないですけど、雰囲気はかなり好きでした。",
+    ]),
     stats,
-    withTopic(flags, "travel_okinawa", "海が好き"),
+    withTopic(flags, "travel_okinawa", "好きな海の場所を聞かれて沖縄の海と答える"),
     internalEvents
   );
 }
@@ -10909,12 +11018,12 @@ if (sleepRhythmAsk) {
 
     return replyWith(
   pickOne([
-    "すみません、少しぼんやりしてますが、今つらいのは熱と咳です。",
-    "うまく答えられてなかったらすみません。今は熱と咳がメインでしんどいです。",
-    "質問うまく拾えてなかったらすみません。症状としては発熱と咳が中心です。",
-    "うまく答えられてなかったらすみません。今一番つらいのは発熱と咳です。",
-    "その聞き方だとうまく返せてなかったらすみません。症状としては熱と咳がメインです。",
-    "細かいことはうまく拾えてなかったらすみません。今は発熱と咳が中心でしんどいです。",
+    "すみません、熱で少しぼんやりしてます。",
+    "うまく答えられてなかったらすみません。ちょっと熱がしんどくて。",
+    "熱で少しぼんやりしてて、質問うまく拾えてなかったらすみません。",
+    "うまく答えられてなかったらすみません。ちょっと熱がしんどくて。",
+    "その聞き方だとうまく返せてなかったらすみません。ちょっと熱がしんどくて。",
+    "熱で少しぼんやりしてて、細かいことはうまく拾えてなかったらすみません。て。",
   ]),
   stats,
   withTopic(flags, "generic_sick", "発熱と咳中心"),
