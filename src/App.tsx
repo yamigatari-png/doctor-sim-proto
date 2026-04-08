@@ -1907,7 +1907,7 @@ function submitOrders(keys: TestKey[]) {
 
   const nextStats: Stats = {
     ...stats,
-    condition: Math.max(0, stats.condition - 5),
+    condition: Math.max(0, stats.condition - 10),
   };
 
   setTestsDone((prev) => {
@@ -2042,7 +2042,7 @@ function queuePatientEndingLines(lines: string[], onDone: () => void) {
 
 const nextStats: Stats = {
   ...out.stats,
-  condition: Math.max(0, out.stats.condition - 2),
+  condition: Math.max(0, out.stats.condition - 5),
 };
 
 let nextFlags = out.flags;
@@ -4249,8 +4249,9 @@ return (
     border: "1px solid rgba(255,255,255,0.08)",
     borderRadius: 12,
     opacity: 1,
-    gridColumn: "2 / span 2",
+    gridColumn: isPhone ? "auto" : "2 / span 2",
     alignContent: "start",
+    minWidth: 0,
   }}
 >
         <div style={{ fontWeight: 700 }}>生化学</div>
@@ -4258,10 +4259,10 @@ return (
         <div
   style={{
     display: "grid",
-    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gridTemplateColumns: isPhone ? "1fr" : "repeat(2, minmax(0, 1fr))",
     gap: 12,
     alignItems: "start",
-    maxHeight: "62vh",
+    maxHeight: isPhone ? "58vh" : "62vh",
     overflowY: "auto",
     overflowX: "hidden",
     paddingRight: 4,
@@ -4552,18 +4553,22 @@ return (
         { title: "造影CT", keys: IMAGE_CONTRAST_CT_KEYS },
       ].map((group) => (
         <div
-          key={group.title}
-          className="card"
-          style={{
-            padding: 10,
-            display: "grid",
-            gap: 8,
-            background: "#232330",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 12,
-            alignContent: "start",
-          }}
-        >
+  key={group.title}
+  className="card"
+  style={{
+    padding: 10,
+    display: "grid",
+    gap: 8,
+    background: "#232330",
+    border: "1px solid rgba(255,255,255,0.08)",
+    borderRadius: 12,
+    alignContent: "start",
+    maxHeight: isPhone ? "58vh" : "none",
+    overflowY: isPhone ? "auto" : "visible",
+    overflowX: "hidden",
+    minWidth: 0,
+  }}
+>
           <div style={{ fontWeight: 700 }}>{group.title}</div>
 
           {group.keys.map((key) => {
@@ -4648,15 +4653,15 @@ return (
     </div>
 
     <div
-      style={{
-        display: "grid",
-        gap: 10,
-        maxHeight: "62vh",
-        overflowY: "auto",
-        overflowX: "hidden",
-        paddingRight: 4,
-      }}
-    >
+  style={{
+    display: "grid",
+    gap: 10,
+    maxHeight: isPhone ? "58vh" : "62vh",
+    overflowY: "auto",
+    overflowX: "hidden",
+    paddingRight: 4,
+  }}
+>
       
       {CATEGORY_KEYS[orderCategory].map((key) => {
         const tr = cp.tests[key];
@@ -4760,7 +4765,16 @@ return (
   }}
 >
               {/* 左：迅速・院内結果あり（全部ここ） */}
-              <div className="card" style={{ padding: 12, display: "grid", gap: 8 }}>
+              <div className="card"
+              style={{
+  padding: 12,
+  display: "grid",
+  gap: 8,
+  maxHeight: isPhone ? "58vh" : "none",
+  overflowY: isPhone ? "auto" : "visible",
+  overflowX: "hidden",
+}}
+              >
                 <div style={{ fontWeight: 800 }}>迅速・院内結果あり</div>
                 {OTHER_GROUP_INFECTION_RAPID.map((key) => {
                   const tr = cp.tests[key];
@@ -4900,7 +4914,16 @@ return (
                 alignItems: "start",
               }}
             >
-              <div className="card" style={{ padding: 12, display: "grid", gap: 8 }}>
+              <div className="card" 
+              style={{
+  padding: 12,
+  display: "grid",
+  gap: 8,
+  maxHeight: isPhone ? "58vh" : "none",
+  overflowY: isPhone ? "auto" : "visible",
+  overflowX: "hidden",
+}}
+              >
                 <div style={{ fontWeight: 800 }}>喀痰</div>
                 {CULTURE_SPUTUM_KEYS.map((key) => {
                   const tr = cp.tests[key];
@@ -5214,41 +5237,50 @@ return (
   }}
 >
     <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "220px minmax(0, 1fr)",
-        gap: 16,
-        minHeight: 0,
-        height: "min(68vh, 760px)",
-      }}
-    >
+  style={{
+    display: "grid",
+    gridTemplateColumns: isPhone ? "1fr" : "220px minmax(0, 1fr)",
+    gridTemplateAreas: isPhone
+      ? `"main"
+         "category"`
+      : `"category main"`,
+    gap: 16,
+    minHeight: 0,
+    height: isPhone ? "min(78vh, 860px)" : "min(68vh, 760px)",
+  }}
+>
       {/* 左カラム：カテゴリ */}
       <div
-        className="card"
-        style={{
-          minHeight: 0,
-          padding: 12,
-          display: "grid",
-          gridTemplateRows: "auto 1fr",
-          gap: 10,
-          background: "#232330",
-          border: "1px solid rgba(255,255,255,0.08)",
-          borderRadius: 12,
-        }}
-      >
+  className="card"
+  style={{
+    gridArea: "category",
+    minHeight: 0,
+    padding: 12,
+    display: "grid",
+    gridTemplateRows: "auto 1fr",
+    gap: 10,
+    background: "#232330",
+    border: "1px solid rgba(255,255,255,0.08)",
+    borderRadius: 12,
+    maxHeight: isPhone ? "22vh" : "none",
+  }}
+>
         <div style={{ fontSize: 14, fontWeight: 800 }}>
           カテゴリ
         </div>
 
         <div
-          style={{
-            minHeight: 0,
-            overflowY: "auto",
-            display: "grid",
-            gap: 8,
-            alignContent: "start",
-          }}
-        >
+  style={{
+    minHeight: 0,
+    overflowY: isPhone ? "hidden" : "auto",
+    overflowX: isPhone ? "auto" : "hidden",
+    display: isPhone ? "flex" : "grid",
+    gap: 8,
+    alignContent: "start",
+    alignItems: "stretch",
+    paddingBottom: isPhone ? 4 : 0,
+  }}
+>
           {DIAGNOSIS_CATEGORY_TABS.map((tab) => {
             const active = activeDiagnosisTab === tab.key;
 
@@ -5261,18 +5293,20 @@ return (
                   setSelectedDiagnosis(null);
                 }}
                 style={{
-                  textAlign: "left",
-                  padding: "10px 12px",
-                  borderRadius: 10,
-                  border: active
-                    ? "2px solid rgba(120,200,255,0.95)"
-                    : "1px solid rgba(255,255,255,0.12)",
-                  background: active ? "rgba(70,110,180,0.35)" : "#2b2b38",
-                  color: "#fff",
-                  cursor: "pointer",
-                  fontSize: 14,
-                  fontWeight: 700,
-                }}
+  textAlign: "left",
+  padding: "10px 12px",
+  borderRadius: 10,
+  border: active
+    ? "2px solid rgba(120,200,255,0.95)"
+    : "1px solid rgba(255,255,255,0.12)",
+  background: active ? "rgba(70,110,180,0.35)" : "#2b2b38",
+  color: "#fff",
+  cursor: "pointer",
+  fontSize: 14,
+  fontWeight: 700,
+  flex: isPhone ? "0 0 auto" : undefined,
+  whiteSpace: "nowrap",
+}}
               >
                 {tab.label}
               </button>
@@ -5283,13 +5317,14 @@ return (
 
       {/* 右カラム：検索 + 候補一覧 + 選択中 + 操作 */}
       <div
-        style={{
-          minHeight: 0,
-          display: "grid",
-          gridTemplateRows: "auto auto minmax(0, 1fr) auto auto",
-          gap: 12,
-        }}
-      >
+  style={{
+    gridArea: "main",
+    minHeight: 0,
+    display: "grid",
+    gridTemplateRows: "auto auto minmax(0, 1fr) auto auto",
+    gap: 12,
+  }}
+>
         <div style={{ fontSize: 13, opacity: 0.8 }}>
           病名で検索してください。
         </div>
@@ -5316,8 +5351,9 @@ return (
   style={{
     minHeight: 0,
     overflowY: "auto",
+    overflowX: "hidden",
     display: "grid",
-    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gridTemplateColumns: isPhone ? "1fr" : "repeat(2, minmax(0, 1fr))",
     gap: 8,
     padding: 10,
     background: "#232330",

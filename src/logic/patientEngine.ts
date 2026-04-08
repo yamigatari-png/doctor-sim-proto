@@ -178,14 +178,22 @@ function isGreeting(normalized: string): boolean {
     "はじめまして",
     "初めまして",
     "こんにちは",
-    "こんばんわ",
+    "こんにちわ",
     "こんばんは",
+    "こんばんわ",
     "おはよう",
     "おはようございます",
     "よろしく",
     "よろしくお願いします",
     "よろしくおねがいします",
     "どうも",
+    "どうぞよろしく",
+    "hello",
+    "hi",
+    "ようこそ",
+    "ちわ",
+    "こんちは",
+    "こんちゃ",
   ]);
 }
 
@@ -702,7 +710,101 @@ export function patientReplyEngine(input: EngineInput): EngineOutput {
 
   const medicalWorstContext = isMedicalWorstContext(normalized);
 
-    const greeting = isGreeting(normalized);
+  const genkiChallenge = getBooleanFlag(flags, "genki_challenge");
+
+const otsukareGreeting = includesAny(normalized, [
+  "おつかれ",
+  "お疲れ様",
+  "お疲れ様です",
+]);
+
+const genkiAsk = normalized === "元気ですか";
+
+const genericConditionGreeting = includesAny(normalized, [
+  "大丈夫ですか",
+  "調子どう",
+  "調子どうですか",
+]);
+
+const specificConditionAsk =
+  includesAny(normalized, ["調子"]) &&
+  includesAny(normalized, [
+    "咳",
+    "熱",
+    "痰",
+    "息",
+    "呼吸",
+    "胸",
+    "のど",
+    "喉",
+    "鼻",
+    "食欲",
+    "腹",
+    "お腹",
+    "頭",
+    "体調",
+  ]);
+
+  const greeting = isGreeting(normalized);
+
+  if (genkiChallenge) {
+  flags = setFlag(flags, "genki_challenge", false);
+
+  if (normalized === "だー" || normalized === "ダー" || normalized === "ﾀﾞｰ") {
+    return replyWith(
+      "バカヤロー！",
+      stats,
+      withTopic(flags, "funny_story", "元気ルート成功"),
+      internalEvents
+    );
+  }
+
+  return replyWith(
+    "あー…",
+    stats,
+    withTopic(flags, "funny_story", "元気ルート失敗"),
+    internalEvents
+  );
+}
+
+if (otsukareGreeting) {
+  return replyWith(
+    "お疲れ様です。",
+    stats,
+    withTopic(flags, "generic_sick", "挨拶（お疲れ様系）"),
+    internalEvents
+  );
+}
+
+if (genkiAsk) {
+  flags = setFlag(flags, "genki_challenge", true);
+
+  return replyWith(
+    "元気があれば何でもできる。行くぞ！１、２、３…",
+    stats,
+    withTopic(flags, "funny_story", "元気ルート開始"),
+    internalEvents
+  );
+}
+
+if (!specificConditionAsk && genericConditionGreeting) {
+  stats = {
+    ...stats,
+    validation: Math.min(100, stats.validation + 3),
+    defense: Math.max(0, stats.defense - 2),
+  };
+
+  return replyWith(
+    pickOne([
+      "こんにちは。今日は熱と咳があって来ました。",
+      "よろしくお願いします。ここ数日、熱と咳があってしんどいです。",
+      "こんにちは。熱と咳が続いていて、ちょっとつらいです。",
+    ]),
+    stats,
+    withTopic(flags, "chief_complaint", "熱と咳が主訴"),
+    internalEvents
+  );
+}
 
   if (greeting) {
   stats = {
@@ -1709,11 +1811,15 @@ const foodDetailAsk =
 const chiefComplaintAsk =
   !includesAny(normalized, ["具体的に", "詳しく", "どのような"]) &&
   includesAny(normalized, [
-    "どうしました",
-    "どうされました",
-    "今日はどうしました",
-    "今日はどうされました",
-    "主訴は",
+  "どうしました",
+  "どうされました",
+  "今日はどうしました",
+  "今日はどうされました",
+  "主訴は",
+  "どうした",
+  "どうしたの",
+  "どうした？",
+  "どうしたの？",
   ]);
 
   const durationAsk =
@@ -1762,11 +1868,15 @@ const symptomDetailAsk =
 
 if (chiefComplaintAsk) {
   return replyWith(
-    "風邪をひきました。",
-    stats,
-    withTopic(flags, "chief_complaint", "風邪をひいた"),
-    internalEvents
-  );
+  pickOne([
+    "風邪をひいたみたいです。",
+    "たぶん風邪をひいたと思います。",
+    "風邪っぽい感じがします。",
+  ]),
+  stats,
+  withTopic(flags, "chief_complaint", "風邪をひいた"),
+  internalEvents
+);
 }
 
 const fatherTalk = includesAny(normalized, [
@@ -5532,6 +5642,17 @@ const vtuberWatchAsk =
     "好きなユーチューバー",
   ]);
   
+  const firstFavoriteStreamerAsk = includesAny(normalized, [
+  "好きなyoutuber",
+  "好きなユーチューバー",
+  "好きな配信者",
+  "誰が好き",
+  "誰好き",
+  "推しは誰",
+  "誰をよく見る",
+  "誰追ってる",
+]);
+
   const favoriteStreamerAsk =
   lastPatientTopic === "tv_youtube" &&
   includesAny(normalized, [
@@ -9958,6 +10079,25 @@ if (amusementWhoAsk) {
     "行くなら友達とか彼女とか、誰かと行くほうが楽しいです。",
     stats,
     withTopic(flags, "daily_life", "遊園地は誰かと行く派"),
+    internalEvents
+  );
+}
+
+if (firstFavoriteStreamerAsk) {
+  stats = {
+    ...stats,
+    validation: Math.min(100, stats.validation + 5),
+    defense: Math.max(0, stats.defense - 3),
+  };
+
+  return replyWith(
+    pickOne([
+      "ゲーム系だと、わいわいとかからすまAは見ますね。笑っちゃって作業しながら聞けないっすよ。",
+      "配信者だと、狩野英孝とか好きです。最近、香住蒼って人を注目してます。声がいいんすよねぇ。",
+      "きゃべつの人とか良く聞いてますよ。あと大関ゲームのショート動画とかついつい見ちゃいます。",
+    ]),
+    stats,
+    withTopic(flags, "tv_youtube", "好きな配信者としてわいわい・のばまん・狩野英孝あたりを見る"),
     internalEvents
   );
 }
