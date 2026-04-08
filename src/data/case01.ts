@@ -846,7 +846,7 @@ BETA_D_GLUCAN: {
   key: "BETA_D_GLUCAN",
   label: "β-D-グルカン",
   category: "blood",
-  minutes: 60,
+  minutes: 120,
   resultText: "<6.0 ng/mL",
 },
 SCC: {

@@ -183,7 +183,7 @@ const TEST_TURNAROUND_MINUTES: Partial<Record<TestKey, number>> = {
   ECHO_ABDOMEN: 30,
 
   PCT: 60,
-  BETA_D_GLUCAN: 60,
+  BETA_D_GLUCAN: 120,
 
   LEGIONELLA_URINARY_ANTIGEN: 30,
   LEGIONELLA_LAMP: 20,
@@ -4327,7 +4327,17 @@ return (
             <div style={{ fontWeight: 700 }}>その他</div>
 
             <button onClick={() => setOtherLabGroup("urine")}>尿検査</button>
-            <button onClick={() => setInfectionSubModalOpen(true)}>感染症</button>
+            <button
+  onClick={() => {
+    if (isPhone) {
+      setOtherLabGroup("infection");
+    } else {
+      setInfectionSubModalOpen(true);
+    }
+  }}
+>
+  感染症
+</button>
             <button onClick={() => setOtherLabGroup("tumor")}>腫瘍マーカー</button>
             <button onClick={() => setOtherLabGroup("autoantibody")}>自己抗体</button>
             <button onClick={() => setOtherLabGroup("endocrine")}>内分泌</button>
@@ -4344,6 +4354,7 @@ return (
             >
               <div style={{ fontWeight: 700 }}>
                 {otherLabGroup === "urine" && "尿検査"}
+                {otherLabGroup === "infection" && "感染症"}
                 {otherLabGroup === "tumor" && "腫瘍マーカー"}
                 {otherLabGroup === "autoantibody" && "自己抗体"}
                 {otherLabGroup === "endocrine" && "内分泌"}
@@ -4510,6 +4521,53 @@ return (
           {tr.label}
           <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
             {minutes}分
+          </div>
+        </button>
+      );
+    })}
+  </div>
+)}
+{otherLabGroup === "infection" && (
+  <div
+    style={{
+      display: "grid",
+      gap: 8,
+      maxHeight: "52vh",
+      overflowY: "auto",
+      overflowX: "hidden",
+      paddingRight: 4,
+      alignContent: "start",
+    }}
+  >
+    {[
+      ...OTHER_GROUP_INFECTION_RAPID,
+      ...OTHER_GROUP_INFECTION_SENDOUT,
+    ].map((key) => {
+      const tr = cp.tests[key];
+      const checked = isQueuedOrDrafted(key);
+      const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
+      const isSendout = OTHER_GROUP_INFECTION_SENDOUT.includes(key);
+
+      return (
+        <button
+          key={key}
+          title={TEST_HELP_TEXT[key] ?? ""}
+          onClick={() => toggleDraftOrderKey(key)}
+          disabled={!!testsDone[key]}
+          style={{
+            textAlign: "left",
+            opacity: testsDone[key] ? 0.5 : 1,
+            border: checked
+              ? "2px solid rgba(120,200,255,0.9)"
+              : "1px solid rgba(255,255,255,0.08)",
+            background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
+            borderRadius: 10,
+          }}
+        >
+          {checked ? "✓ " : ""}
+          {tr.label}
+          <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
+            {minutes}分{isSendout ? " ／ 外注" : ""}
           </div>
         </button>
       );
@@ -4755,7 +4813,7 @@ return (
         </div>
       )}
 
-      {infectionSubModalOpen && (
+      {infectionSubModalOpen && !isPhone && (
         <Modal
           title="感染症検査"
           onClose={() => {
@@ -5392,7 +5450,7 @@ return (
             setDiagnosisQuery(e.target.value);
             setSelectedDiagnosis(null);
           }}
-          placeholder="例：肺炎 / 咽頭炎 / 尿路感染"
+          placeholder="例：感冒 "
           style={{
             width: "100%",
             padding: "10px 12px",
