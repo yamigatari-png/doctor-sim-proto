@@ -4180,6 +4180,10 @@ return (
     borderRadius: 16,
     padding: 16,
     opacity: 1,
+    minHeight: 0,
+    maxHeight: isPhone ? "70vh" : "none",
+    overflowY: isPhone ? "auto" : "visible",
+    overflowX: "hidden",
   }}
 >
     <div style={{ fontSize: 13, opacity: 0.8 }}>
@@ -4534,7 +4538,16 @@ return (
         </div>
   </div>
 ) : orderCategory === "image" ? (
-  <div style={{ display: "grid", gap: 12 }}>
+  <div
+  style={{
+    display: "grid",
+    gap: 12,
+    minHeight: 0,
+    maxHeight: isPhone ? "70vh" : "none",
+    overflowY: isPhone ? "auto" : "visible",
+    overflowX: "hidden",
+  }}
+>
     <div style={{ fontSize: 13, opacity: 0.8 }}>
       実施したい検査項目を選択してください。
     </div>
@@ -4638,16 +4651,20 @@ return (
   </div>
 ) : (
   <div
-    style={{
-      width:
-        orderCategory === "vital"
-          ? "min(100%, 560px)"
-          : "min(100%, 640px)",
-      justifySelf: "start",
-      display: "grid",
-      gap: 12,
-    }}
-  >
+  style={{
+    width:
+      orderCategory === "vital"
+        ? "min(100%, 560px)"
+        : "min(100%, 640px)",
+    justifySelf: "start",
+    display: "grid",
+    gap: 12,
+    minHeight: 0,
+    maxHeight: isPhone ? "70vh" : "none",
+    overflowY: isPhone ? "auto" : "visible",
+    overflowX: "hidden",
+  }}
+>
     <div style={{ fontSize: 13, opacity: 0.8 }}>
       実施したい検査項目を選択してください。
     </div>
@@ -4808,7 +4825,17 @@ return (
               </div>
 
               {/* 中央：外注 前半 */}
-              <div className="card" style={{ padding: 12, display: "grid", gap: 8 }}>
+              <div
+  className="card"
+  style={{
+    padding: 12,
+    display: "grid",
+    gap: 8,
+    maxHeight: isPhone ? "58vh" : "none",
+    overflowY: isPhone ? "auto" : "visible",
+    overflowX: "hidden",
+  }}
+>
                 <div style={{ fontWeight: 800 }}>外注</div>
                 {OTHER_GROUP_INFECTION_SENDOUT.slice(
                   0,
@@ -4845,7 +4872,17 @@ return (
               </div>
 
               {/* 右：外注 後半 */}
-              <div className="card" style={{ padding: 12, display: "grid", gap: 8 }}>
+              <div
+  className="card"
+  style={{
+    padding: 12,
+    display: "grid",
+    gap: 8,
+    maxHeight: isPhone ? "58vh" : "none",
+    overflowY: isPhone ? "auto" : "visible",
+    overflowX: "hidden",
+  }}
+>
                 <div style={{ fontWeight: 800, opacity: 0 }}>外注</div>
                 {OTHER_GROUP_INFECTION_SENDOUT.slice(
                   Math.ceil(OTHER_GROUP_INFECTION_SENDOUT.length / 2)
@@ -4956,7 +4993,17 @@ return (
                 })}
               </div>
 
-              <div className="card" style={{ padding: 12, display: "grid", gap: 8 }}>
+              <div
+  className="card"
+  style={{
+    padding: 12,
+    display: "grid",
+    gap: 8,
+    maxHeight: isPhone ? "58vh" : "none",
+    overflowY: isPhone ? "auto" : "visible",
+    overflowX: "hidden",
+  }}
+>
                 <div style={{ fontWeight: 800 }}>尿</div>
                 {CULTURE_URINE_KEYS.map((key) => {
                   const tr = cp.tests[key];
@@ -4989,7 +5036,17 @@ return (
                 })}
               </div>
 
-              <div className="card" style={{ padding: 12, display: "grid", gap: 8 }}>
+              <div
+  className="card"
+  style={{
+    padding: 12,
+    display: "grid",
+    gap: 8,
+    maxHeight: isPhone ? "58vh" : "none",
+    overflowY: isPhone ? "auto" : "visible",
+    overflowX: "hidden",
+  }}
+>
                 <div style={{ fontWeight: 800 }}>血液培養検査</div>
                 {CULTURE_BLOOD_KEYS.map((key) => {
                   const tr = cp.tests[key];
