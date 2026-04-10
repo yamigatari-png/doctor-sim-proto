@@ -1175,8 +1175,132 @@ const recentGameAsk = includesAny(normalized, [
 const funnyThingAsk = includesAny(normalized, [
   "面白いこと言って",
   "おもしろいこと言って",
+  "面白い話して",
+  "おもしろい話して",
   "なんか面白い話して",
+  "なんかおもしろい話して",
   "笑える話して",
+  "笑える話",
+  "何か面白い話",
+  "何かおもしろい話",
+  "面白い話ある",
+  "おもしろい話ある",
+]);
+
+const sweatTalk = includesAny(normalized, [
+  "汗かいてるね",
+  "汗すごいね",
+  "汗すごい",
+  "汗かいてる",
+]);
+
+const hairPraiseAsk = includesAny(normalized, [
+  "髪型きまってるね",
+  "髪型決まってるね",
+  "髪型いいね",
+  "どこで髪切ってる",
+  "どこで髪切る",
+  "美容室どこ",
+]);
+
+const appearancePraiseAsk = includesAny(normalized, [
+  "イケメンだね",
+  "かっこいいね",
+  "かっこいい",
+  "イケメン",
+]);
+
+const childhoodAsk = includesAny(normalized, [
+  "どんな子供だった",
+  "どんな子どもだった",
+  "子供の頃どんな",
+  "子どもの頃どんな",
+  "昔どんな子供",
+  "昔どんな子ども",
+]);
+
+const soccerCaptainAsk =
+  lastPatientTopic === "soccer_like" &&
+  includesAny(normalized, [
+    "キャプテンだった",
+    "少年サッカー団",
+    "少年サッカー",
+    "どこでやってた",
+    "何してた",
+  ]);
+
+const childhoodMemoryAsk =
+  lastPatientTopic === "soccer_like" &&
+  includesAny(normalized, [
+    "何か聞かれたら",
+    "思い出は",
+    "どんな思い出",
+    "楽しい思い出",
+    "何が楽しかった",
+    "どんな思いで",
+    "どんな思い出",
+  ]);
+
+const workAsk = includesAny(normalized, [
+  "仕事はなにしてる",
+  "仕事は何してる",
+  "何の仕事してる",
+  "仕事なに",
+  "職業は",
+]);
+
+const workHardAsk =
+  (lastPatientTopic === "work_anxiety" || lastPatientTopic === "daily_life") &&
+  includesAny(normalized, [
+    "営業って大変",
+    "営業は大変",
+    "仕事大変",
+    "営業きつい",
+  ]);
+
+const hiddenChildAsk = includesAny(normalized, [
+  "隠し子いる",
+  "隠し子いる？",
+  "子供いる",
+  "隠し子いますか",
+]);
+
+const hiddenChildPushAsk =
+  lastPatientTopic === "girlfriend_detail" &&
+  includesAny(normalized, [
+    "本当に",
+    "ほんとうに",
+    "マジで",
+    "まじで",
+  ]);
+
+const smartphoneAsk = includesAny(normalized, [
+  "スマホはなにを使ってる",
+  "スマホは何を使ってる",
+  "何のスマホ使ってる",
+  "iphone",
+  "android",
+]);
+
+const clothesAsk = includesAny(normalized, [
+  "服はどこで買ってる",
+  "服どこで買ってる",
+  "どこで服買ってる",
+  "服どこで買う",
+]);
+
+const earthEndAsk = includesAny(normalized, [
+  "地球はいつ滅ぶ",
+  "地球いつ滅ぶ",
+  "世界はいつ終わる",
+  "世界いつ終わる",
+]);
+
+const prophecyAsk = includesAny(normalized, [
+  "予言して",
+  "予言してよ",
+  "未来を予言して",
+  "～を予言して",
 ]);
 
 const inokiTsukkomi = includesAny(normalized, [
@@ -1653,6 +1777,42 @@ if (toiletEmbarrassingAsk) {
       internalEvents
     );
   }
+
+  if (hairPraiseAsk || appearancePraiseAsk) {
+  if (!getBooleanFlag(flags, "used_praise_bonus_once")) {
+    stats = {
+      ...stats,
+      defense: Math.max(0, stats.defense - 10),
+      validation: Math.min(100, stats.validation + 5),
+      trust: Math.min(100, stats.trust + 5),
+    };
+    flags = setFlag(flags, "used_praise_bonus_once", true);
+  }
+
+  if (hairPraiseAsk) {
+    return replyWith(
+      pickOne([
+        "ありがとうございます。地元の美容室で適当に切ってます。",
+        "ありがとうございます。いつも同じとこで切ってるだけっす。",
+        "ありがとうございます。そこまでこだわってないですけど、地元の美容室っすね。",
+      ]),
+      stats,
+      withTopic(flags, "daily_life", "髪型を褒められた"),
+      internalEvents
+    );
+  }
+
+  return replyWith(
+    pickOne([
+      "いやいや、そんなことないっすよ。",
+      "ありがとうございます。そう言われると普通にうれしいっす。",
+      "いや、照れるじゃないっすか。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "見た目を褒められた"),
+    internalEvents
+  );
+}
 
   if (isEmpathy) {
   if (!Boolean((flags as any).used_empathy_once)) {
@@ -4170,9 +4330,149 @@ if (recentGameAsk) {
   );
 }
 
-if (funnyThingAsk) {
+if (sweatTalk) {
   return replyWith(
-    "小学校のときに面白いヤツいたんですよ。小学校って毎朝出欠取るじゃないっすか。ある日、そいつが急に『先生、ボクのことはウルトラマンガイアって呼んでくれ』って言いだして。先生も周りもポカーンですよ。でもね、その後、みんなでガイアってからかったら逆に満足そうな顔して。先生も一時期ウルトラマンガイア君って呼んでましたからね。なんだよ、ウルトラマンガイア君って。",
+    pickOne([
+      "すいません。汗臭いっすよね。",
+      "そうなんすよ。熱あってちょっと汗やばいです。",
+      "熱しんどくて汗出ちゃってます。",
+    ]),
+    stats,
+    withTopic(flags, "general_severity", "発熱で汗が多い"),
+    internalEvents
+  );
+}
+
+if (childhoodAsk) {
+  return replyWith(
+    "サッカーばっかやってました。少年サッカー団でキャプテンもしてました。",
+    stats,
+    withTopic(flags, "soccer_like", "子供の頃はサッカー中心でキャプテンだった", {
+      childhood_soccer_captain: true,
+    }),
+    internalEvents
+  );
+}
+
+if (soccerCaptainAsk) {
+  return replyWith(
+    "楽しい思い出しかないっす。",
+    stats,
+    withTopic(flags, "soccer_like", "少年サッカーの思い出は楽しい"),
+    internalEvents
+  );
+}
+
+if (childhoodMemoryAsk) {
+  return replyWith(
+    "県大会で準優勝したんです。うちのチームとしては最高な結果だったんですけど、みんな負けたのが悔しくて悔しくて、すぐ学校に戻って練習してました。",
+    stats,
+    withTopic(flags, "soccer_like", "県大会準優勝の悔しさと熱量"),
+    internalEvents
+  );
+}
+
+if (workAsk) {
+  return replyWith(
+    "営業やってます。",
+    stats,
+    withTopic(flags, "work_anxiety", "仕事は営業"),
+    internalEvents
+  );
+}
+
+if (workHardAsk) {
+  return replyWith(
+    pickOne([
+      "大変は大変っすね。気を使うし、数字も見ないといけないんで。",
+      "まあ普通に大変っす。人と話すのは嫌いじゃないですけど、楽ではないです。",
+      "きつい時はありますね。でも全然無理ってほどではないです。",
+    ]),
+    stats,
+    withTopic(flags, "work_anxiety", "営業の大変さ"),
+    internalEvents
+  );
+}
+
+if (hiddenChildAsk) {
+  return replyWith(
+    "いないです。",
+    stats,
+    withTopic(flags, "girlfriend_detail", "隠し子はいない"),
+    internalEvents
+  );
+}
+
+if (hiddenChildPushAsk) {
+  return replyWith(
+    "しつこいっすよ。",
+    stats,
+    withTopic(flags, "girlfriend_detail", "隠し子の追及を嫌がる"),
+    internalEvents
+  );
+}
+
+if (smartphoneAsk) {
+  return replyWith(
+    pickOne([
+      "iPhoneっす。",
+      "普通にiPhone使ってます。",
+      "スマホはiPhoneですね。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "スマホはiPhone"),
+    internalEvents
+  );
+}
+
+if (clothesAsk) {
+  return replyWith(
+    pickOne([
+      "ユニクロとかが多いっすね。",
+      "あんまりこだわらないんですけど、ユニクロが多いです。",
+      "服はだいたいユニクロで買ってます。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "服は無難な店で買う"),
+    internalEvents
+  );
+}
+
+if (earthEndAsk) {
+  return replyWith(
+    pickOne([
+      "知らないっすけど、今日じゃないならとりあえず大丈夫じゃないですか。",
+      "さすがに分かんないっす。でも今じゃないことを祈ります。",
+      "それ分かったら逆に怖いっすよ。",
+    ]),
+    stats,
+    withTopic(flags, "funny_story", "地球滅亡ネタを軽く流す"),
+    internalEvents
+  );
+}
+
+if (prophecyAsk || fortuneAsk) {
+  return replyWith(
+    pickOne([
+      "じゃあ予言します。先生は、このあとちょっとだけ良いことあります。",
+      "予言っすか。たぶん今日どこかで、あ、これラッキーって思うことありますよ。",
+      "たぶん今日、人生で一番大変な日になりますよ。",
+    ]),
+    stats,
+    withTopic(flags, "funny_story", "軽い予言ネタに乗る"),
+    internalEvents
+  );
+}
+
+if (funnyThingAsk) {
+  stats = {
+    ...stats,
+    validation: Math.min(100, stats.validation + 4),
+    defense: Math.max(0, stats.defense - 3),
+  };
+
+  return replyWith(
+    "小学校のときに面白いやついたんですよ。朝の出欠で、そいつが急に『先生、ボクのことはウルトラマンガイアって呼んでくれ』って言い出して。先生もクラスもポカーンですよ。でも、みんなでガイアって呼んだら本人めちゃくちゃ満足そうで。しばらく本当にウルトラマンガイア君って呼ばれてました。",
     stats,
     withTopic(flags, "funny_story", "ウルトラマンガイア君の話を始める", {
       funny_story_stage: 1,
@@ -4186,7 +4486,7 @@ if (lastPatientTopic === "funny_story" && funnyStoryContinueAsk) {
 
   if (stage <= 1) {
     return replyWith(
-      "で、高校のとき、またそいつに会ったんですよ。そしたら下向いてぶつぶつ言ってて、何してんの？って聞いたら『神はいるか考えてる』って。ああ、これが中二病かって思いましたよ。",
+      "で、高校でまた会ったら、今度は下向いてぶつぶつ言ってるんですよ。何してんのって聞いたら、『神はいるか考えてる』って。ああ、ちゃんと育っちゃったなって思いました。",
       stats,
       withTopic(flags, "funny_story", "高校で再会して中二病化していた", {
         funny_story_stage: 2,
@@ -4197,7 +4497,7 @@ if (lastPatientTopic === "funny_story" && funnyStoryContinueAsk) {
 
   if (stage === 2) {
     return replyWith(
-      "まあそいつ、医者になって、中二病の論文書いたんすけどね。",
+      "まあ、そいつ今は医者になって、中二病の論文まで書いてるんですけどね。",
       stats,
       withTopic(flags, "funny_story", "ウルトラマンガイア君は医者になって中二病論文を書いた", {
         funny_story_stage: 3,
@@ -4207,9 +4507,11 @@ if (lastPatientTopic === "funny_story" && funnyStoryContinueAsk) {
   }
 
   return replyWith(
-    "誰かは秘密です。先生の知り合いかもしれませんし。",
+    "誰かは秘密っす。先生の知り合いかもしれないですし。",
     stats,
-    withTopic(flags, "funny_story", "誰かは明かさない"),
+    withTopic(flags, "funny_story", "誰かは明かさない", {
+      funny_story_stage: 3,
+    }),
     internalEvents
   );
 }
