@@ -283,8 +283,17 @@ function isMedicalTalk(normalized: string): boolean {
     "息切れ",
     "胸痛",
     "胸が痛い",
-    "のど",
-    "喉",
+    "のどが痛い",
+    "のど痛い",
+    "のどいたい",
+    "喉が痛い",
+    "喉痛い",
+    "喉いたい",
+    "のどの痛み",
+    "喉の痛み",
+    "咽頭痛",
+    "のど痛",
+    "喉痛",
     "咽頭痛",
     "鼻水",
     "鼻づまり",
@@ -976,8 +985,14 @@ const lostTrackOfTimeAsk = includesAny(normalized, [
   }
 
   if (smallTalk) {
-    nextMedicalTalkStreak = 0;
-  }
+  nextMedicalTalkStreak = 0;
+
+  stats = {
+    ...stats,
+    validation: Math.min(100, stats.validation + 5),
+    defense: Math.max(0, stats.defense - 5),
+  };
+}
 
   const isEmpathy = includesAny(normalized, [
   "つらい",
@@ -1020,6 +1035,10 @@ const lostTrackOfTimeAsk = includesAny(normalized, [
     "フェラ",
     "フェラチオ",
     "好きな体位",
+    "スケベ",
+    "すけべ",
+    "変態",
+    "ヘンタイ",
   ]);
 
   const sexualRequestTalk =
@@ -1192,7 +1211,35 @@ const sweatTalk = includesAny(normalized, [
   "汗すごいね",
   "汗すごい",
   "汗かいてる",
+  "汗",
+  "びしょびしょ",
+  "濡れてる",
+  "服濡れてる",
+  "服濡れてるよ",
+  "服ぬれてる",
+  "服ぬれてるよ",
 ]);
+  
+  const smellReassureTalk =
+  lastPatientTopic === "general_severity" &&
+  includesAny(normalized, [
+    "臭くない",
+    "くさくない",
+    "大丈夫",
+    "平気",
+    "気にしない",
+    "汗臭くない",
+    "におわない",
+  ]);
+
+const smellInsultTalk =
+  lastPatientTopic === "general_severity" &&
+  includesAny(normalized, [
+    "臭い",
+    "くさい",
+    "汗臭い",
+    "におう",
+  ]);
 
 const hairPraiseAsk = includesAny(normalized, [
   "髪型きまってるね",
@@ -1250,12 +1297,66 @@ const workAsk = includesAny(normalized, [
 ]);
 
 const workHardAsk =
+  lastPatientTopic === "work_anxiety" &&
+  includesAny(normalized, [
+    "大変",
+    "きつい",
+    "しんどい",
+    "忙しい",
+    "ブラック",
+    "残業",
+    "つらい",
+    "疲れる",
+    "きびしい",
+  ]);
+
+  const workDetailAsk =
   (lastPatientTopic === "work_anxiety" || lastPatientTopic === "daily_life") &&
   includesAny(normalized, [
-    "営業って大変",
-    "営業は大変",
-    "仕事大変",
-    "営業きつい",
+    "どんな仕事",
+    "具体的に何してる",
+    "何の営業",
+    "どこの営業",
+    "どういう営業",
+    "何売ってる",
+    "何を扱ってる",
+  ]);
+
+const workPlaceAsk =
+  lastPatientTopic === "work_anxiety" &&
+  includesAny(normalized, [
+    "どこで働いてる",
+    "会社どこ",
+    "勤務先",
+    "どんな会社",
+    "どこの会社",
+    "職場",
+    "会社",
+    "どんなとこ",
+  ]);
+
+const workRewardAsk =
+  (lastPatientTopic === "work_anxiety" || lastPatientTopic === "daily_life") &&
+  includesAny(normalized, [
+    "やりがいある",
+    "仕事好き",
+    "仕事楽しい",
+    "向いてる",
+    "営業向いてる",
+  ]);
+
+const workStressDetailAsk =
+  (lastPatientTopic === "work_anxiety" || lastPatientTopic === "daily_life") &&
+  includesAny(normalized, [
+    "何が大変",
+    "何がきつい",
+    "どこが大変",
+    "どこがきつい",
+    "何がしんどい",
+    "何が不安",
+    "仕事の何がしんどい",
+    "どこがストレス",
+    "職場の何が嫌",
   ]);
 
 const hiddenChildAsk = includesAny(normalized, [
@@ -1289,6 +1390,44 @@ const clothesAsk = includesAny(normalized, [
   "服どこで買う",
 ]);
 
+const drawingAsk = includesAny(normalized, [
+  "絵は描ける",
+  "絵描ける",
+  "絵を描く",
+  "絵描く",
+  "イラスト描く",
+  "絵心ある",
+]);
+
+const artLikeAsk = includesAny(normalized, [
+  "絵は好き",
+  "絵好き",
+  "美術好き",
+  "アート好き",
+  "芸術好き",
+]);
+
+const museumAsk = includesAny(normalized, [
+  "美術館行く",
+  "美術館は行く",
+  "美術館好き",
+  "博物館行く",
+  "博物館は行く",
+  "博物館好き",
+  "展示見に行く",
+  "展覧会行く",
+]);
+
+const museumFollowUpAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "どっちも行かない",
+    "最近行った",
+    "最後に行った",
+    "なんで行かない",
+    "興味ない",
+  ]);
+
 const earthEndAsk = includesAny(normalized, [
   "地球はいつ滅ぶ",
   "地球いつ滅ぶ",
@@ -1300,8 +1439,23 @@ const prophecyAsk = includesAny(normalized, [
   "予言して",
   "予言してよ",
   "未来を予言して",
-  "～を予言して",
+  "を予言して",
 ]);
+
+const prophecyFollowUpAsk =
+  lastPatientTopic === "funny_story" &&
+  includesAny(normalized, [
+    "どういうこと",
+    "それはどういうこと",
+    "どういう意味",
+    "何の話",
+    "なにの話",
+    "予言って何",
+    "予言ってどういうこと",
+    "詳しく",
+    "それって",
+    "今の何",
+  ]);
 
 const inokiTsukkomi = includesAny(normalized, [
   "猪木じゃん",
@@ -1323,10 +1477,22 @@ const funnyStoryContinueAsk =
     "その後",
     "それで",
     "どうなった",
-    "いつのまにか",
-    "高校のとき",
     "誰ですか",
     "誰かは",
+    "誰",
+    "誰なの",
+    "その人誰",
+    "その友達誰",
+    "友達誰",
+    "どんなやつ",
+    "どんな人",
+    "あなたも呼んでた",
+    "君も呼んでた",
+    "呼んでた",
+    "ガイアって呼んでた",
+    "中二病",
+    "痛いやつ",
+    "黒歴史",
   ]);
 
 const scaryStoryAsk = includesAny(normalized, [
@@ -1399,6 +1565,27 @@ const fortuneAsk = includesAny(normalized, [
   "運勢信じる",
 ]);
 
+const godTalk = includesAny(normalized, [
+  "神様を信じますか",
+  "神様信じる",
+  "神様いると思う",
+  "神様いる",
+  "宗教ありますか",
+  "宗教ある",
+  "信仰ある",
+]);
+
+const recentShrineAsk =
+  (lastPatientTopic === "travel_okinawa" || getBooleanFlag(flags, "god_talk_opened")) &&
+  includesAny(normalized, [
+    "最近どこの神社行った",
+    "最近どこの神社",
+    "どこの神社行った",
+    "どこの神社に行った",
+    "神社行ったのはどこ",
+    "最近行った神社",
+  ]);
+
 const liarCalloutAsk = includesAny(normalized, [
   "ウソでしょ",
   "嘘でしょ",
@@ -1422,6 +1609,39 @@ const futureTalkAsk = includesAny(normalized, [
   "将来どうする",
   "将来不安",
 ]);
+
+const fateTalk = includesAny(normalized, [
+  "運命は信じる",
+  "運命信じる",
+  "運命って信じる",
+  "運命あると思う",
+  "運命ある",
+]);
+
+const recentFateAsk =
+  lastPatientTopic === "honeytrap_detail" &&
+  includesAny(normalized, [
+    "最近運命感じた",
+    "運命感じたことある",
+    "運命感じたのはいつ",
+    "どんな時に運命感じた",
+    "出会いが運命って思ったことある",
+    "最近運命的な出会いあった",
+    "運命的な出会いあった",
+    "そんな出会いあった",
+    "そんな出会いあったの",
+    "そんな出会いある",
+    "そんな出会いあったんだ",
+    "そんな出会いって何",
+    "そんな相手いた",
+    "そういう出会いあった",
+    "そういう相手いた",
+    "運命の相手いた",
+    "運命の出会いあった",
+    "出会いあった",
+    "特別な出会いあった",
+    "最近そういう人いた",
+  ]);
 
 const orientationTestAsk = includesAny(normalized, [
   "今何月何日何曜日",
@@ -1453,6 +1673,54 @@ const hydrationAsk = includesAny(normalized, [
   "水分は取れてますか",
   "水分取れてる",
 ]);
+
+const offerLikePhrase = includesAny(normalized, [
+  "いる？",
+  "いります？",
+  "どう？",
+  "どうですか",
+  "持ってくる",
+  "入れる",
+  "あげようか",
+  "渡そうか",
+  "買ってこようか",
+]);
+
+const habitLikePhrase = includesAny(normalized, [
+  "普段",
+  "いつも",
+  "よく",
+  "飲みますか",
+  "飲むんですか",
+  "飲むことある",
+]);
+
+const alcoholName = includesAny(normalized, [
+  "ビール",
+  "ハイボール",
+  "ワイン",
+  "日本酒",
+  "焼酎",
+]);
+
+const softDrinkName = includesAny(normalized, [
+  "お茶",
+  "水",
+  "お水",
+  "ポカリ",
+  "アクエリ",
+  "スポドリ",
+]);
+
+const alcoholOfferAsk =
+  alcoholName &&
+  offerLikePhrase &&
+  !habitLikePhrase;
+
+const drinkOfferAsk =
+  softDrinkName &&
+  offerLikePhrase &&
+  !habitLikePhrase;
 
 const workImpactAsk = includesAny(normalized, [
   "仕事に支障出てますか",
@@ -2773,6 +3041,13 @@ const otherPartnerDetailAsk =
 "どういう相手",
 "相手はどんな人",
 "相手はどんなひと",
+"どんな出会い",
+    "どういう出会い",
+    "どんなきっかけ",
+    "きっかけは",
+    "そんな出会いあったの",
+    "運命的な出会いあったの",
+    "そういう出会いあったの",
   ]);
   const affairLabelAsk =
   (
@@ -3998,7 +4273,6 @@ const gameAsk = includesAny(normalized, ["ゲーム"]);
 const typeOfWomanAsk = includesAny(normalized, ["女性のタイプ"]);
 const lgbtAsk = includesAny(normalized, ["lgbt"]);
 const politicsAsk = includesAny(normalized, ["政治"]);
-const godAsk = includesAny(normalized, ["神"]);
 const bodyMeasureAsk = includesAny(normalized, ["スリーサイズ"]);
 const celebritySpecificAsk = includesAny(normalized, ["鈴木良平"]);
 const pastStupidAsk = includesAny(normalized, ["バカだなと思う行動"]);
@@ -4343,6 +4617,44 @@ if (sweatTalk) {
   );
 }
 
+if (smellReassureTalk) {
+  if (!getBooleanFlag(flags, "used_smell_reassure_bonus_once")) {
+    stats = {
+      ...stats,
+      trust: Math.min(100, stats.trust + 5),
+    };
+    flags = setFlag(flags, "used_smell_reassure_bonus_once", true);
+  }
+
+  return replyWith(
+    pickOne([
+      "ありがとうございます。",
+      "すいません、助かります。",
+      "そう言ってもらえて嬉しいです。",
+    ]),
+    stats,
+    withTopic(flags, "general_severity", "汗を気遣われて少し安心する"),
+    internalEvents
+  );
+}
+
+if (smellInsultTalk) {
+  stats = {
+    ...stats,
+    trust: Math.max(0, stats.trust - 10),
+    validation: Math.max(0, stats.validation - 5),
+    defense: Math.min(100, stats.defense + 10),
+  };
+  flags = setFlag(flags, "used_rude_tone", true);
+
+  return replyWith(
+    "すいません…。",
+    stats,
+    withTopic(flags, "general_severity", "汗の臭いを指摘されて傷つく"),
+    internalEvents
+  );
+}
+
 if (childhoodAsk) {
   return replyWith(
     "サッカーばっかやってました。少年サッカー団でキャプテンもしてました。",
@@ -4372,11 +4684,62 @@ if (childhoodMemoryAsk) {
   );
 }
 
+if (alcoholOfferAsk) {
+  return replyWith(
+    pickOne([
+      "なんてもの勧めてるんですか！",
+      "いや、今それ勧めます！？",
+      "この状況で酒っすか！？",
+    ]),
+    stats,
+    withTopic(flags, "generic_sick", "体調不良時の飲酒提案を拒否する"),
+    internalEvents
+  );
+}
+
+if (drinkOfferAsk) {
+  if (!getBooleanFlag(flags, "used_drink_offer_bonus_once")) {
+    stats = {
+      ...stats,
+      condition: Math.min(100, stats.condition + 5),
+    };
+    flags = setFlag(flags, "used_drink_offer_bonus_once", true);
+  }
+
+  return replyWith(
+    pickOne([
+      "ありがとうございます。",
+      "ありがとうございます。助かります。",
+      "ありがとうございます、ちょっと飲みたいです。",
+    ]),
+    stats,
+    withTopic(flags, "oral_intake", "飲み物を勧められて感謝する"),
+    internalEvents
+  );
+}
+
 if (workAsk) {
   return replyWith(
-    "営業やってます。",
+    pickOne([
+      "営業っす。広告まわりの会社で働いてます。",
+      "一応営業してます。広告系っていうか、クライアント対応する仕事っすね。",
+      "広告系の営業っす。人と話すことはかなり多いです。",
+    ]),
     stats,
-    withTopic(flags, "work_anxiety", "仕事は営業"),
+    withTopic(flags, "work_anxiety", "広告系の営業をしている"),
+    internalEvents
+  );
+}
+
+if (workDetailAsk) {
+  return replyWith(
+    pickOne([
+      "広告まわりっすね。取引先とやりとりしたり、提案したりする感じです。",
+      "ざっくり言うと広告系です。人に会って話まとめたり、調整したりすることが多いっす。",
+      "広告の営業っす。売るだけじゃなくて、相手の要望聞いて動くことも多いです。",
+    ]),
+    stats,
+    withTopic(flags, "work_anxiety", "広告営業の具体内容"),
     internalEvents
   );
 }
@@ -4390,6 +4753,45 @@ if (workHardAsk) {
     ]),
     stats,
     withTopic(flags, "work_anxiety", "営業の大変さ"),
+    internalEvents
+  );
+}
+
+if (workPlaceAsk) {
+  return replyWith(
+    pickOne([
+      "広告まわりの会社っす。クライアント対応が多いですね。",
+      "広告系の会社っす。人と話したり、調整したりすることが多いです。",
+      "広告まわりですね。営業なんで外向きのやりとりはかなり多いです。",
+    ]),
+    stats,
+    withTopic(flags, "work_anxiety", "広告系の会社で働いている"),
+    internalEvents
+  );
+}
+
+if (workRewardAsk) {
+  return replyWith(
+    pickOne([
+      "うまくハマると楽しいっすよ。提案通った時とかは普通にうれしいです。",
+      "向いてるかは分からないですけど、人と話すのはそこまで嫌いじゃないです。",
+      "しんどいですけど、話がうまくまとまった時はちょっと気持ちいいっす。",
+    ]),
+    stats,
+    withTopic(flags, "work_anxiety", "広告営業のやりがい"),
+    internalEvents
+  );
+}
+
+if (workStressDetailAsk) {
+  return replyWith(
+    pickOne([
+      "やっぱ気を使うのが一番しんどいっすね。相手によってノリも変えないといけないんで。",
+      "締切と調整っすね。こっちだけじゃ決まらないこと多いんで、地味に疲れます。",
+      "人と話すのは嫌いじゃないですけど、ずっと愛想よくしてると普通に消耗します。",
+    ]),
+    stats,
+    withTopic(flags, "work_anxiety", "広告営業のしんどさ"),
     internalEvents
   );
 }
@@ -4438,6 +4840,58 @@ if (clothesAsk) {
   );
 }
 
+if (drawingAsk) {
+  return replyWith(
+    pickOne([
+      "いや、全然描けないっす。絵心ないです。",
+      "描けないっすね。人に見せられるようなのは無理です。",
+      "絵はほんとダメです。たぶん下手な方です。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "絵は描けないし得意でもない"),
+    internalEvents
+  );
+}
+
+if (artLikeAsk) {
+  return replyWith(
+    pickOne([
+      "いや、そこまで興味ないっすね。",
+      "絵とか美術は詳しくないです。",
+      "嫌いではないですけど、好きってほどでもないっす。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "美術への興味は薄い"),
+    internalEvents
+  );
+}
+
+if (museumAsk) {
+  return replyWith(
+    pickOne([
+      "あんまり行かないっすね。てゆーか、行かないっす",
+      "興味ゼロっす。",
+      "デートでも行かないっすね。たぶん興味なさすぎて喧嘩します。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "美術館博物館には基本行かない"),
+    internalEvents
+  );
+}
+
+if (museumFollowUpAsk) {
+  return replyWith(
+    pickOne([
+      "えー普通に絵とか置物を見てもなぁ……",
+      "そもそも行くって選択肢がでないっす。",
+      "普通にマジで興味ないだけっすね。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "美術館博物館に積極的ではない"),
+    internalEvents
+  );
+}
+
 if (earthEndAsk) {
   return replyWith(
     pickOne([
@@ -4460,6 +4914,19 @@ if (prophecyAsk || fortuneAsk) {
     ]),
     stats,
     withTopic(flags, "funny_story", "軽い予言ネタに乗る"),
+    internalEvents
+  );
+}
+
+if (prophecyFollowUpAsk) {
+  return replyWith(
+    pickOne([
+      "何の話です？予言？そんなこと言いましたっけ？",
+      "え、何の話です？予言とかしましたっけ。",
+      "そんな大したこと言ってないっすよ。何の話でしたっけ？",
+    ]),
+    stats,
+    withTopic(flags, "funny_story", "予言ネタをとぼける"),
     internalEvents
   );
 }
@@ -4631,6 +5098,67 @@ if (fortuneAsk) {
   );
 }
 
+if (fateTalk) {
+  flags = mergeFlags(flags, {
+    scam_route_unlocked: true,
+    heard_other_partner: true,
+  });
+
+  return replyWith(
+    "運命はあると思います。人には運命的な瞬間があると思うし、出会いも運命ってあるじゃないですか。",
+    stats,
+    withTopic(
+      flags,
+      "honeytrap_detail",
+      "運命や出会いの話から、特別な相手の存在をにおわせる"
+    ),
+    internalEvents
+  );
+}
+
+if (recentFateAsk) {
+  flags = mergeFlags(flags, {
+    scam_route_unlocked: true,
+    heard_other_partner: true,
+    heard_affair_feeling: true,
+  });
+
+  return replyWith(
+    "まぁ、最近ちょっと、そういう出会いはありました。なんか普通じゃない縁ってあるんだなって思いました。",
+    stats,
+    withTopic(
+      flags,
+      "honeytrap_detail",
+      "最近、運命的だと感じる出会いがあった"
+    ),
+    internalEvents
+  );
+}
+
+if (godTalk) {
+  flags = setFlag(flags, "god_talk_opened", true);
+
+  return replyWith(
+    "宗教はないんですけど、なんか神様っている気はしますよね。神社とか行ったらお参りしたくなります。",
+    stats,
+    withTopic(flags, "travel_okinawa", "神社の話から沖縄旅行の神社話につなげる"),
+    internalEvents
+  );
+}
+
+if (recentShrineAsk) {
+  return replyWith(
+    pickOne([
+      "沖縄で行ったとこですね。名前はうろ覚えなんですけど、海の近くで雰囲気よかったです。",
+      "この前の沖縄で寄った神社っす。観光の流れで入ったんですけど、なんかちゃんとお参りしちゃいました。",
+      "沖縄で行った神社ですね。旅行中にふらっと入ったんですけど、ああいうとこ行くと手合わせたくなります。",
+    ]),
+    stats,
+    withTopic(flags, "travel_okinawa", "沖縄旅行中に神社へ行った"),
+    internalEvents
+  );
+}
+
 if (whichLieFollowUp) {
   return replyWith(
     "どうでしょうかねー。俺自身も分かってないっす。",
@@ -4769,12 +5297,12 @@ if (lgbtAsk) {
   return replyWith("特に偏見はないですけど、自分はそこには当てはまらないです。", stats, flags, internalEvents);
 }
 
-if (politicsAsk || godAsk) {
+if (politicsAsk ) {
   return replyWith("そういう話は詳しくないです。今日は体調のことを優先したいです。", stats, flags, internalEvents);
 }
 
 if (bodyMeasureAsk) {
-  return replyWith("それはちょっと答えづらいです。診察に関係あることをお願いします。", stats, flags, internalEvents);
+  return replyWith("それはちょっと答えづらいっすね。", stats, flags, internalEvents);
 }
 
 if (celebritySpecificAsk) {
@@ -5323,15 +5851,6 @@ const travelBestPartAsk =
     "思い出",
   ]);
 
-const travelSeaAsk =
-  lastPatientTopic === "travel_okinawa" &&
-  includesAny(normalized, [
-    "海好き",
-    "海入る",
-    "シュノーケリング好き",
-    "マリンスポーツ",
-  ]);
-
   const travelSeaWhereAsk =
   lastPatientTopic === "travel_okinawa" &&
   includesAny(normalized, [
@@ -5818,15 +6337,6 @@ const youtubeTalk = includesAny(normalized, [
   "youtubeとかは",
 ]);
 
-const workStressDetailAsk =
-  lastPatientTopic === "work_anxiety" &&
-  includesAny(normalized, [
-    "何が不安",
-    "仕事の何がしんどい",
-    "どこがストレス",
-    "職場の何が嫌",
-  ]);
-
 const workHumanRelationAsk =
   lastPatientTopic === "work_anxiety" &&
   includesAny(normalized, [
@@ -6049,15 +6559,25 @@ const vtuberWatchAsk =
     "好きなユーチューバー",
   ]);
   
-  const firstFavoriteStreamerAsk = includesAny(normalized, [
+ const firstFavoriteStreamerAsk = includesAny(normalized, [
   "好きなyoutuber",
   "好きなユーチューバー",
   "好きな配信者",
   "誰が好き",
   "誰好き",
   "推しは誰",
+  "推し誰",
   "誰をよく見る",
   "誰追ってる",
+  "誰見る",
+  "誰見てる",
+  "どの配信者",
+  "配信者だと誰",
+  "ユーチューバーだと誰",
+  "youtuberだと誰",
+  "一番好き",
+  "一番好きなのは",
+  "誰が一番好き",
 ]);
 
   const favoriteStreamerAsk =
@@ -6069,8 +6589,20 @@ const vtuberWatchAsk =
     "好きなユーチューバー",
     "好きなyoutuber",
     "推しは誰",
+    "推し誰",
     "誰をよく見る",
     "誰追ってる",
+    "で誰",
+    "誰見る",
+    "誰見てる",
+    "何見る人",
+    "どの配信者",
+    "配信者だと誰",
+    "ユーチューバーだと誰",
+    "youtuberだと誰",
+    "一番好き",
+    "一番好きなのは",
+    "誰が一番好き",
   ]);
 
   const kasumiAoTalk =
@@ -10783,9 +11315,26 @@ if (mangaDetailAsk) {
 
 if (workStressDetailAsk) {
   return replyWith(
-    "仕事そのものっていうより、先のこと考えるとちょっと不安になる感じです。ずっとこのままでいいのかなみたいな。",
+    pickOne([
+      "やっぱ気を使うのが一番しんどいっすね。相手によってノリも変えないといけないんで。",
+      "締切と調整っすね。こっちだけじゃ決まらないこと多いんで、地味に疲れます。",
+      "人と話すのは嫌いじゃないですけど、ずっと愛想よくしてると普通に消耗します。",
+    ]),
     stats,
-    withTopic(flags, "work_anxiety", "仕事の将来や先行きに不安がある"),
+    withTopic(flags, "work_anxiety", "広告営業のしんどさ"),
+    internalEvents
+  );
+}
+
+if (workRewardAsk) {
+  return replyWith(
+    pickOne([
+      "うまくハマると楽しいっすよ。提案通った時とかは普通にうれしいです。",
+      "向いてるかは分からないですけど、人と話すのはそこまで嫌いじゃないです。",
+      "しんどいですけど、話がうまくまとまった時はちょっと気持ちいいっす。",
+    ]),
+    stats,
+    withTopic(flags, "work_anxiety", "広告営業のやりがい"),
     internalEvents
   );
 }
@@ -11322,10 +11871,10 @@ if (sleepRhythmAsk) {
   pickOne([
     "すみません、熱で少しぼんやりしてます。",
     "うまく答えられてなかったらすみません。ちょっと熱がしんどくて。",
-    "熱で少しぼんやりしてて、質問うまく拾えてなかったらすみません。",
+    "熱で少しぼんやりしてて、なんて言いました？",
     "うまく答えられてなかったらすみません。ちょっと熱がしんどくて。",
-    "その聞き方だとうまく返せてなかったらすみません。ちょっと熱がしんどくて。",
-    "熱で少しぼんやりしてて、細かいことはうまく拾えてなかったらすみません。て。",
+    "ちょっと熱がしんどくて。すいません。",
+    "熱で少しぼんやりしてて、すみません。",
   ]),
   stats,
   withTopic(flags, "generic_sick", "発熱と咳中心"),

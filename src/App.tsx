@@ -3179,7 +3179,7 @@ return (
           style={{
             display: "grid",
             gridTemplateColumns: isResultCompact ? "1fr" : "1fr 320px",
-            gap: isResultPhone ? 10 : 12,
+            gap: isResultPhone ? 10 : 5,
             alignItems: "stretch",
           }}
         >
@@ -3209,7 +3209,7 @@ return (
             <div
               style={{
                 display: "grid",
-                gap: isResultPhone ? 4 : 6,
+                gap: isResultPhone ? 0 : 6,
                 fontSize: isResultPhone ? 16 : isResultCompact ? 18 : 20,
                 lineHeight: 1.55,
                 opacity: 0.96,
@@ -3302,10 +3302,10 @@ return (
           <textarea
             value={chartReviewText}
             onChange={(e) => setChartReviewText(e.target.value.slice(0, 180))}
-            placeholder="例：発症時期をもう少し詳しく聞くべきだった。咳と痰の経過を時系列で確認したかった。"
+            placeholder=""
             style={{
-              width: "100%",
-              minHeight: isResultPhone ? 82 : 96,
+              width: "80%",
+              minHeight: isResultPhone ? 82 : 90,
               resize: "none",
               borderRadius: 14,
               border: "1px solid rgba(255,255,255,0.18)",
@@ -3325,9 +3325,9 @@ return (
     justifyContent: "space-between",
     alignItems: "center",
     gap: 12,
-    fontSize: isResultPhone ? 12 : 15,
+    fontSize: isResultPhone ? 12 : 14,
     lineHeight: 1.7,
-    opacity: 0.76,
+    opacity: 0.7,
     minWidth: 0,
   }}
 >
@@ -3472,27 +3472,13 @@ return (
 </div>
 <div
   style={{
-    display: "grid",
-    gridTemplateColumns: isResultCompact ? "1fr" : "1fr auto auto",
+    display: "flex",
+    justifyContent: "flex-end",
     gap: 12,
-    alignItems: "center",
     padding: isResultPhone ? "12px 4px 0" : "14px 4px 0",
-    minWidth: 0,
+    flexWrap: "wrap",
   }}
 >
-  <div
-    style={{
-      fontSize: isResultPhone ? 14 : 18,
-      lineHeight: 1.6,
-      opacity: 0.92,
-      minWidth: 0,
-      textAlign: "right",
-      justifySelf: "end",
-    }}
-  >
-    医療知識を使って戦うカードゲーム『レギュレア』も公開中
-  </div>
-
   <button
     onClick={() => {
       playSe(buttonSe);
