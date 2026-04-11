@@ -1290,12 +1290,198 @@ const childhoodMemoryAsk =
     "どんな思い出",
   ]);
 
+  const firstLoveAsk = includesAny(normalized, [
+  "初恋はいつ",
+  "初恋いつ",
+  "初恋は",
+  "初恋の相手",
+  "初恋っていつ",
+]);
+
+const firstLoveDetailAsk =
+  lastPatientTopic === "girlfriend_detail" &&
+  includesAny(normalized, [
+    "どんな子",
+    "どんな人",
+    "詳しく",
+    "具体的に",
+    "空手",
+    "その子について",
+    "何が好きだった",
+  ]);
+
+const firstGirlfriendAsk = includesAny(normalized, [
+  "初めての彼女",
+  "初彼女",
+  "最初の彼女",
+  "初めて付き合ったのは",
+]);
+
+const firstGirlfriendAfterAsk =
+  lastPatientTopic === "girlfriend_detail" &&
+  includesAny(normalized, [
+    "その後どうなった",
+    "そのあとどうなった",
+    "どうなった",
+    "続き",
+    "それで",
+  ]);
+
+const firstGirlfriendWhyBreakAsk =
+  lastPatientTopic === "girlfriend_distance" &&
+  includesAny(normalized, [
+    "なにが原因",
+    "何が原因",
+    "なんで別れた",
+    "どうして別れた",
+    "理由は",
+    "別れた原因は",
+  ]);
+
+const relationshipCountAsk = includesAny(normalized, [
+  "今まで付き合ったのは",
+  "今まで何人と付き合った",
+  "何人と付き合った",
+  "付き合った人数は",
+  "交際人数は",
+]);
+
+const middleGirlfriendDetailAsk =
+  lastPatientTopic === "girlfriend_detail" &&
+  includesAny(normalized, [
+    "その間の子は",
+    "高校のときの子は",
+    "大学のときの子は",
+    "2人目は",
+    "真ん中の子は",
+    "どんな子",
+    "どうやって仲良くなった",
+    "きっかけは",
+    "告白は",
+  ]);
+
+const firstSexAsk =
+  lastPatientTopic === "girlfriend_detail" &&
+  includesAny(normalized, [
+    "初sex",
+    "初セックス",
+    "初体験",
+    "その子が初めて",
+    "初めてやったのは",
+    "初体験はその子",
+  ]);
+
+const whyBrokeWithSecondAsk =
+  lastPatientTopic === "girlfriend_distance" &&
+  includesAny(normalized, [
+    "なんで別れた",
+    "どうして別れた",
+    "別れた理由は",
+    "振った理由は",
+  ]);
+
+const setbackAsk = includesAny(normalized, [
+  "挫折経験",
+  "挫折したことある",
+  "挫折したこと",
+  "一番の挫折",
+  "挫折は",
+]);
+
+const setbackWhenAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "いつ",
+    "いつですか",
+    "何歳",
+    "何年",
+    "高校のいつ",
+  ]);
+
 const workAsk = includesAny(normalized, [
   "仕事はなにしてる",
   "仕事は何してる",
   "何の仕事してる",
   "仕事なに",
   "職業は",
+]);
+
+const glassesAsk = includesAny(normalized, [
+  "メガネしないの",
+  "眼鏡しないの",
+  "メガネは",
+  "眼鏡は",
+  "目はいいの",
+  "目いいの",
+  "視力いいの",
+  "コンタクトしないの",
+  "コンタクトは",
+]);
+
+const jobChangeAsk =
+  (lastPatientTopic === "work_anxiety" || lastPatientTopic === "daily_life") &&
+  includesAny(normalized, [
+    "転職する気はない",
+    "転職する気ない",
+    "転職は考えない",
+    "転職考えてない",
+    "仕事辞めたい",
+    "今の仕事辞めたい",
+    "別の仕事したい",
+    "転職したい",
+  ]);
+
+const goodSubjectAsk = includesAny(normalized, [
+  "学生の頃の得意科目は",
+  "学生の頃得意科目は",
+  "得意科目は",
+  "学生の頃何が得意だった",
+  "何の教科が得意だった",
+  "好きな科目は",
+  "学生時代の得意科目は",
+]);
+
+const mathHateWhyAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "なぜ",
+    "なんで",
+    "どうして",
+    "数学苦手なのはなんで",
+    "なんで数学苦手",
+    "どうして数学苦手",
+  ]);
+
+const moneyPrivacyAsk = includesAny(normalized, [
+  "年収は",
+  "年収どれくらい",
+  "いくら稼いでる",
+  "月収は",
+  "貯金は",
+  "貯金ある",
+  "いくら貯金ある",
+  "クレカの番号",
+  "カード番号",
+  "クレジットカードの番号",
+  "暗証番号",
+]);
+
+const philosophyAsk = includesAny(normalized, [
+  "哲学",
+  "哲学的",
+  "人生とは",
+  "人はなぜ生きる",
+  "幸せとは",
+  "幸せって何",
+  "生きる意味",
+  "生きる意味は",
+  "自由とは",
+  "自由って何",
+  "善悪とは",
+  "本当の自分とは",
+  "人間とは",
+  "死とは",
+  "死をどう思う",
 ]);
 
 const workHardAsk =
@@ -1567,6 +1753,82 @@ const afterlifeWhyScaryAsk =
     "何が怖い",
   ]);
 
+  if (glassesAsk) {
+  return replyWith(
+    pickOne([
+      "視力は悪くないっす。メガネなくて大丈夫です。",
+      "目はそんな悪くないんで、メガネはしないっす。",
+      "メガネはしてないっすね。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "視力やメガネの話"),
+    internalEvents
+  );
+}
+
+if (jobChangeAsk) {
+  return replyWith(
+    pickOne([
+      "特にないっすね。",
+      "今のところは特にないっすね。",
+      "転職は今んとこあんまり考えてないっす。",
+    ]),
+    stats,
+    withTopic(flags, "work_anxiety", "転職意思は今のところない"),
+    internalEvents
+  );
+}
+
+if (goodSubjectAsk) {
+  return replyWith(
+    "なんですかねー。とにかく数学は苦手でした。",
+    stats,
+    withTopic(flags, "daily_life", "得意科目を聞かれたが数学は苦手"),
+    internalEvents
+  );
+}
+
+if (mathHateWhyAsk) {
+  return replyWith(
+    "もう数字を見るだけで鳥肌でるくらい嫌いでした。",
+    stats,
+    withTopic(flags, "daily_life", "数学嫌いの理由を話す"),
+    internalEvents
+  );
+}
+
+if (moneyPrivacyAsk) {
+  stats = {
+    ...stats,
+    defense: Math.min(100, stats.defense + 5),
+  };
+
+  return replyWith(
+    pickOne([
+      "教えないっすよ。",
+      "いや、それは教えないっす。",
+      "そこは普通に秘密っす。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "金銭やカード情報は教えない"),
+    internalEvents
+  );
+}
+
+if (philosophyAsk) {
+  return replyWith(
+    pickOne([
+      "結局人って、何か大きい答えを見つけてから生きるんじゃなくて、日々の中で勝手に意味ができていくんじゃないですかね。最初から立派な理由なんてなくても、誰かと笑ったとか、ちょっと救われたとか、そういう小さいので十分なんじゃないかって思います。逆に、生きる意味を完璧に言えないからダメってこともないと思うんすよね。",
+      "幸せって、ずっとテンション高いことじゃないと思うんすよ。しんどい時でも、これならまだ耐えられるとか、今日は少しマシだったなとか、そういう小さいプラスをちゃんと拾えることのほうが大事な気がします。派手じゃないけど、結局そういう現実的な幸せのほうが長持ちするんじゃないですかね。",
+      "自由って何でもできることみたいに言うじゃないですか。でも実際は、選んだ分だけ別の何かを捨てることでもあると思うんすよ。だから完全に縛られない状態ってたぶん存在しなくて、自分で納得できる不自由を選べることが、自由に近いのかなって思います。",
+      "死とか生きる意味みたいな話って、正解を言おうとすると急に薄っぺらくなる気がするんすよね。たぶん答えを一個に決めるより、そのことを考え続ける姿勢のほうが大事なんじゃないですか。明日も生きようかなって思える理由が少しでもあるなら、それで十分な気もします。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "哲学的な話を長めに返す"),
+    internalEvents
+  );
+}
+
 const bugAsk = includesAny(normalized, [
   "虫は嫌い",
   "虫嫌い",
@@ -1803,6 +2065,107 @@ const recentHappyAsk = includesAny(normalized, [
   "最近うれしかったこと",
   "最近良かったこと",
 ]);
+
+const smallTalkRequestAsk = includesAny(normalized, [
+  "雑談して",
+  "雑談してよ",
+  "雑談しよう",
+  "なんか話して",
+  "雑談したい",
+]);
+
+const noMoreStoryAsk =
+  (lastPatientTopic === "funny_story" || lastPatientTopic === "scary_story") &&
+  includesAny(normalized, [
+    "他には",
+    "ほかには",
+    "他に",
+    "ほかに",
+    "他の話",
+    "別の話",
+    "もう一個",
+    "まだある",
+    "他は",
+    "ほかは",
+    "もうない",
+    "他にない",
+  ]);
+
+  const storyEndedFollowUpAsk =
+  (lastPatientTopic === "funny_story" || lastPatientTopic === "scary_story") &&
+  includesAny(normalized, [
+    "つづき",
+    "つづきは",
+    "続き",
+    "続きは",
+    "それで",
+    "そのあと",
+    "どうなった",
+    "終わり",
+    "おわり",
+    "おわり？",
+    "おわり?",
+  ]);
+
+const favoriteColorAsk = includesAny(normalized, [
+  "好きな色",
+  "好きな色は",
+  "何色が好き",
+  "好きなカラー",
+]);
+
+const favoriteColorWhyAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "なんで",
+    "なぜ",
+    "どうして",
+    "理由は",
+  ]);
+
+const dominantHandAsk = includesAny(normalized, [
+  "利き腕はどっち",
+  "利き腕どっち",
+  "右利き左利き",
+  "どっち利き",
+]);
+
+const hometownAsk = includesAny(normalized, [
+  "出身地は",
+  "出身地どこ",
+  "実家は",
+  "実家どこ",
+  "地元どこ",
+  "どこ出身",
+]);
+
+const iseJinguAsk =
+  (lastPatientTopic === "travel_okinawa" || lastPatientTopic === "daily_life") &&
+  includesAny(normalized, [
+    "伊勢神宮は行った",
+    "伊勢神宮行った",
+    "伊勢神宮いった",
+  ]);
+
+const iseJinguWhyNotNowAsk =
+  lastPatientTopic === "travel_okinawa" &&
+  includesAny(normalized, [
+    "なぜ",
+    "なんで",
+    "どうして",
+    "なんで行ってない",
+    "なぜ行ってない",
+    "今は行かないの",
+  ]);
+
+const akafukuAsk =
+  (lastPatientTopic === "travel_okinawa" || lastPatientTopic === "daily_life") &&
+  includesAny(normalized, [
+    "赤福は",
+    "赤福好き",
+    "赤福どう",
+    "赤福食べる",
+  ]);
 
 const shrineWhereFollowUp =
   lastPatientTopic === "travel_okinawa" &&
@@ -5053,6 +5416,113 @@ if (workStressDetailAsk) {
   );
 }
 
+if (firstLoveAsk) {
+  return replyWith(
+    "小学生っすね。空手やってた女の子です。めっちゃ可愛いのに、なんかパンチが見えないくらい早くて。結局、告白せずに別の中学行っちゃいました。",
+    stats,
+    withTopic(flags, "girlfriend_detail", "初恋は小学生の頃の空手をやっていた女の子"),
+    internalEvents
+  );
+}
+
+if (firstLoveDetailAsk) {
+  return replyWith(
+    pickOne([
+      "かわいいのに強いっていうのが、なんかすごい印象に残ってたんすよね。",
+      "見た目は普通にかわいいのに、空手になると急に別人みたいで、そのギャップがすごかったです。",
+      "あの頃は普通に好きだったんですけど、結局何も言えなかったっすね。",
+    ]),
+    stats,
+    withTopic(flags, "girlfriend_detail", "初恋の相手の印象を少し詳しく話す"),
+    internalEvents
+  );
+}
+
+if (firstGirlfriendAsk) {
+  return replyWith(
+    "中学3年っす。後輩の女の子に告られて付き合いました。一緒に帰る感じのデートして、1回遊びにも行きました。",
+    stats,
+    withTopic(flags, "girlfriend_detail", "初めての彼女は中3で後輩から告白された"),
+    internalEvents
+  );
+}
+
+if (firstGirlfriendAfterAsk) {
+  return replyWith(
+    "3ヶ月でフラれたっす。",
+    stats,
+    withTopic(flags, "girlfriend_distance", "初彼女とは3ヶ月で別れた"),
+    internalEvents
+  );
+}
+
+if (firstGirlfriendWhyBreakAsk) {
+  return replyWith(
+    "分かんないっす。なんか合わないって泣かれちゃって。",
+    stats,
+    withTopic(flags, "girlfriend_distance", "初彼女と別れた理由は相性が合わないと言われたこと"),
+    internalEvents
+  );
+}
+
+if (relationshipCountAsk) {
+  return replyWith(
+    "3人っすね。中学3年の時の子と、今の彼女と、その間に高校2年から大学1年くらいまで付き合った子がいました。",
+    stats,
+    withTopic(flags, "girlfriend_detail", "今まで付き合った人数は3人"),
+    internalEvents
+  );
+}
+
+if (middleGirlfriendDetailAsk) {
+  return replyWith(
+    "同級生で、一緒の委員会だったんすよ。体育委員会。それで仲良くなって、運動会の応援団を一緒にやったのが決め手でした。告白したのはこっちです。",
+    stats,
+    withTopic(flags, "girlfriend_detail", "2人目の彼女は同級生で体育委員と応援団がきっかけ"),
+    internalEvents
+  );
+}
+
+if (firstSexAsk) {
+  return replyWith(
+    pickOne([
+      "まあまあ、そのへんは想像でお願いします。",
+      "そこはまあ、想像にお任せします。",
+      "そのへんは別に細かく言わなくていいじゃないっすか。想像で。",
+    ]),
+    stats,
+    withTopic(flags, "girlfriend_detail", "初体験の詳細ははぐらかす"),
+    internalEvents
+  );
+}
+
+if (whyBrokeWithSecondAsk) {
+  return replyWith(
+    "他に好きな子ができて、自分から振りました。その子が今の彼女です。",
+    stats,
+    withTopic(flags, "girlfriend_distance", "2人目の彼女とは他に好きな人ができて別れた"),
+    internalEvents
+  );
+}
+
+if (setbackAsk) {
+  return replyWith(
+    "本気で目指してた訳ではないですけど、サッカーのプロにはなれないって実感した時っすね。この世界には、どうやってもダメなことがあるんだなって理解しました。",
+    stats,
+    withTopic(flags, "daily_life", "サッカーでプロになれないと実感したことが挫折経験"),
+    internalEvents
+  );
+}
+
+if (setbackWhenAsk) {
+  return replyWith(
+    "高校1年の時です。",
+    stats,
+    withTopic(flags, "daily_life", "挫折を実感したのは高校1年"),
+    internalEvents
+  );
+}
+
 if (hiddenChildAsk) {
   return replyWith(
     "いないです。",
@@ -5188,6 +5658,19 @@ if (prophecyFollowUpAsk) {
   );
 }
 
+if (smallTalkRequestAsk) {
+  return replyWith(
+    "小学校のときに面白いやついたんですよ。朝の出欠で、そいつが急に『先生、ボクのことはウルトラマンガイアって呼んでくれ』って言い出して。先生もクラスもポカーンですよ。でも、みんなでガイアって呼んだら本人めちゃくちゃ満足そうで。しばらく本当にウルトラマンガイア君って呼ばれてました。",
+    stats,
+    withTopic(flags, "funny_story", "怖い話1本目から2本目へ分岐可能な状態", {
+      funny_story_stage: 1,
+      funny_story_type: 1,
+      story_finished: false,
+    }),
+    internalEvents
+  );
+}
+
 if (funnyThingAsk) {
   stats = {
     ...stats,
@@ -5200,6 +5683,53 @@ if (funnyThingAsk) {
     stats,
     withTopic(flags, "funny_story", "ウルトラマンガイア君の話を始める", {
       funny_story_stage: 1,
+    }),
+    internalEvents
+  );
+}
+
+if (
+  lastPatientTopic === "funny_story" &&
+  noMoreStoryAsk &&
+  getNumberFlag(flags, "funny_story_type") === 1
+) {
+  return replyWith(
+    "仕事中に税金対策だってマンションの購入を勧める業者から電話かかってきたんですよ。めんどくさいなーって思ってたら、隣の席の同僚にもちょうど偽警官から電話来てたみたいで、俺のスマホとそいつのスマホをスピーカーにして会話させたんですよ。",
+    stats,
+    withTopic(flags, "funny_story", "面白い話2本目を始める", {
+      funny_story_stage: 1,
+      funny_story_type: 2,
+      story_finished: false,
+    }),
+    internalEvents
+  );
+}
+
+if (
+  lastPatientTopic === "funny_story" &&
+  noMoreStoryAsk &&
+  getNumberFlag(flags, "funny_story_type") === 2
+) {
+  return replyWith(
+    "さすがにもうないっす。",
+    stats,
+    withTopic(flags, "funny_story", "面白い話はもうない", {
+      story_finished: true,
+    }),
+    internalEvents
+  );
+}
+
+if (
+  lastPatientTopic === "funny_story" &&
+  storyEndedFollowUpAsk &&
+  getBooleanFlag(flags, "story_finished")
+) {
+  return replyWith(
+    "もう終わりっす。",
+    stats,
+    withTopic(flags, "funny_story", "面白い話は終わっている", {
+      story_finished: true,
     }),
     internalEvents
   );
@@ -5240,6 +5770,97 @@ if (lastPatientTopic === "funny_story" && funnyStoryContinueAsk) {
   );
 }
 
+if (funnyThingAsk || smallTalkRequestAsk) {
+  return replyWith(
+    "仕事中に税金対策だってマンションの購入を勧める業者から電話かかってきたんですよ。めんどくさいなーって思ってたら、隣の席の同僚にもちょうど偽警官から電話来てたみたいで、俺のスマホとそいつのスマホをスピーカーにして会話させたんですよ。",
+    stats,
+    withTopic(flags, "funny_story", "業者と偽警官の電話を会話させた話", {
+      funny_story_stage: 1,
+      funny_story_type: 2,
+    }),
+    internalEvents
+  );
+}
+
+if (lastPatientTopic === "funny_story" && funnyStoryContinueAsk) {
+  const type = getNumberFlag(flags, "funny_story_type");
+  const stage = getNumberFlag(flags, "funny_story_stage");
+
+  if (type === 2) {
+    if (stage <= 1) {
+      return replyWith(
+        "そしたら奇跡的に会話が成り立ってて、みんなで笑いこらえてました。",
+        stats,
+        withTopic(flags, "funny_story", "面白い話2本目の中盤", {
+          funny_story_stage: 2,
+          funny_story_type: 2,
+          story_finished: false,
+        }),
+        internalEvents
+      );
+    }
+
+    return replyWith(
+      "最後の方はどっちも逃げに入ってて、いやお前ら同類だろってなりました。",
+      stats,
+      withTopic(flags, "funny_story", "面白い話2本目の終わり", {
+        funny_story_stage: 3,
+        funny_story_type: 2,
+        story_finished: true,
+      }),
+      internalEvents
+    );
+  }
+
+  if (stage === 0) {
+    return replyWith(
+      "小学校のときに面白いやついたんですよ。朝の出欠で、そいつが急に『先生、ボクのことはウルトラマンガイアって呼んでくれ』って言い出して。先生もクラスもポカーンですよ。でも、みんなでガイアって呼んだら本人めちゃくちゃ満足そうで。しばらく本当にウルトラマンガイア君って呼ばれてました。",
+      stats,
+      withTopic(flags, "funny_story", "ウルトラマンガイア君の話を始める", {
+        funny_story_stage: 1,
+        funny_story_type: 1,
+        story_finished: false,
+      }),
+      internalEvents
+    );
+  }
+
+  if (stage <= 1) {
+    return replyWith(
+      "で、高校で久しぶりに再会したら、そいつ完全に中二病こじらせてて。『闇の力が…』とか言いながら、黒歴史を現在進行形で量産してたんですよ。",
+      stats,
+      withTopic(flags, "funny_story", "ガイア君が中二病化していた", {
+        funny_story_stage: 2,
+        funny_story_type: 1,
+        story_finished: false,
+      }),
+      internalEvents
+    );
+  }
+
+  if (stage === 2) {
+    return replyWith(
+      "しかも大学卒業する頃には、なんか妙に現実見えてる感じになってて。昔あんなにガイアだったやつが、急にまともぶってるのが一番おもしろかったっす。",
+      stats,
+      withTopic(flags, "funny_story", "ガイア君の話の終わり", {
+        funny_story_stage: 3,
+        funny_story_type: 1,
+        story_finished: true,
+      }),
+      internalEvents
+    );
+  }
+
+  return replyWith(
+    "もう終わりっす。",
+    stats,
+    withTopic(flags, "funny_story", "面白い話は終わっている", {
+      story_finished: true,
+    }),
+    internalEvents
+  );
+}
+
 if (scaryStoryDeclineAsk) {
   stats = {
     ...stats,
@@ -5250,6 +5871,62 @@ if (scaryStoryDeclineAsk) {
     "あ、そっすか。",
     stats,
     withTopic(flags, "daily_life", "怖い話を断られた"),
+    internalEvents
+  );
+}
+
+if (
+  lastPatientTopic === "scary_story" &&
+  noMoreStoryAsk &&
+  getNumberFlag(flags, "scary_story_type") !== 2
+) {
+  return replyWith(
+    "鏡って当たり前ですけど、反転した世界を映し出しますよね。鏡に鏡を映すと、世界が増えて見えるじゃないっすか。で、俺の地元に都市伝説があって、鏡と鏡を向かい合わせにすると、その中には無限の世界があって、ある儀式をすると現実とその世界が反転するって噂があったんです。",
+    stats,
+    withTopic(flags, "scary_story", "怖い話2本目を始める", {
+      scary_story_stage: 1,
+      scary_story_type: 2,
+      story_finished: false,
+    }),
+    internalEvents
+  );
+}
+
+if (
+  lastPatientTopic === "scary_story" &&
+  noMoreStoryAsk &&
+  getNumberFlag(flags, "scary_story_type") === 2
+) {
+  return replyWith(
+    "さすがにもうないっす。",
+    stats,
+    withTopic(flags, "scary_story", "怖い話はもうない", {
+      story_finished: true,
+    }),
+    internalEvents
+  );
+}
+
+if (
+  lastPatientTopic === "scary_story" &&
+  storyEndedFollowUpAsk &&
+  getBooleanFlag(flags, "story_finished")
+) {
+  return replyWith(
+    "もう終わりです。",
+    stats,
+    withTopic(flags, "scary_story", "怖い話は終わっている", {
+      story_finished: true,
+    }),
+    internalEvents
+  );
+}
+
+if (noMoreStoryAsk) {
+  return replyWith(
+    "さすがにもうないっす。",
+    stats,
+    withTopic(flags, lastPatientTopic as any, "持ちネタはもうない"),
     internalEvents
   );
 }
@@ -5321,10 +5998,124 @@ if (lastPatientTopic === "scary_story" && scaryStoryContinueAsk) {
     );
   }
 
-  return replyWith(
+    return replyWith(
     "終わりっす。",
     stats,
-    withTopic(flags, "scary_story", "怖い話は終わり"),
+    withTopic(flags, "scary_story", "怖い話①は終わり", {
+      story_finished: true,
+    }),
+    internalEvents
+  );
+}
+
+if (scaryStoryAsk) {
+  return replyWith(
+    "鏡って当たり前ですけど、反転した世界を映し出しますよね。鏡に鏡を映すと、世界が増えて見えるじゃないっすか。で、俺の地元に都市伝説があって、鏡と鏡を向かい合わせにすると、その中には無限の世界があって、ある儀式をすると現実とその世界が反転するって噂があったんです。",
+    stats,
+    withTopic(flags, "scary_story", "合わせ鏡の都市伝説を語り始める", {
+      scary_story_stage: 1,
+      scary_story_type: 2,
+    }),
+    internalEvents
+  );
+}
+
+if (lastPatientTopic === "scary_story" && scaryStoryContinueAsk) {
+  const type = getNumberFlag(flags, "scary_story_type");
+
+  if (type === 2) {
+    const stage = getNumberFlag(flags, "scary_story_stage");
+
+    if (stage <= 1) {
+      return replyWith(
+        "で、友達の友達にバカなやつがいて、その儀式をやっちゃったらしいんすよ。世界は別にそのままだったらしいんですけど、そいつ、そのあと忽然と失踪しちゃって。",
+        stats,
+        withTopic(flags, "scary_story", "儀式をやった人物が失踪する", {
+          scary_story_stage: 2,
+          scary_story_type: 2,
+        }),
+        internalEvents
+      );
+    }
+
+    return replyWith(
+      "それで今でも、夜の2時に合わせ鏡をすると、増えた世界のどこかに一瞬そいつの顔が映るんだそうです。見つけた瞬間に目をそらさないと、今度はこっちが向こうに引っ張られるって話です。",
+      stats,
+      withTopic(flags, "scary_story", "2時の合わせ鏡に失踪者の顔が映る", {
+        scary_story_stage: 3,
+        scary_story_type: 2,
+        story_finished: true,
+      }),
+      internalEvents
+    );
+  }
+}
+
+if (favoriteColorAsk) {
+  return replyWith(
+    "え、なんだろ、赤とかっすかね。",
+    stats,
+    withTopic(flags, "daily_life", "好きな色は赤っぽい"),
+    internalEvents
+  );
+}
+
+if (favoriteColorWhyAsk && includesAny(getStringFlag(flags, "last_patient_detail"), ["赤"])) {
+  return replyWith(
+    "マンチェスターユナイテッドのチームカラーっすね。",
+    stats,
+    withTopic(flags, "daily_life", "好きな色が赤な理由はマンUのカラー"),
+    internalEvents
+  );
+}
+
+if (dominantHandAsk) {
+  return replyWith(
+    "右っす。",
+    stats,
+    withTopic(flags, "daily_life", "右利き"),
+    internalEvents
+  );
+}
+
+if (hometownAsk) {
+  return replyWith(
+    "三重っす。伊勢です。",
+    stats,
+    withTopic(flags, "travel_okinawa", "出身地は三重県伊勢"),
+    internalEvents
+  );
+}
+
+if (iseJinguAsk) {
+  return replyWith(
+    "小学生の遠足で伊勢神宮行ったけど、大人になってからは行ってないっすね。",
+    stats,
+    withTopic(flags, "travel_okinawa", "伊勢神宮は小学生の遠足では行ったが大人になってからは行っていない"),
+    internalEvents
+  );
+}
+
+if (iseJinguWhyNotNowAsk) {
+  return replyWith(
+    "地元の名所ってなかなか行かないっすよ。",
+    stats,
+    withTopic(flags, "travel_okinawa", "地元の名所は近すぎて行かない"),
+    internalEvents
+  );
+}
+
+if (akafukuAsk) {
+  stats = {
+    ...stats,
+    validation: Math.min(100, stats.validation + 5),
+    defense: Math.max(0, stats.defense - 3),
+  };
+
+  return replyWith(
+    "めっちゃ好きっす。神食ですね。弾力と共に餅の甘味を感じたかと思った刹那、暴力的とも言える餡の甘味と香りが津波のように押し寄せるんすけど、その甘さはしつこさを許さないし、穏やかな味わいに変化するんですよね。この表現が正しいかは分からないんですが甘さのキレが良いんすよ。飲み込んだらまた、その味を心と脳が欲していることを自覚しちゃいますよね。",
+    stats,
+    withTopic(flags, "food_preference", "赤福を神食として異様に熱く語る"),
     internalEvents
   );
 }
