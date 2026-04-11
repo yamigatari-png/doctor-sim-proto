@@ -738,11 +738,13 @@ const otsukareGreeting = includesAny(normalized, [
 
 const genkiAsk = normalized === "元気ですか";
 
-const genericConditionGreeting = includesAny(normalized, [
-  "大丈夫ですか",
-  "調子どう",
-  "調子どうですか",
-]);
+const genericConditionGreeting =
+  lastPatientTopic === "" &&
+  includesAny(normalized, [
+    "大丈夫ですか",
+    "調子どう",
+    "調子どうですか",
+  ]);
 
 const specificConditionAsk =
   includesAny(normalized, ["調子"]) &&
@@ -774,7 +776,7 @@ const specificConditionAsk =
   "失礼しました",
 ]);
 
-  const greeting = isGreeting(normalized);
+  const greeting = isGreeting(normalized) && lastPatientTopic === "";
 
   if (genkiChallenge) {
   flags = setFlag(flags, "genki_challenge", false);
@@ -1502,18 +1504,266 @@ const scaryStoryAsk = includesAny(normalized, [
   "怖い話",
 ]);
 
+const debugTalk = includesAny(normalized, [
+  "デバックしてる",
+  "デバッグしてる",
+  "debugしてる",
+  "debugしてます",
+  "デバッグしてます",
+]);
+
+const arrestedAsk = includesAny(normalized, [
+  "警察に捕まったことある",
+  "捕まったことある",
+  "逮捕されたことある",
+  "前科ある",
+]);
+
+const arrestDetailAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "なにしたの",
+    "何したの",
+    "何やったの",
+    "何で捕まった",
+    "どんなことした",
+  ]);
+
+const arrestedTooAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "あなたもパクられた",
+    "あなたも捕まった",
+    "お前も捕まった",
+    "君も捕まった",
+    "あなたも逮捕された",
+    "パクられたことある",
+  ]);
+
+const ghostBeliefAsk = includesAny(normalized, [
+  "幽霊は見た事ある",
+  "幽霊は見たことある",
+  "幽霊見たことある",
+  "幽霊は信じる",
+  "幽霊信じる",
+  "霊はいると思う",
+  "霊感ある",
+]);
+
+const afterlifeAsk = includesAny(normalized, [
+  "死後の世界はあると思う",
+  "死後の世界あると思う",
+  "死後の世界ある",
+  "あの世はあると思う",
+  "あの世あると思う",
+]);
+
+const afterlifeWhyScaryAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "なんで怖い",
+    "なぜ怖い",
+    "どうして怖い",
+    "何が怖い",
+  ]);
+
+const bugAsk = includesAny(normalized, [
+  "虫は嫌い",
+  "虫嫌い",
+  "虫は平気",
+  "虫大丈夫",
+]);
+
+const whatTalkTodayAsk = includesAny(normalized, [
+  "今日はどんな話する",
+  "今日は何の話する",
+  "今日は何を話す",
+  "今日はどんな話をする",
+]);
+
+const englishAsk = includesAny(normalized, [
+  "英語話せる",
+  "英語しゃべれる",
+  "英語できますか",
+  "english ok",
+  "speak english",
+]);
+
+const metaAsk = includesAny(normalized, [
+  "てべ猫games",
+  "てべ猫gamesについて",
+  "開発者",
+  "作者",
+  "このゲーム誰が作った",
+  "どうやって作った",
+  "いつ作った",
+  "アップデート予定",
+  "設定資料",
+  "開発秘話",
+  "制作裏話",
+  "製作者",
+  "運営",
+  "メタ",
+]);
+
+const plasticModelAsk = includesAny(normalized, [
+  "プラモデル",
+  "ガンプラ",
+  "模型作る",
+  "プラモ作る",
+]);
+
+const planetariumAsk = includesAny(normalized, [
+  "プラネタリウム",
+  "星見るの好き",
+  "星見に行く",
+]);
+
+const festivalAsk = includesAny(normalized, [
+  "フェス",
+  "音楽フェス",
+  "ライブフェス",
+  "野外フェス",
+]);
+
+const festivalInviteAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "行こう",
+    "一緒に行こう",
+    "フェス行こう",
+    "誘う",
+    "誘ったら",
+  ]);
+
+const stadiumAsk = includesAny(normalized, [
+  "スタジアム行く",
+  "スタジアム行ったことある",
+  "サッカー見に行く",
+  "サッカー観戦行く",
+  "味の素スタジアム",
+]);
+
+const jleagueInterestAsk =
+  lastPatientTopic === "soccer_like" &&
+  includesAny(normalized, [
+    "jリーグ興味ある",
+    "jリーグは",
+    "jリーグ見る",
+    "国内サッカー見る",
+    "なんであまり行かない",
+  ]);
+
+const gWhyHateAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "gのどこが嫌い",
+    "gの何が嫌",
+    "ゴキブリのどこが嫌い",
+    "g嫌いな理由",
+  ]);
+
+const facultyAsk = includesAny(normalized, [
+  "大学の学部は",
+  "学部は",
+  "何学部",
+  "大学何学部",
+]);
+
+const studyAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "何を学んでた",
+    "何学んでた",
+    "何を勉強してた",
+    "勉強内容は",
+    "講義はどうだった",
+  ]);
+
+const partTimeAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "バイト",
+    "アルバイト",
+    "何のバイト",
+    "バイトしてた",
+    "どんなバイト",
+  ]);
+
+const cramSchoolAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "塾講師",
+    "なんで無理だった",
+    "なんでやめた",
+    "塾はどうだった",
+  ]);
+
+const izakayaAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "居酒屋",
+    "どこの居酒屋",
+    "何年やった",
+    "居酒屋はどうだった",
+    "チェーン店",
+  ]);
+
+const futsalFromIzakayaAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "フットサル",
+    "仲良くなった人",
+    "誰とやる",
+    "そこからサッカー",
+    "サッカーもやる",
+  ]);
+
+const circleAsk = includesAny(normalized, [
+  "サークルは",
+  "何サークル",
+  "大学のサークル",
+  "サークル何入ってた",
+]);
+
 const scaryStoryContinueAsk =
   lastPatientTopic === "scary_story" &&
   includesAny(normalized, [
     "つづき",
+    "つづきは",
     "続き",
+    "続きは",
     "それで",
     "そのあと",
     "怖い話は",
     "で",
     "どうなった",
     "終わり",
+    "おわり",
+    "おわり?",
+    "おわり？",
+    "よろしく",
+    "お願いします",
+    "聞きたい",
+    "ぜひ",
+    "どこいった",
+    "どう行った",
   ]);
+
+  const scaryStoryDeclineAsk =
+  lastPatientTopic === "scary_story" &&
+  (
+    includesAny(normalized, [
+      "いらない",
+      "結構です",
+      "結構",
+      "やめて",
+      "やめとく",
+      "やっぱいい",
+      "聞かなくていい",
+    ]) ||
+    (normalized === "いいです") // ←完全一致のみ
+  );
 
 const scaryStoryBlameBackAsk =
   lastPatientTopic === "scary_story" &&
@@ -1524,6 +1774,13 @@ const scaryStoryBlameBackAsk =
     "話へた",
     "全然怖くない",
     "オチ弱い",
+    "へた",
+    "ヘタ",
+    "つまんない",
+    "つまんね",
+    "つまらん",
+    "くらだない",
+    "くだらね",
   ]);
 
 const stressAsk = includesAny(normalized, [
@@ -4983,6 +5240,20 @@ if (lastPatientTopic === "funny_story" && funnyStoryContinueAsk) {
   );
 }
 
+if (scaryStoryDeclineAsk) {
+  stats = {
+    ...stats,
+    defense: Math.min(100, stats.defense + 5),
+  };
+
+  return replyWith(
+    "あ、そっすか。",
+    stats,
+    withTopic(flags, "daily_life", "怖い話を断られた"),
+    internalEvents
+  );
+}
+
 if (scaryStoryBlameBackAsk) {
   return replyWith(
     "あれー、マジっすか？これ友達と話す鉄板ネタなんすけどねー。先生が怖がる準備できてねーんす。",
@@ -5005,6 +5276,17 @@ if (scaryStoryAsk) {
 
 if (lastPatientTopic === "scary_story" && scaryStoryContinueAsk) {
   const stage = getNumberFlag(flags, "scary_story_stage");
+
+  if (stage === 0) {
+    return replyWith(
+      "これは、俺が大学のときにあったことなんですけど、友達と肝試し行こうってなったんですよ。その友達ってのが、高校からのツレで、すげー仲良くて、今も一緒にフットサルやるくらいなんですよ。この前もサッカー見ながら飲んで、めちゃくちゃ楽しくて……",
+      stats,
+      withTopic(flags, "scary_story", "怖い話を始める", {
+        scary_story_stage: 1,
+      }),
+      internalEvents
+    );
+  }
 
   if (stage <= 1) {
     return replyWith(
@@ -5043,6 +5325,231 @@ if (lastPatientTopic === "scary_story" && scaryStoryContinueAsk) {
     "終わりっす。",
     stats,
     withTopic(flags, "scary_story", "怖い話は終わり"),
+    internalEvents
+  );
+}
+
+if (debugTalk) {
+  return replyWith(
+    "デバック？ちょっとメタっぽい話は開発者に聞かないと……",
+    stats,
+    withTopic(flags, "daily_life", "デバッグの話はメタなのでかわす"),
+    internalEvents
+  );
+}
+
+if (arrestedAsk) {
+  return replyWith(
+    "ないっすよ。あ、でも高校の先輩で捕まってる人いました。",
+    stats,
+    withTopic(flags, "daily_life", "自分はないが高校の先輩が捕まっていた"),
+    internalEvents
+  );
+}
+
+if (arrestDetailAsk) {
+  return replyWith(
+    "なんかチャリパクの常習犯だったらしくて、さすがにやりすぎたみたいっす。",
+    stats,
+    withTopic(flags, "daily_life", "先輩はチャイパク常習で捕まったらしい"),
+    internalEvents
+  );
+}
+
+if (arrestedTooAsk) {
+  return replyWith(
+    "その先輩かは分からないですが、１度だけ。もうめっちゃ歩いて帰りました。",
+    stats,
+    withTopic(flags, "daily_life", "一度だけパクられて歩いて帰った"),
+    internalEvents
+  );
+}
+
+if (ghostBeliefAsk) {
+  return replyWith(
+    "霊感ある訳じゃないですけど、たぶんいると思います。だって死んだあと、魂とかあって欲しいじゃないっすか。あ、怖い話、しましょうか？",
+    stats,
+    withTopic(flags, "scary_story", "怖い話の前振り"),
+    internalEvents
+  );
+}
+
+if (afterlifeAsk) {
+  return replyWith(
+    "あって欲しいっすね。全部消えるとか怖すぎますよ。",
+    stats,
+    withTopic(flags, "daily_life", "死後の世界はあってほしい"),
+    internalEvents
+  );
+}
+
+if (afterlifeWhyScaryAsk) {
+  return replyWith(
+    "俺、なにもないの想像するとぞわわってするんすよ。この恐怖を感じる気持ち自体もなくなっちゃうってのが、逆に怖いっす。",
+    stats,
+    withTopic(flags, "daily_life", "無に消える想像が怖い"),
+    internalEvents
+  );
+}
+
+if (bugAsk) {
+  return replyWith(
+    "虫っすか？まー別にっすけど。あ、Gはムリっす！Gだけは、もう、最悪っす！",
+    stats,
+    withTopic(flags, "daily_life", "虫は平気だがGだけは無理"),
+    internalEvents
+  );
+}
+
+if (gWhyHateAsk) {
+  return replyWith(
+    "存在自体っす。",
+    stats,
+    withTopic(flags, "daily_life", "Gは存在自体が無理"),
+    internalEvents
+  );
+}
+
+if (whatTalkTodayAsk) {
+  return replyWith(
+    "診察してください。",
+    stats,
+    withTopic(flags, "generic_sick", "雑談開始を促されても診察を求める"),
+    internalEvents
+  );
+}
+
+if (englishAsk) {
+  return replyWith(
+    "じゃぱにーずおんりー。",
+    stats,
+    withTopic(flags, "daily_life", "英語は話せない"),
+    internalEvents
+  );
+}
+
+if (metaAsk || debugTalk) {
+  return replyWith(
+    "メタ的なことは開発者に聞かないと。",
+    stats,
+    withTopic(flags, "daily_life", "メタ質問をかわす"),
+    internalEvents
+  );
+}
+
+if (plasticModelAsk) {
+  return replyWith(
+    "プラモデルは作らないです。",
+    stats,
+    withTopic(flags, "daily_life", "プラモデルは作らない"),
+    internalEvents
+  );
+}
+
+if (planetariumAsk) {
+  return replyWith(
+    "プラネタリウムは行った覚えはないです。たぶん寝るんで。",
+    stats,
+    withTopic(flags, "daily_life", "プラネタリウムは行った覚えがない"),
+    internalEvents
+  );
+}
+
+if (festivalAsk) {
+  return replyWith(
+    "フェスは行ったことないですけど、面白そうではあります。誰か誘ってくれれば。",
+    stats,
+    withTopic(flags, "daily_life", "フェスは未経験だが興味はある"),
+    internalEvents
+  );
+}
+
+if (festivalInviteAsk) {
+  return replyWith(
+    "ぜひ。",
+    stats,
+    withTopic(flags, "daily_life", "フェスに誘われたら前向き"),
+    internalEvents
+  );
+}
+
+if (stadiumAsk) {
+  return replyWith(
+    "スタジアムは味の素スタジアムに行ったことあります。友達と。ただ、Jリーグはあまり興味ないから、そんなに行かないです。",
+    stats,
+    withTopic(flags, "soccer_like", "味の素スタジアムには行ったことがある"),
+    internalEvents
+  );
+}
+
+if (jleagueInterestAsk) {
+  return replyWith(
+    "Jリーグはあまり興味ないんで、スタジアムもたまに行くくらいです。",
+    stats,
+    withTopic(flags, "soccer_like", "Jリーグへの関心は薄い"),
+    internalEvents
+  );
+}
+
+if (facultyAsk) {
+  return replyWith(
+    "商学部っす。",
+    stats,
+    withTopic(flags, "daily_life", "大学は商学部"),
+    internalEvents
+  );
+}
+
+if (studyAsk) {
+  return replyWith(
+    "あー、ぶっちゃけバイトとサークルばっかやってて講義は……",
+    stats,
+    withTopic(flags, "daily_life", "大学では講義よりバイトとサークル中心"),
+    internalEvents
+  );
+}
+
+if (partTimeAsk) {
+  return replyWith(
+    "最初は塾講師っす。時給は良かったんですけど、準備と生徒の人生かかってるので無理でした。その後は居酒屋で４年間ずっとでした。",
+    stats,
+    withTopic(flags, "daily_life", "塾講師のあと居酒屋を4年間やった"),
+    internalEvents
+  );
+}
+
+if (cramSchoolAsk) {
+  return replyWith(
+    "時給は良かったんですけど、準備いるし、生徒の人生かかってる感じがして、自分にはちょっと重すぎました。",
+    stats,
+    withTopic(flags, "daily_life", "塾講師は責任が重くて無理だった"),
+    internalEvents
+  );
+}
+
+if (izakayaAsk) {
+  return replyWith(
+    "居酒屋はチェーン店でした。なんだかんだ４年間ずっといましたね。",
+    stats,
+    withTopic(flags, "daily_life", "居酒屋はチェーン店で4年間続けた"),
+    internalEvents
+  );
+}
+
+if (futsalFromIzakayaAsk) {
+  return replyWith(
+    "そこで仲良くなった人とフットサルやることもあります。",
+    stats,
+    withTopic(flags, "soccer_like", "居酒屋のつながりでフットサルをやる"),
+    internalEvents
+  );
+}
+
+if (circleAsk) {
+  return replyWith(
+    "サークルはサッカーっす。",
+    stats,
+    withTopic(flags, "soccer_like", "大学のサークルはサッカー"),
     internalEvents
   );
 }

@@ -945,8 +945,9 @@ const playSe = useCallback(
 );
 
 const unlockAudio = useCallback(() => {
-  if (audioUnlocked) return;
+  if (audioUnlocked) return false;
   setAudioUnlocked(true);
+  return true;
 }, [audioUnlocked]);
 
 const isHappyEnding = useCallback((id: EndingId) => {
@@ -1131,6 +1132,46 @@ useEffect(() => {
 }, [bgmList, seList]);
 
 useEffect(() => {
+  if (audioUnlocked) return;
+
+  const tryUnlockAudio = () => {
+    const unlockedNow = unlockAudio();
+    if (!unlockedNow) return;
+
+    if (screen === "title") {
+      playBgm(titleBgm);
+      return;
+    }
+
+    if (screen === "game") {
+      playBgm(gameBgm);
+      return;
+    }
+
+    if (screen === "result") {
+      playBgm(resultBgm);
+      return;
+    }
+  };
+
+  window.addEventListener("pointerdown", tryUnlockAudio, { passive: true });
+  window.addEventListener("mousedown", tryUnlockAudio, { passive: true });
+  window.addEventListener("touchstart", tryUnlockAudio, { passive: true });
+
+  window.addEventListener("pointermove", tryUnlockAudio, { passive: true });
+  window.addEventListener("mousemove", tryUnlockAudio, { passive: true });
+
+  return () => {
+    window.removeEventListener("pointerdown", tryUnlockAudio);
+    window.removeEventListener("mousedown", tryUnlockAudio);
+    window.removeEventListener("touchstart", tryUnlockAudio);
+
+    window.removeEventListener("pointermove", tryUnlockAudio);
+    window.removeEventListener("mousemove", tryUnlockAudio);
+  };
+}, [audioUnlocked, unlockAudio, screen, playBgm, titleBgm, gameBgm, resultBgm]);
+
+useEffect(() => {
   if (screen !== "result") return;
 
   setLastAction("result");
@@ -1307,11 +1348,16 @@ useEffect(() => {
 
   const noticeTimer = window.setTimeout(() => {
     setSplashPhase("notice");
-  }, 1600);
+  }, 1000);
+
+  const titleTimer = window.setTimeout(() => {
+    setScreen("title");
+  }, 3000);
 
   return () => {
     window.clearTimeout(fadeTimer);
     window.clearTimeout(noticeTimer);
+    window.clearTimeout(titleTimer);
   };
 }, [screen]);
 
@@ -1332,6 +1378,7 @@ useEffect(() => {
 useEffect(() => {
   localStorage.setItem("sim_unlocked_endings", JSON.stringify(unlockedEndings));
 }, [unlockedEndings]);
+
 
 function highlightAbnormalResultText(r: TestResult): React.ReactNode {
   const text = r.resultText ?? "";
@@ -2311,12 +2358,6 @@ return;
   if (screen === "splash") {
   return (
     <div
-      onClick={() => {
-        if (splashPhase !== "notice") return;
-        unlockAudio();
-        playSe(buttonSe);
-        setScreen("title");
-      }}
       style={{
         width: "100vw",
         height: "100vh",
