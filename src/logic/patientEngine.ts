@@ -712,6 +712,13 @@ export function patientReplyEngine(input: EngineInput): EngineOutput {
   let flags = input.flags;
   const internalEvents: StatEvent[] = [];
 
+  // funny_story 初期化（未定義対策）
+if (getBooleanFlag(flags, "funny_story_active") === false) {
+  // 何もしない（falseのまま）
+} else if (!("funny_story_active" in (flags as any))) {
+  flags = setFlag(flags, "funny_story_active", false);
+}
+
   const fire = (ev: StatEvent) => {
     internalEvents.push(ev);
     const out = applyEvent(stats, flags, ev);
@@ -804,6 +811,42 @@ if (apologyTalk) {
     validation: Math.min(100, stats.validation + 3),
     defense: Math.max(0, stats.defense - 2),
   };
+
+  if (getBooleanFlag(flags, "funny_story_active")) {
+    return replyWith(
+      pickOne([
+        "いいっすよ。面白い話の途中でしたよね。",
+        "大丈夫っす。さっきの話の続きならできますよ。",
+        "気にしなくていいっす。まだ面白い話の流れですし。",
+      ]),
+      stats,
+      withTopic(flags, "funny_story", "謝罪を受け流すが面白い話の文脈は維持", {
+        funny_story_active: true,
+        funny_story_stage: getNumberFlag(flags, "funny_story_stage"),
+        funny_story_type: getNumberFlag(flags, "funny_story_type"),
+        story_finished: getBooleanFlag(flags, "story_finished"),
+      }),
+      internalEvents
+    );
+  }
+
+  if (getBooleanFlag(flags, "scary_story_active")) {
+    return replyWith(
+      pickOne([
+        "いいっすよ。怖い話の途中でしたよね。",
+        "大丈夫っす。さっきの話の続きならできますよ。",
+        "気にしなくていいっす。まだ怖い話の流れですし。",
+      ]),
+      stats,
+      withTopic(flags, "scary_story", "謝罪を受け流すが怖い話の文脈は維持", {
+        scary_story_active: true,
+        scary_story_stage: getNumberFlag(flags, "scary_story_stage"),
+        scary_story_type: getNumberFlag(flags, "scary_story_type"),
+        story_finished: getBooleanFlag(flags, "story_finished"),
+      }),
+      internalEvents
+    );
+  }
 
   return replyWith(
     pickOne([
@@ -1197,7 +1240,9 @@ const funnyThingAsk = includesAny(normalized, [
   "面白いこと言って",
   "おもしろいこと言って",
   "面白い話して",
+  "面白い話をして",
   "おもしろい話して",
+  "おもしろい話をして",
   "なんか面白い話して",
   "なんかおもしろい話して",
   "笑える話して",
@@ -1631,7 +1676,7 @@ const prophecyAsk = includesAny(normalized, [
 ]);
 
 const prophecyFollowUpAsk =
-  lastPatientTopic === "funny_story" &&
+  getBooleanFlag(flags, "funny_story_active") &&
   includesAny(normalized, [
     "どういうこと",
     "それはどういうこと",
@@ -1658,13 +1703,65 @@ const proWrestlingAsk = includesAny(normalized, [
 ]);
 
 const funnyStoryContinueAsk =
-  lastPatientTopic === "funny_story" &&
+  getBooleanFlag(flags, "funny_story_active") &&
   includesAny(normalized, [
     "つづき",
     "続き",
     "その後",
     "それで",
+    "それで？",
+    "そのあと",
     "どうなった",
+    "へー",
+    "へえ",
+    "そうなんだ",
+    "そうなんですね",
+    "おもしろいね",
+    "面白いね",
+    "面白い",
+    "おもしろい",
+    "すごいヤツ",
+    "すごい奴",
+    "変なやつだね",
+    "変な奴だね",
+    "変なやつ",
+    "変な奴",
+    "へんなやつ",
+    "へんな奴",
+    "ヘンなやつ",
+    "ヘンな奴",
+    "中二病",
+    "痛いやつ",
+    "黒歴史",
+    "本物だ",
+    "ホンモノだ",
+    "すごい",
+    "凄い",
+    "やばい",
+    "ヤバイ",
+    "ヤバい",
+    "それな",
+    "わかる",
+    "分かる",
+    "マジ",
+    "まじ",
+    "面白かった",
+    "おもしろかった",
+    "ありがとう",
+    "ありがと",
+    "サンキュー",
+    "まじで",
+    "マジで",
+    "確かに面白い",
+    "たしかに面白い",
+    "それ面白い",
+    "確かにおもしろい",
+    "たしかにおもしろい",
+  ]);
+
+  const funnyStoryPersonFollowUpAsk =
+  getBooleanFlag(flags, "funny_story_active") &&
+  includesAny(normalized, [
     "誰ですか",
     "誰かは",
     "誰",
@@ -1678,9 +1775,26 @@ const funnyStoryContinueAsk =
     "君も呼んでた",
     "呼んでた",
     "ガイアって呼んでた",
-    "中二病",
-    "痛いやつ",
-    "黒歴史",
+    "そいつ今なにやってんの",
+    "そいつ今何やってんの",
+    "今なにやってんの",
+    "今何やってんの",
+    "今なにしてる",
+    "今何してる",
+    "今どうしてる",
+    "その後どうなった",
+    "何科",
+    "なに科",
+    "何の科",
+    "どこの科",
+    "何科なの",
+    "何科なん",
+    "どんな科",
+    "病院",
+    "どこの病院",
+    "医者なの",
+    "医師なの",
+    "ドクターなの",
   ]);
 
 const scaryStoryAsk = includesAny(normalized, [
@@ -1989,7 +2103,7 @@ const circleAsk = includesAny(normalized, [
 ]);
 
 const scaryStoryContinueAsk =
-  lastPatientTopic === "scary_story" &&
+  getBooleanFlag(flags, "scary_story_active") &&
   includesAny(normalized, [
     "つづき",
     "つづきは",
@@ -2010,10 +2124,11 @@ const scaryStoryContinueAsk =
     "ぜひ",
     "どこいった",
     "どう行った",
+    "その時",
   ]);
 
   const scaryStoryDeclineAsk =
-  lastPatientTopic === "scary_story" &&
+  getBooleanFlag(flags, "scary_story_active") &&
   (
     includesAny(normalized, [
       "いらない",
@@ -2028,7 +2143,7 @@ const scaryStoryContinueAsk =
   );
 
 const scaryStoryBlameBackAsk =
-  lastPatientTopic === "scary_story" &&
+  getBooleanFlag(flags, "scary_story_active") &&
   includesAny(normalized, [
     "怖くない",
     "こわくない",
@@ -2075,7 +2190,8 @@ const smallTalkRequestAsk = includesAny(normalized, [
 ]);
 
 const noMoreStoryAsk =
-  (lastPatientTopic === "funny_story" || lastPatientTopic === "scary_story") &&
+  (getBooleanFlag(flags, "funny_story_active") ||
+    getBooleanFlag(flags, "scary_story_active")) &&
   includesAny(normalized, [
     "他には",
     "ほかには",
@@ -2089,10 +2205,23 @@ const noMoreStoryAsk =
     "ほかは",
     "もうない",
     "他にない",
+
+    "他に面白い話ある",
+    "ほかに面白い話ある",
+    "他の面白い話ある",
+    "別の面白い話ある",
+    "面白い話まだある",
+    "まだ面白い話ある",
+
+    "他に怖い話ある",
+    "ほかに怖い話ある",
+    "別の怖い話ある",
+    "怖い話まだある",
   ]);
 
   const storyEndedFollowUpAsk =
-  (lastPatientTopic === "funny_story" || lastPatientTopic === "scary_story") &&
+  (getBooleanFlag(flags, "funny_story_active") ||
+    getBooleanFlag(flags, "scary_story_active")) &&
   includesAny(normalized, [
     "つづき",
     "つづきは",
@@ -5658,152 +5787,54 @@ if (prophecyFollowUpAsk) {
   );
 }
 
-if (smallTalkRequestAsk) {
-  return replyWith(
-    "小学校のときに面白いやついたんですよ。朝の出欠で、そいつが急に『先生、ボクのことはウルトラマンガイアって呼んでくれ』って言い出して。先生もクラスもポカーンですよ。でも、みんなでガイアって呼んだら本人めちゃくちゃ満足そうで。しばらく本当にウルトラマンガイア君って呼ばれてました。",
-    stats,
-    withTopic(flags, "funny_story", "怖い話1本目から2本目へ分岐可能な状態", {
-      funny_story_stage: 1,
-      funny_story_type: 1,
-      story_finished: false,
-    }),
-    internalEvents
-  );
-}
-
-if (funnyThingAsk) {
-  stats = {
-    ...stats,
-    validation: Math.min(100, stats.validation + 4),
-    defense: Math.max(0, stats.defense - 3),
-  };
-
-  return replyWith(
-    "小学校のときに面白いやついたんですよ。朝の出欠で、そいつが急に『先生、ボクのことはウルトラマンガイアって呼んでくれ』って言い出して。先生もクラスもポカーンですよ。でも、みんなでガイアって呼んだら本人めちゃくちゃ満足そうで。しばらく本当にウルトラマンガイア君って呼ばれてました。",
-    stats,
-    withTopic(flags, "funny_story", "ウルトラマンガイア君の話を始める", {
-      funny_story_stage: 1,
-    }),
-    internalEvents
-  );
-}
-
-if (
-  lastPatientTopic === "funny_story" &&
-  noMoreStoryAsk &&
-  getNumberFlag(flags, "funny_story_type") === 1
-) {
-  return replyWith(
-    "仕事中に税金対策だってマンションの購入を勧める業者から電話かかってきたんですよ。めんどくさいなーって思ってたら、隣の席の同僚にもちょうど偽警官から電話来てたみたいで、俺のスマホとそいつのスマホをスピーカーにして会話させたんですよ。",
-    stats,
-    withTopic(flags, "funny_story", "面白い話2本目を始める", {
-      funny_story_stage: 1,
-      funny_story_type: 2,
-      story_finished: false,
-    }),
-    internalEvents
-  );
-}
-
-if (
-  lastPatientTopic === "funny_story" &&
-  noMoreStoryAsk &&
-  getNumberFlag(flags, "funny_story_type") === 2
-) {
-  return replyWith(
-    "さすがにもうないっす。",
-    stats,
-    withTopic(flags, "funny_story", "面白い話はもうない", {
-      story_finished: true,
-    }),
-    internalEvents
-  );
-}
-
-if (
-  lastPatientTopic === "funny_story" &&
-  storyEndedFollowUpAsk &&
-  getBooleanFlag(flags, "story_finished")
-) {
-  return replyWith(
-    "もう終わりっす。",
-    stats,
-    withTopic(flags, "funny_story", "面白い話は終わっている", {
-      story_finished: true,
-    }),
-    internalEvents
-  );
-}
-
-if (lastPatientTopic === "funny_story" && funnyStoryContinueAsk) {
-  const stage = getNumberFlag(flags, "funny_story_stage");
-
-  if (stage <= 1) {
-    return replyWith(
-      "で、高校でまた会ったら、今度は下向いてぶつぶつ言ってるんですよ。何してんのって聞いたら、『神はいるか考えてる』って。ああ、ちゃんと育っちゃったなって思いました。",
-      stats,
-      withTopic(flags, "funny_story", "高校で再会して中二病化していた", {
-        funny_story_stage: 2,
-      }),
-      internalEvents
-    );
-  }
-
-  if (stage === 2) {
-    return replyWith(
-      "まあ、そいつ今は医者になって、中二病の論文まで書いてるんですけどね。",
-      stats,
-      withTopic(flags, "funny_story", "ウルトラマンガイア君は医者になって中二病論文を書いた", {
-        funny_story_stage: 3,
-      }),
-      internalEvents
-    );
-  }
-
-  return replyWith(
-    "誰かは秘密っす。先生の知り合いかもしれないですし。",
-    stats,
-    withTopic(flags, "funny_story", "誰かは明かさない", {
-      funny_story_stage: 3,
-    }),
-    internalEvents
-  );
-}
-
-if (funnyThingAsk || smallTalkRequestAsk) {
-  return replyWith(
-    "仕事中に税金対策だってマンションの購入を勧める業者から電話かかってきたんですよ。めんどくさいなーって思ってたら、隣の席の同僚にもちょうど偽警官から電話来てたみたいで、俺のスマホとそいつのスマホをスピーカーにして会話させたんですよ。",
-    stats,
-    withTopic(flags, "funny_story", "業者と偽警官の電話を会話させた話", {
-      funny_story_stage: 1,
-      funny_story_type: 2,
-    }),
-    internalEvents
-  );
-}
-
-if (lastPatientTopic === "funny_story" && funnyStoryContinueAsk) {
+if (getBooleanFlag(flags, "funny_story_active")) {
   const type = getNumberFlag(flags, "funny_story_type");
   const stage = getNumberFlag(flags, "funny_story_stage");
+  const finished = getBooleanFlag(flags, "story_finished");
 
-  if (type === 2) {
-    if (stage <= 1) {
-      return replyWith(
-        "そしたら奇跡的に会話が成り立ってて、みんなで笑いこらえてました。",
-        stats,
-        withTopic(flags, "funny_story", "面白い話2本目の中盤", {
-          funny_story_stage: 2,
-          funny_story_type: 2,
-          story_finished: false,
-        }),
-        internalEvents
-      );
-    }
-
+  if (noMoreStoryAsk && type === 1) {
     return replyWith(
-      "最後の方はどっちも逃げに入ってて、いやお前ら同類だろってなりました。",
+      "えーそうっすね。この前、仕事中に税金対策だってマンションの購入を勧める業者から電話かかってきたんですよ。めんどくさいなーって思ってたら、隣の席の同僚にもちょうど偽警官から電話来てたみたいで、俺のスマホとそいつのスマホをスピーカーにして会話させたんですよ。",
       stats,
-      withTopic(flags, "funny_story", "面白い話2本目の終わり", {
+      withTopic(flags, "funny_story", "面白い話2本目を始める", {
+        funny_story_active: true,
+        funny_story_stage: 1,
+        funny_story_type: 2,
+        story_finished: false,
+      }),
+      internalEvents
+    );
+  }
+
+  if (
+  getBooleanFlag(flags, "funny_story_active") &&
+  includesAny(normalized, [
+    "面白かった",
+    "おもしろかった",
+    "ありがとう",
+    "ありがと",
+    "サンキュー",
+  ])
+) {
+  return replyWith(
+    "ありがとうございます。",
+    stats,
+    withTopic(flags, "funny_story", "面白い話への感想に礼を言う", {
+      funny_story_active: true,
+      funny_story_stage: getNumberFlag(flags, "funny_story_stage"),
+      funny_story_type: getNumberFlag(flags, "funny_story_type"),
+      story_finished: getBooleanFlag(flags, "story_finished"),
+    }),
+    internalEvents
+  );
+}
+
+  if (noMoreStoryAsk && type === 2) {
+    return replyWith(
+      "さすがにもうないっす。",
+      stats,
+      withTopic(flags, "funny_story", "面白い話はもうない", {
+        funny_story_active: true,
         funny_story_stage: 3,
         funny_story_type: 2,
         story_finished: true,
@@ -5812,50 +5843,117 @@ if (lastPatientTopic === "funny_story" && funnyStoryContinueAsk) {
     );
   }
 
-  if (stage === 0) {
+  if (finished && storyEndedFollowUpAsk) {
     return replyWith(
-      "小学校のときに面白いやついたんですよ。朝の出欠で、そいつが急に『先生、ボクのことはウルトラマンガイアって呼んでくれ』って言い出して。先生もクラスもポカーンですよ。でも、みんなでガイアって呼んだら本人めちゃくちゃ満足そうで。しばらく本当にウルトラマンガイア君って呼ばれてました。",
+      "もう終わりっす。",
       stats,
-      withTopic(flags, "funny_story", "ウルトラマンガイア君の話を始める", {
-        funny_story_stage: 1,
-        funny_story_type: 1,
-        story_finished: false,
-      }),
-      internalEvents
-    );
-  }
-
-  if (stage <= 1) {
-    return replyWith(
-      "で、高校で久しぶりに再会したら、そいつ完全に中二病こじらせてて。『闇の力が…』とか言いながら、黒歴史を現在進行形で量産してたんですよ。",
-      stats,
-      withTopic(flags, "funny_story", "ガイア君が中二病化していた", {
-        funny_story_stage: 2,
-        funny_story_type: 1,
-        story_finished: false,
-      }),
-      internalEvents
-    );
-  }
-
-  if (stage === 2) {
-    return replyWith(
-      "しかも大学卒業する頃には、なんか妙に現実見えてる感じになってて。昔あんなにガイアだったやつが、急にまともぶってるのが一番おもしろかったっす。",
-      stats,
-      withTopic(flags, "funny_story", "ガイア君の話の終わり", {
-        funny_story_stage: 3,
-        funny_story_type: 1,
+      withTopic(flags, "funny_story", "面白い話は終わっている", {
+        funny_story_active: true,
         story_finished: true,
       }),
       internalEvents
     );
   }
 
+  if (funnyStoryContinueAsk || funnyStoryPersonFollowUpAsk) {
+    if (type === 1) {
+      if (stage <= 1) {
+        return replyWith(
+          "で、高校でまた会ったら、今度は下向いてぶつぶつ言ってるんですよ。何してんのって聞いたら、『神はいるか考えてる』って。ああ、ちゃんと育っちゃったなって思いました。",
+          stats,
+          withTopic(flags, "funny_story", "高校で再会して中二病化していた", {
+            funny_story_active: true,
+            funny_story_stage: 2,
+            funny_story_type: 1,
+            story_finished: false,
+          }),
+          internalEvents
+        );
+      }
+
+      if (stage === 2) {
+        return replyWith(
+          "まあ、そいつ今は医者になって、中二病の論文まで書いてるんですけどね。",
+          stats,
+          withTopic(flags, "funny_story", "ガイア君の現在を話す", {
+            funny_story_active: true,
+            funny_story_stage: 3,
+            funny_story_type: 1,
+            story_finished: true,
+          }),
+          internalEvents
+        );
+      }
+
+       return replyWith(
+        "誰かは秘密っす。先生の知り合いかもしれないですし。",
+        stats,
+        withTopic(flags, "funny_story", "誰かは明かさない", {
+          funny_story_active: true,
+          funny_story_stage: 3,
+          funny_story_type: 1,
+          story_finished: true,
+        }),
+        internalEvents
+      );
+    }
+
+    if (type === 2) {
+      if (stage <= 1) {
+        return replyWith(
+          "そしたら奇跡的に会話が成り立ってて、みんなで笑いこらえてました。",
+          stats,
+          withTopic(flags, "funny_story", "面白い話2本目の中盤", {
+            funny_story_active: true,
+            funny_story_stage: 2,
+            funny_story_type: 2,
+            story_finished: false,
+          }),
+          internalEvents
+        );
+      }
+
+      if (stage === 2) {
+        return replyWith(
+          "最後の方はどっちも逃げに入ってて、いやお前ら同類だろってなりました。",
+          stats,
+          withTopic(flags, "funny_story", "面白い話2本目の終わり", {
+            funny_story_active: true,
+            funny_story_stage: 3,
+            funny_story_type: 2,
+            story_finished: true,
+          }),
+          internalEvents
+        );
+      }
+
+      return replyWith(
+        "もう終わりっす。",
+        stats,
+        withTopic(flags, "funny_story", "面白い話②は終わり", {
+          funny_story_active: true,
+          funny_story_stage: 3,
+          funny_story_type: 2,
+          story_finished: true,
+        }),
+        internalEvents
+      );
+    }
+  }
+}
+
+if (
+  (smallTalkRequestAsk || funnyThingAsk) &&
+  !getBooleanFlag(flags, "funny_story_active")
+) {
   return replyWith(
-    "もう終わりっす。",
+    "いいっすよ。じゃあ小学校のときの面白いやつの話。朝の出欠で、そいつが急に『先生、ボクのことはウルトラマンガイアって呼んでくれ』って言い出して。先生も生徒もポカーンですよ。でも、みんなでガイアって呼んだら本人めちゃくちゃ満足そうで。しばらく本当にウルトラマンガイア君って呼ばれてました。",
     stats,
-    withTopic(flags, "funny_story", "面白い話は終わっている", {
-      story_finished: true,
+    withTopic(flags, "funny_story", "面白い話1本目を始める", {
+      funny_story_active: true,
+      funny_story_stage: 1,
+      funny_story_type: 1,
+      story_finished: false,
     }),
     internalEvents
   );
@@ -5870,13 +5968,16 @@ if (scaryStoryDeclineAsk) {
   return replyWith(
     "あ、そっすか。",
     stats,
-    withTopic(flags, "daily_life", "怖い話を断られた"),
+    withTopic(flags, "daily_life", "怖い話を断られた", {
+      scary_story_active: false,
+      story_finished: true,
+    }),
     internalEvents
   );
 }
 
 if (
-  lastPatientTopic === "scary_story" &&
+  getBooleanFlag(flags, "scary_story_active") &&
   noMoreStoryAsk &&
   getNumberFlag(flags, "scary_story_type") !== 2
 ) {
@@ -5893,7 +5994,7 @@ if (
 }
 
 if (
-  lastPatientTopic === "scary_story" &&
+  getBooleanFlag(flags, "scary_story_active")&&
   noMoreStoryAsk &&
   getNumberFlag(flags, "scary_story_type") === 2
 ) {
@@ -5908,7 +6009,7 @@ if (
 }
 
 if (
-  lastPatientTopic === "scary_story" &&
+  getBooleanFlag(flags, "scary_story_active") &&
   storyEndedFollowUpAsk &&
   getBooleanFlag(flags, "story_finished")
 ) {
@@ -5944,23 +6045,29 @@ if (scaryStoryAsk) {
   return replyWith(
     "これは、俺が大学のときにあったことなんですけど、友達と肝試し行こうってなったんですよ。その友達ってのが、高校からのツレで、すげー仲良くて、今も一緒にフットサルやるくらいなんですよ。この前もサッカー見ながら飲んで、めちゃくちゃ楽しくて……",
     stats,
-    withTopic(flags, "scary_story", "怖い話を始める", {
-      scary_story_stage: 1,
-    }),
+    withTopic(flags, "scary_story", "怖い話", {
+  scary_story_active: true,
+  scary_story_stage: 1,
+  scary_story_type: 1,
+  story_finished: false,
+}),
     internalEvents
   );
 }
 
-if (lastPatientTopic === "scary_story" && scaryStoryContinueAsk) {
+if (getBooleanFlag(flags, "scary_story_active") && scaryStoryContinueAsk) {
   const stage = getNumberFlag(flags, "scary_story_stage");
 
   if (stage === 0) {
     return replyWith(
       "これは、俺が大学のときにあったことなんですけど、友達と肝試し行こうってなったんですよ。その友達ってのが、高校からのツレで、すげー仲良くて、今も一緒にフットサルやるくらいなんですよ。この前もサッカー見ながら飲んで、めちゃくちゃ楽しくて……",
       stats,
-      withTopic(flags, "scary_story", "怖い話を始める", {
-        scary_story_stage: 1,
-      }),
+      withTopic(flags, "scary_story", "怖い話", {
+  scary_story_active: true,
+  scary_story_stage: 1,
+  scary_story_type: 1,
+  story_finished: false,
+}),
       internalEvents
     );
   }
@@ -5969,9 +6076,12 @@ if (lastPatientTopic === "scary_story" && scaryStoryContinueAsk) {
     return replyWith(
       "ああ、それで、友達が良い心霊スポットあるって言ってきて、お前、なにガチじゃん、え、幽霊とか信じてんの？って言ったら、は？馬鹿じゃん。信じてる訳ねーしとか言って、いや、手震えてんじゃん、あいつマジになってんすよ。",
       stats,
-      withTopic(flags, "scary_story", "友達がビビっていた話", {
-        scary_story_stage: 2,
-      }),
+      withTopic(flags, "scary_story", "怖い話2本目を始める", {
+  scary_story_active: true,
+  scary_story_stage: 2,
+  scary_story_type: 1,
+  story_finished: false,
+}),
       internalEvents
     );
   }
@@ -5981,7 +6091,10 @@ if (lastPatientTopic === "scary_story" && scaryStoryContinueAsk) {
       "そう急かさないでくださいよ。で、なんかいわくつきのトンネル？とか行ったんすけど、懐中電灯も持ってなくて、真っ暗な中、トンネルに入るか3時間くらい話してたんすけど、その時！",
       stats,
       withTopic(flags, "scary_story", "トンネル前で3時間もたついた", {
+        scary_story_active: true,
         scary_story_stage: 3,
+        scary_story_type: 1,
+        story_finished: false,
       }),
       internalEvents
     );
@@ -5992,7 +6105,10 @@ if (lastPatientTopic === "scary_story" && scaryStoryContinueAsk) {
       "日が昇ってきちゃって、腹減ったんで帰りました。",
       stats,
       withTopic(flags, "scary_story", "オチは朝になって帰宅", {
+        scary_story_active: true,
         scary_story_stage: 4,
+        scary_story_type: 1,
+        story_finished: false,
       }),
       internalEvents
     );
@@ -6002,7 +6118,30 @@ if (lastPatientTopic === "scary_story" && scaryStoryContinueAsk) {
     "終わりっす。",
     stats,
     withTopic(flags, "scary_story", "怖い話①は終わり", {
+      scary_story_active: true,
       story_finished: true,
+    }),
+    internalEvents
+  );
+}
+
+if (
+  getBooleanFlag(flags, "scary_story_active") &&
+  includesAny(normalized, [
+    "他に怖い話ある",
+    "ほかに怖い話ある",
+    "別の怖い話ある",
+  ]) &&
+  getNumberFlag(flags, "scary_story_type") !== 2
+) {
+  return replyWith(
+    "鏡って当たり前ですけど、反転した世界を映し出しますよね。鏡に鏡を映すと世界が増えて見えるじゃないっすか。で、俺の地元に都市伝説があって、鏡と鏡をくっつけると、その中には無限の世界があって、そこである儀式をすると現実とその世界が反転するって噂があったんです。",
+    stats,
+    withTopic(flags, "scary_story", "怖い話2本目", {
+      scary_story_active: true,
+      scary_story_stage: 1,
+      scary_story_type: 2,
+      story_finished: false,
     }),
     internalEvents
   );
@@ -6013,6 +6152,7 @@ if (scaryStoryAsk) {
     "鏡って当たり前ですけど、反転した世界を映し出しますよね。鏡に鏡を映すと、世界が増えて見えるじゃないっすか。で、俺の地元に都市伝説があって、鏡と鏡を向かい合わせにすると、その中には無限の世界があって、ある儀式をすると現実とその世界が反転するって噂があったんです。",
     stats,
     withTopic(flags, "scary_story", "合わせ鏡の都市伝説を語り始める", {
+      scary_story_active: true,
       scary_story_stage: 1,
       scary_story_type: 2,
     }),
@@ -6020,7 +6160,7 @@ if (scaryStoryAsk) {
   );
 }
 
-if (lastPatientTopic === "scary_story" && scaryStoryContinueAsk) {
+if (getBooleanFlag(flags, "scary_story_active") && scaryStoryContinueAsk) {
   const type = getNumberFlag(flags, "scary_story_type");
 
   if (type === 2) {
@@ -6031,6 +6171,7 @@ if (lastPatientTopic === "scary_story" && scaryStoryContinueAsk) {
         "で、友達の友達にバカなやつがいて、その儀式をやっちゃったらしいんすよ。世界は別にそのままだったらしいんですけど、そいつ、そのあと忽然と失踪しちゃって。",
         stats,
         withTopic(flags, "scary_story", "儀式をやった人物が失踪する", {
+          scary_story_active: true,
           scary_story_stage: 2,
           scary_story_type: 2,
         }),
@@ -6042,6 +6183,7 @@ if (lastPatientTopic === "scary_story" && scaryStoryContinueAsk) {
       "それで今でも、夜の2時に合わせ鏡をすると、増えた世界のどこかに一瞬そいつの顔が映るんだそうです。見つけた瞬間に目をそらさないと、今度はこっちが向こうに引っ張られるって話です。",
       stats,
       withTopic(flags, "scary_story", "2時の合わせ鏡に失踪者の顔が映る", {
+        scary_story_active: true,
         scary_story_stage: 3,
         scary_story_type: 2,
         story_finished: true,

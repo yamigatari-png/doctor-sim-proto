@@ -1352,7 +1352,7 @@ useEffect(() => {
 
   const titleTimer = window.setTimeout(() => {
     setScreen("title");
-  }, 3000);
+  }, 1800);
 
   return () => {
     window.clearTimeout(fadeTimer);
