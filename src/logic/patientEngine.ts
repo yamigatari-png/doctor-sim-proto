@@ -8927,7 +8927,7 @@ const soccerBestCounterAsk = includesAny(normalized, [
     "過去に大きな病気",
     "今まで大きな病気",
     "入院歴",
-    "大きな病気はしてない",
+    "大きな病気は",
   ]);
 
   const jargonPastHistoryAsk = includesAny(normalized, [
@@ -9156,6 +9156,7 @@ const familyBigDiseaseAsk = includesAny(normalized, [
   "家族で病気に罹患している人は",
   "ご家族に病気",
   "家族に病気",
+  "家族で病気"
 ]);
 
 const familyRelationAsk = includesAny(normalized, [
@@ -9347,6 +9348,32 @@ const friendCoworkerAsk =
     "苦しいところ",
     "どこが悪い",
   ]);
+
+  const iqosIsTobaccoReply =
+  lastPatientTopic === "smoking_iqos" &&
+  includesAny(normalized, [
+    "iqosはタバコ",
+    "アイコスはタバコ",
+    "iqosもタバコ",
+    "アイコスもタバコ",
+    "それタバコ",
+    "タバコですよ",
+    "タバコです",
+    "紙巻きじゃなくてもタバコ",
+  ]);
+
+  if (iqosIsTobaccoReply) {
+  return replyWith(
+    pickOne([
+      "あ、そうなんすか。",
+      "へー、そうなんすね。",
+      "なるほど。じゃあ吸ってることで。",
+    ]),
+    stats,
+    withTopic(flags, "smoking_iqos", "IQOSもタバコだと教えられて受け入れる"),
+    internalEvents
+  );
+}
 
   if (asksSmoking) fire({ type: "SMOKING_ASKED" });
   if (asksVaccine) fire({ type: "VACCINE_ASKED" });
@@ -9549,6 +9576,11 @@ if (fatherCurrentStatusAsk) {
     getBooleanFlag(flags, "father_family_history_asked")
   )
 ) {
+  stats = {
+    ...stats,
+    openness: Math.min(100, stats.openness + 15),
+  };
+
   flags = mergeFlags(flags, {
     father_route_unlocked: true,
     father_family_history_asked: true,
@@ -9563,12 +9595,17 @@ if (fatherCurrentStatusAsk) {
   // validation >= 60
   // =========================
   if (
-    !Boolean((flags as any).scam_route_unlocked) &&
-    stats.defense <= 35 &&
-    stats.validation >= 60
-  ) {
-    flags = setFlag(flags, "scam_route_unlocked", true);
-  }
+  !Boolean((flags as any).scam_route_unlocked) &&
+  stats.defense <= 35 &&
+  stats.validation >= 60
+) {
+  stats = {
+    ...stats,
+    openness: Math.min(100, stats.openness + 15),
+  };
+
+  flags = setFlag(flags, "scam_route_unlocked", true);
+}
 
   if (jointPainAsk) {
   return replyWithYesNo(

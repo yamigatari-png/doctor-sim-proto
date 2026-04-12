@@ -287,7 +287,6 @@ export const ICD_MASTER: DiagnosisOption[] = [
   { code: "G51.0", label: "ベル麻痺" },
   { code: "G61.0", label: "ギラン・バレー症候群" },
   { code: "G35", label: "多発性硬化症" },
-  { code: "G93.4", label: "脳症" },
   { code: "F05", label: "せん妄" },
   { code: "F03", label: "認知症" },
   { code: "G20", label: "パーキンソン病" },
@@ -297,7 +296,6 @@ export const ICD_MASTER: DiagnosisOption[] = [
   { code: "M54.5", label: "腰痛症" },
   { code: "M54.2", label: "頚部痛" },
   { code: "C71.9", label: "脳腫瘍" },
-  { code: "G93.6", label: "脳浮腫" },
 
   // =========================
   // 全身・代謝・内分泌
