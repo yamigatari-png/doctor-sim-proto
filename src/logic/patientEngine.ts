@@ -282,6 +282,11 @@ function isMedicalTalk(normalized: string): boolean {
     "呼吸苦",
     "息切れ",
     "胸痛",
+    "腹痛",
+    "下痢",
+    "痛み",
+    "残尿感",
+    "排尿時痛",
     "胸が痛い",
     "のどが痛い",
     "のど痛い",
@@ -332,12 +337,29 @@ function isMedicalTalk(normalized: string): boolean {
     "嘔吐",
     "過去に大きな病気",
     "今まで大きな病気",
+    "大きな病気",
     "大きな病気はしてない",
     "入院したこと",
     "入院歴",
     "関節痛",
     "関節が痛い",
+    "悪寒",
     "戦慄",
+    "水",
+    "お水",
+    "ポカリ",
+    "アクエリ",
+    "スポドリ",
+    "飲水",
+    "経口摂取",
+    "関節痛",
+    "皮膚",
+    "皮疹",
+    "汗",
+    "アルコール",
+    "今日はどうしました",
+    "今日はどうされました",
+    "主訴は",
   ]);
 }
 
@@ -353,7 +375,6 @@ function isSmallTalk(normalized: string): boolean {
     "サイドバック",
     "オーバーラップ",
     "野球",
-    "巨人",
     "東京ドーム",
     "旅行",
     "沖縄",
@@ -378,6 +399,16 @@ function isSmallTalk(normalized: string): boolean {
     "プロポーズ",
     "嫁",
     "婚約",
+    "ラーメン",
+    "Youtube",
+    "ユーチューブ",
+    "休日",
+    "ユーチューバー",
+    "甘い",
+    "辛い",
+    "お酒",
+    "コーヒー",
+    "食べ物",
   ]);
 }
 
@@ -1071,7 +1102,8 @@ const lostTrackOfTimeAsk = includesAny(normalized, [
   if (medicalTalk) {
     stats = {
       ...stats,
-      trust: Math.min(100, stats.trust + 5),
+      trust: Math.min(100, stats.trust + 8),
+      openness: Math.min(100, stats.openness + 4),
     };
     nextMedicalTalkStreak += 1;
     nextSmalltalkStreak = 0;
@@ -1083,6 +1115,7 @@ const lostTrackOfTimeAsk = includesAny(normalized, [
 
   stats = {
     ...stats,
+    trust: Math.min(100, stats.trust + 3),
     validation: Math.min(100, stats.validation + 5),
     defense: Math.max(0, stats.defense - 5),
   };
@@ -2572,23 +2605,8 @@ const offerLikePhrase = includesAny(normalized, [
   "あげようか",
   "渡そうか",
   "買ってこようか",
-]);
-
-const habitLikePhrase = includesAny(normalized, [
-  "普段",
-  "いつも",
-  "よく",
-  "飲みますか",
-  "飲むんですか",
-  "飲むことある",
-]);
-
-const alcoholName = includesAny(normalized, [
-  "ビール",
-  "ハイボール",
-  "ワイン",
-  "日本酒",
-  "焼酎",
+  "飲みます",
+  "飲む？",
 ]);
 
 const softDrinkName = includesAny(normalized, [
@@ -2599,6 +2617,28 @@ const softDrinkName = includesAny(normalized, [
   "アクエリ",
   "スポドリ",
 ]);
+
+const alcoholName = includesAny(normalized, [
+  "ビール",
+  "ハイボール",
+  "ワイン",
+  "日本酒",
+  "焼酎",
+]);
+
+const habitLikePhrase =
+  includesAny(normalized, [
+    "普段",
+    "いつも",
+    "よく",
+    "飲むんですか",
+    "飲むことある",
+  ]) ||
+  (
+    normalized.includes("飲みますか") &&
+    !softDrinkName &&
+    !alcoholName
+  );
 
 const alcoholOfferAsk =
   alcoholName &&
@@ -3763,6 +3803,19 @@ const girlfriendFeelingAsk =
     "気持ち",
   ]);
 
+  const girlfriendLikeReasonAsk =
+  (lastPatientTopic === "girlfriend_distance" || lastPatientTopic === "girlfriend_detail") &&
+  includesAny(normalized, [
+    "彼女のどんなところが好き",
+    "彼女のどんなところ好き",
+    "彼女のどこが好き",
+    "彼女の何が好き",
+    "どういうところが好き",
+    "どんなところが好き",
+    "好きなところ",
+    "何に惹かれた",
+  ]);
+
   const marriageWillingnessAsk =
   (lastPatientTopic === "girlfriend_distance" || lastPatientTopic === "girlfriend_marriage") &&
   includesAny(normalized, [
@@ -3871,6 +3924,9 @@ const girlfriendDetailAsk =
 "どういうところが好き",
 "どんなところが好き",
 "何に惹かれた",
+"彼女のどこが好き",
+"どこが好き",
+"好きなところ",
   ]);
 
   const otherPartnerTalk = includesAny(normalized, [
@@ -4478,6 +4534,8 @@ const moneySupportIntentAsk =
   "どのクラブ",
   "好きなクラブ",
   "推しクラブ",
+  "好きなサッカーチーム",
+  "好きなサッカークラブ",
 ]);
 const manUTalk = includesAny(normalized, [
     "マンu",
@@ -5620,22 +5678,34 @@ if (alcoholOfferAsk) {
 }
 
 if (drinkOfferAsk) {
-  if (!getBooleanFlag(flags, "used_drink_offer_bonus_once")) {
+  const alreadyOffered = getBooleanFlag(flags, "drink_offer_used");
+
+  if (!alreadyOffered) {
+    // 初回
     stats = {
       ...stats,
       condition: Math.min(100, stats.condition + 5),
     };
-    flags = setFlag(flags, "used_drink_offer_bonus_once", true);
+
+    flags = setFlag(flags, "drink_offer_used", true);
+
+    return replyWith(
+      pickOne([
+        "ありがとうございます。",
+        "助かります。",
+        "ちょっと飲みたいです。",
+      ]),
+      stats,
+      withTopic(flags, "oral_intake", "飲み物を勧められて受ける"),
+      internalEvents
+    );
   }
 
+  // 2回目以降
   return replyWith(
-    pickOne([
-      "ありがとうございます。",
-      "ありがとうございます。助かります。",
-      "ありがとうございます、ちょっと飲みたいです。",
-    ]),
+    "大丈夫っす。",
     stats,
-    withTopic(flags, "oral_intake", "飲み物を勧められて感謝する"),
+    withTopic(flags, "oral_intake", "飲み物はもう大丈夫"),
     internalEvents
   );
 }
@@ -9465,7 +9535,7 @@ const friendCoworkerAsk =
 ? pickOne([
     "ユナイテッドが好きっすね。結局ああいうクラブに惹かれるんすよ。",
     "プレミアだとユナイテッドが好きっす。波あるけど見てて面白いんで。",
-    "特定のチームだとマンUっすね。なんだかんだで追っちゃいます。",
+    "特定のチームだとマンUっすね。基本、Jリーグは見ないかな。",
   ])
 : favoritePlayerTalk || favoritePlayerTypoTalk
 ? pickOne([
@@ -10401,6 +10471,9 @@ if (familyKnowsCurrentIllnessAsk) {
 
 //サッカー話//
   if (watchedMatchAsk) {
+    flags = mergeFlags(flags, {
+    talked_soccer: true,
+  });
     return replyWith(
       pickOne([
         "その日はユナイテッド絡みの試合見てました。店の空気も良くて、点入るたびに知らない人とも一緒に盛り上がって最高でした。",
@@ -10414,6 +10487,9 @@ if (familyKnowsCurrentIllnessAsk) {
   }
 
   if (supportedTeamAsk) {
+    flags = mergeFlags(flags, {
+    talked_soccer: true,
+  });
     return replyWith(
       pickOne([
         "応援してるのはユナイテッドっすね。なんだかんだずっと気になるクラブです。",
@@ -10427,6 +10503,9 @@ if (familyKnowsCurrentIllnessAsk) {
   }
 
   if (manUTalk) {
+    flags = mergeFlags(flags, {
+    talked_soccer: true,
+  });
     return replyWith(
       pickOne([
         "ユナイテッド好きっすね。なんか結局あのクラブ感がいいんすよ。",
@@ -10440,6 +10519,9 @@ if (familyKnowsCurrentIllnessAsk) {
   }
 
   if (premierTalk) {
+    flags = mergeFlags(flags, {
+    talked_soccer: true,
+  });
     return replyWith(
       pickOne([
         "プレミアが一番テンション上がるっすね。速いし当たりも強いし。",
@@ -10453,6 +10535,9 @@ if (familyKnowsCurrentIllnessAsk) {
   }
 
   if (sbTalk || positionTalk) {
+    flags = mergeFlags(flags, {
+    talked_soccer: true,
+  });
     return replyWith(
       "高校のときは右サイドバックっす。オーバーラップ好きでした。守るだけのSBより、ちゃんと攻撃参加するほうが好きっす。",
       stats,
@@ -10462,6 +10547,9 @@ if (familyKnowsCurrentIllnessAsk) {
   }
 
   if (favoritePlayerTalk || favoritePlayerTypoTalk) {
+    flags = mergeFlags(flags, {
+    talked_soccer: true,
+  });
   return replyWith(
     pickOne([
       "選手で言うと、やっぱサイドの選手は見ちゃいますね。上下動できる選手は普通に好きっす。",
@@ -10488,6 +10576,9 @@ if (futsalTalk) {
 }
 
   if (jleagueTalk) {
+    flags = mergeFlags(flags, {
+    talked_soccer: true,
+  });
     return replyWith(
       pickOne([
         "Jリーグは正直あんま見ないっすね。嫌いってほどじゃないですけど、海外優先です。",
@@ -10500,6 +10591,9 @@ if (futsalTalk) {
   }
 
   if (soccerTalk) {
+    flags = mergeFlags(flags, {
+    talked_soccer: true,
+  });
     return replyWith(
       pickOne([
         "サッカーはかなり好きっす。ユナイテッドとプレミア中心っすね。右SBだったんでそのへんの話は好きです。",
@@ -10549,6 +10643,9 @@ if (ownPositionAsk) {
 }
 
 if (otherPremierClubAsk) {
+  flags = mergeFlags(flags, {
+    talked_soccer: true,
+  });
   return replyWith(
     "基本はユナイテッドですけど、プレミア全体は見ます。強いだけじゃなくて、戦術はっきりしてるチームは見てて面白いです。",
     stats,
@@ -11155,6 +11252,15 @@ if (girlfriendFeelingAsk) {
     "まあ好きですよ。大事な人ですし。でも最近は結婚の話ばっかりで、正直ちょっと疲れてるのもあります。",
     stats,
     withTopic(flags, "girlfriend_distance", "彼女は好きだが結婚プレッシャーで疲れている"),
+    internalEvents
+  );
+}
+
+if (girlfriendLikeReasonAsk) {
+  return replyWith(
+    "まぁ一緒にいて楽ってのはあります。話してて変に気を使わないし、ちゃんとしてるところはちゃんとしてるし。そういうところは普通に好きなんですけどね……",
+    stats,
+    withTopic(flags, "girlfriend_detail", "彼女の好きなところを話す"),
     internalEvents
   );
 }

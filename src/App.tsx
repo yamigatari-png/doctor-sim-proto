@@ -2256,7 +2256,7 @@ const pneumoniaHit = exactTruthHit || allNames.some((name) =>
     queuePatientEndingLines(
   [
     "肺炎ですか！てっきり風邪だと思ってました。",
-    "先生と話してるとすごい楽しいし、気もあいますよね。\n今度、フットサルあるとき誘っていいっすか？",
+    "先生と話してるとすごい楽しいし、気もあいますよね。\n今度、フットサル誘っていいっすか？一緒にやりましょうよ！",
   ],
   () => {
     setShowNextButton(true);
@@ -2975,7 +2975,7 @@ return;
     honeytrap_scam:
       "それは病気ではなく、人間関係の罠だった。",
     soccer_end:
-      "診療の先に、患者との強い絆が生まれた。",
+      "診療の先に、患者さんとの強い絆が生まれた。",
   };
 
   const endingImageMap: Record<EndingId, string> = {
