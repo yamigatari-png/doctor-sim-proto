@@ -36,7 +36,7 @@ function formatClock(totalSeconds: number) {
 const SPECIAL_SCAM_OPTION: DiagnosisOption = {
   code: "SPECIAL_SCAM",
   label: "恋の病",
-  aliases: ["詐欺", "美人局", "ハニートラップ", "いただき女子"],
+  aliases: ["詐欺", "美人局", "ハニートラップ", "いただき女子" ],
 };
 
 const CATEGORY_LABELS: Record<TestCategory, string> = {
@@ -1086,7 +1086,10 @@ const filteredDiagnosisOptions = useMemo(() => {
   q.includes("詐欺") ||
   q.includes("美人局") ||
   q.includes("ハニートラップ") ||
-  q.includes("いただき女子")
+  q.includes("ハニトラ") ||
+  q.includes("恋") ||
+  q.includes("いただき女子") ||
+  q.includes("いただき")
 ) {
   return [SPECIAL_SCAM_OPTION];
 }
@@ -2219,6 +2222,9 @@ const pneumoniaHit = exactTruthHit || allNames.some((name) =>
     "美人局",
     "ハニートラップ",
     "いただき女子",
+    "いただき",
+    "恋",
+    "ハニトラ",
   ].map(normalizeDiagnosisText).includes(name)
 );
 

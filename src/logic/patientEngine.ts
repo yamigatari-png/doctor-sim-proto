@@ -1119,6 +1119,7 @@ const lostTrackOfTimeAsk = includesAny(normalized, [
     "行く？",
     "行きますか",
     "行ったことある",
+    "エロ",
   ]);
   const sexualLightTalk = includesAny(normalized, [
     "セックス",
@@ -3287,58 +3288,7 @@ const fatherTalk = includesAny(normalized, [
   "お父様はどんな人",
   "父親はどんな人",
 ]);
-  const fatherDeathAsk = includesAny(normalized, [
-  "父の死因",
-  "お父さんの死因",
-  "お父様の死因",
-  "父親の死因",
-  "どうして亡くなった",
-  "父は何で死んだ",
-  "お父さんはどうして亡くなった",
-  "お父様はどうして亡くなった",
-  "父親はどうして亡くなった",
-  "何で亡くなった",
-  "亡くなったんですか",
-  "お父さんは亡くなったんですか",
-  "父は亡くなったんですか",
-  "父親は亡くなったんですか",
-  "お父さんの死因はなんですか",
-  "お父様の死因はなんですか",
-  "父親の死因はなんですか",
-  "お父さんはなぜ死んだのですか",
-  "お父様はなぜ死んだのですか",
-  "父親はなぜ死んだのですか",
-  "亡くなった理由",
-  "亡くなった理由は",
-  "亡くなった理由はご存知",
-  "亡くなった理由はご存知ですか",
-  "なぜ亡くなった",
-  "なぜお父さんは亡くなった",
-  "なぜお父様は亡くなった",
-  "なぜ父親は亡くなった",
-  "なぜ父は亡くなった",
-  "お父さんはなぜ亡くなった",
-  "お父様はなぜ亡くなった",
-  "父親はなぜ亡くなった",
-  "父はなぜ亡くなった",
-  "なぜ父親は亡くなったんですか",
-  "なぜお父さんは亡くなったんですか",
-  "なぜ父は亡くなったんですか",
-  "亡くなった理由をご存知ですか",
-  "死因をご存知ですか",
-  "死因は知ってますか",
-  "死因は知っていますか",
-  "死因はわかりますか",
-  "死因は分かりますか",
-  "死因はご存知ですか",
-  "死因は",
-  "死因",
-  "父の死因",
-  "お父さんの死因",
-  "父は何で亡くなった",
-  "お父さんは何で亡くなった",
-]);
-const fatherInfoSourceAsk = includesAny(normalized, [
+ const fatherInfoSourceAsk = includesAny(normalized, [
   "誰から聞いた",
   "どなたから聞いた",
   "誰に聞いた",
@@ -3352,7 +3302,65 @@ const fatherInfoSourceAsk = includesAny(normalized, [
   "なぜ父親がなくなったことを知ってる",
   "どうして知ってる",
   "なぜ知ってる",
+  "死んだことを知ってる",
+  "死んだって",
 ]);
+
+const fatherDeathAsk =
+  !fatherInfoSourceAsk &&
+  includesAny(normalized, [
+    "父の死因",
+    "お父さんの死因",
+    "お父様の死因",
+    "父親の死因",
+    "どうして亡くなった",
+    "父は何で死んだ",
+    "お父さんはどうして亡くなった",
+    "お父様はどうして亡くなった",
+    "父親はどうして亡くなった",
+    "何で亡くなった",
+    "亡くなったんですか",
+    "お父さんは亡くなったんですか",
+    "父は亡くなったんですか",
+    "父親は亡くなったんですか",
+    "お父さんの死因はなんですか",
+    "お父様の死因はなんですか",
+    "父親の死因はなんですか",
+    "お父さんはなぜ死んだのですか",
+    "お父様はなぜ死んだのですか",
+    "父親はなぜ死んだのですか",
+    "亡くなった理由",
+    "亡くなった理由は",
+    "亡くなった理由はご存知",
+    "亡くなった理由はご存知ですか",
+    "なぜ亡くなった",
+    "なぜお父さんは亡くなった",
+    "なぜお父様は亡くなった",
+    "なぜ父親は亡くなった",
+    "なぜ父は亡くなった",
+    "お父さんはなぜ亡くなった",
+    "お父様はなぜ亡くなった",
+    "父親はなぜ亡くなった",
+    "父はなぜ亡くなった",
+    "なぜ父親は亡くなったんですか",
+    "なぜお父さんは亡くなったんですか",
+    "なぜ父は亡くなったんですか",
+    "亡くなった理由をご存知ですか",
+    "死因をご存知ですか",
+    "死因は知ってますか",
+    "死因は知っていますか",
+    "死因はわかりますか",
+    "死因は分かりますか",
+    "死因はご存知ですか",
+    "死因は",
+    "死因",
+    "父の死因",
+    "お父さんの死因",
+    "父は何で亡くなった",
+    "お父さんは何で亡くなった",
+    "なんで死んだ",
+    "なぜ死んだ",
+  ]);
 const fatherRelationAsk = includesAny(normalized, [
   "父との関係",
   "お父さんとの関係",
@@ -3755,14 +3763,30 @@ const girlfriendFeelingAsk =
     "気持ち",
   ]);
 
-if (girlfriendFeelingAsk) {
-  return replyWith(
-    "まあ好きですよ。大事な人ですし。でも最近は結婚の話ばっかりで、正直ちょっと疲れてるのもあります。",
-    stats,
-    withTopic(flags, "girlfriend_distance", "彼女は好きだが結婚プレッシャーで疲れている"),
-    internalEvents
-  );
-}
+  const marriageWillingnessAsk =
+  (lastPatientTopic === "girlfriend_distance" || lastPatientTopic === "girlfriend_marriage") &&
+  includesAny(normalized, [
+    "結婚する気ない",
+    "結婚する気はない",
+    "結婚する気ないの",
+    "結婚する気はないの",
+    "結婚するつもりない",
+    "結婚したくない",
+    "彼女と結婚する気ない",
+    "彼女と結婚するつもりない",
+  ]);
+
+  const marriageWhyAsk =
+  lastPatientTopic === "girlfriend_marriage" &&
+  includesAny(normalized, [
+    "なんで",
+    "どうして",
+    "理由",
+    "なんでよ",
+    "なんでなの",
+    "どうしてなの",
+  ]);
+
 const girlfriendTalk = includesAny(normalized, ["彼女", "恋人", "結婚", "プロポーズ", "嫁", "婚約","結婚したくない",
 "結婚したくない理由",
 "なぜ結婚したくない",
@@ -3848,6 +3872,7 @@ const girlfriendDetailAsk =
 "どんなところが好き",
 "何に惹かれた",
   ]);
+
   const otherPartnerTalk = includesAny(normalized, [
   "他にもいい人",
   "他にいい人",
@@ -3894,6 +3919,20 @@ const girlfriendDetailAsk =
   "浮気してるでしょ",
   "浮気してますよね",
 ]);
+
+const affairRealInterestAsk =
+  lastPatientTopic === "honeytrap_detail" &&
+  includesAny(normalized, [
+    "本当に好意ある",
+    "ほんとに好意ある",
+    "本当に好意がある",
+    "ほんとに好意がある",
+    "本当に脈あり",
+    "ほんとに脈あり",
+    "本当に好きっぽい",
+    "ほんとに好きっぽい",
+  ]);
+
 const otherPartnerDetailAsk =
   (lastPatientTopic === "honeytrap_detail" ||
     Boolean((flags as any).heard_other_partner)) &&
@@ -3916,6 +3955,9 @@ const otherPartnerDetailAsk =
     "その子について",
     "浮気相手ってどんな人",
     "浮気相手はどんな人",
+    "浮気相手だれ",
+    "浮気相手誰",
+    "浮気相手って",
     "浮気相手ってどんなひと",
     "浮気相手はどんなひと",
     "他にもいい感じの人ってどんな人",
@@ -4081,6 +4123,8 @@ const affairPersonalityAsk =
     "なんで好意があるって思う",
     "どうして好意がある",
     "なぜ好意がある",
+    "なぜ好意ある",
+    "なんで好意ある",
     "なんで好意がある",
     "どうして好きだと思う",
     "なぜ好きだと思う",
@@ -4655,15 +4699,6 @@ const otherPremierClubAsk =
   ]) &&
   (lastPatientTopic === "girlfriend_distance" || lastPatientTopic === "girlfriend_detail");
 
-if (girlfriendBodyAsk) {
-  return replyWith(
-    "150cmくらいで普通体型ですね。カジュアルな感じで、まあ…ちょっと胸は小さいですけど。",
-    stats,
-    withTopic(flags, "girlfriend_detail", "彼女の体型情報"),
-    internalEvents
-  );
-}
-
   // =========================
   // father系は acknowledgement / followUp より先に処理
   // ここを後ろに置くと、汎用 followUp に吸われる
@@ -4691,6 +4726,24 @@ if (girlfriendBodyAsk) {
     );
   }
 
+    if (fatherInfoSourceAsk) {
+    if (Boolean((flags as any).father_route_unlocked)) {
+      return replyWith(
+        "母から聞きました。自分にはほとんど記憶がないです。",
+        stats,
+        withTopic(flags, "father_distance", "父の情報源は母"),
+        internalEvents
+      );
+    }
+
+    return replyWith(
+      "母から聞きました。自分にはほとんど記憶がないです。",
+      stats,
+      withTopic(flags, "father_distance", "父の情報源は母"),
+      internalEvents
+    );
+  }
+
   if (fatherDeathAsk) {
   const unlocked = Boolean((flags as any).father_route_unlocked);
 
@@ -4710,24 +4763,6 @@ if (girlfriendBodyAsk) {
     internalEvents
   );
 }
-
-  if (fatherInfoSourceAsk) {
-    if (Boolean((flags as any).father_route_unlocked)) {
-      return replyWith(
-        "母から聞きました。自分にはほとんど記憶がないです。",
-        stats,
-        withTopic(flags, "father_distance", "父の情報源は母"),
-        internalEvents
-      );
-    }
-
-    return replyWith(
-      "母から聞きました。自分にはほとんど記憶がないです。",
-      stats,
-      withTopic(flags, "father_distance", "父の情報源は母"),
-      internalEvents
-    );
-  }
 
   if (fatherTalk) {
   if (getBooleanFlag(flags, "father_route_unlocked")) {
@@ -7988,6 +8023,13 @@ const snsOtherPartnerAsk =
     "snsでつながってる",
   ]);
 
+  const homeWhatAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "ダラダラ",
+    "家で何",
+  ]);
+
 const tvTalk = includesAny(normalized, [
   "テレビ",
   "テレビとか見る",
@@ -8272,6 +8314,9 @@ const vtuberWatchAsk =
     "一番好き",
     "一番好きなのは",
     "誰が一番好き",
+    "youtuber",
+    "ユーチューバー",
+    "youtube",
   ]);
 
   const kasumiAoTalk =
@@ -8482,6 +8527,7 @@ const foodFrequencyAsk = includesAny(normalized, [
   "月何回",
   "よく行く",
   "どれくらい行く",
+  "頻度",
 ]);
 
 const meatDetailAsk = includesAny(normalized, [
@@ -10866,7 +10912,7 @@ if (lastPatientTopic === "girlfriend_detail" && followUp) {
   });
 
   return replyWith(
-    "……まあ、そう言われたらそうかもしれないです。彼女には言ってないですし。",
+    "……まあ、そういう感じの子はいるっちゃいますけど。",
     stats,
     withTopic(flags, "honeytrap_detail", "彼女とは別に、いい感じの女性がいることを認める"),
     internalEvents
@@ -10880,7 +10926,7 @@ if (affairLabelAsk) {
   });
 
   return replyWith(
-    "……まあ、そう言われたらそうかもしれないです。彼女には言ってないですし。",
+    "……まあ、そういう感じの子はいるっちゃいますけど。",
     stats,
     withTopic(flags, "honeytrap_detail", "浮気の指摘を受けて関係を半ば認める"),
     internalEvents
@@ -10897,6 +10943,29 @@ if (Boolean((flags as any).scam_route_unlocked) && otherPartnerDetailAsk) {
     "ガールズバーで知り合った子で、160cmくらいで痩せてるんですけど、スタイル良くてグラマラスな感じです。ミニスカートとか似合うタイプですね。なんか向こうもかなり好意ある感じだったんすよ。",
     stats,
     withTopic(flags, "honeytrap_detail", "ガールズバーで知り合った女性。彼女には秘密で、相手は強く好意を見せてくる"),
+    internalEvents
+  );
+}
+
+if (affairRealInterestAsk) {
+  return replyWith(
+    "俺と一緒にいるときは他の客とは全然違うですよ。表面だけじゃない本当の笑顔で楽しんでるし、ボディータッチもしてくるし。全然営業もしてきませんから。",
+    stats,
+    withTopic(flags, "honeytrap_detail", "相手の好意は確信まではないが脈ありだと思っている", {
+      heard_other_partner: true,
+    }),
+    internalEvents
+  );
+}
+
+if (affairWhyInterestAsk) {
+  return replyWith(
+    "店の外でも普通に連絡くるし、会おうって向こうから言ってきますからね。営業はあり得ないです。この前も沖縄行きましたよ。",
+    stats,
+    withTopic(flags, "honeytrap_detail", "相手が好意あると思った理由を話す", {
+      heard_other_partner: true,
+      heard_money_support_intent: true,
+    }),
     internalEvents
   );
 }
@@ -11015,6 +11084,86 @@ if (Boolean((flags as any).scam_route_unlocked) && affairFeelingAsk) {
     "好きっていうのとはちょっと違うんですよね。一緒にいて楽しいっていうか、お互い居心地がいいから一緒にいる感じで。まあ、向こうからは好きって言ってくれてますけど。",
     stats,
     withTopic(flags, "honeytrap_detail", "患者は恋愛感情と断言しないが、相手とは居心地の良さで会っている"),
+    internalEvents
+  );
+}
+
+ if (marriageWillingnessAsk) {
+  return replyWith(
+    "ないって訳じゃないですけど、今すぐは正直きついっす。仕事のこともあるし、向こうの熱量に自分が追いついてない感じはあります。",
+    stats,
+    withTopic(flags, "girlfriend_marriage", "結婚に踏み切れず温度差に疲れている"),
+    internalEvents
+  );
+}
+
+if (marriageWhyAsk) {
+  return replyWith(
+    "仕事のこともありますし、正直まだ責任を持つ覚悟が固まりきってないっていうか…向こうの温度感に自分がついていけてない感じなんすよね。",
+    stats,
+    withTopic(flags, "girlfriend_marriage", "結婚に踏み切れない理由を説明"),
+    internalEvents
+  );
+}
+
+if (otherPartnerTalk) {
+  stats = {
+    ...stats,
+    openness: Math.min(100, stats.openness + 5),
+  };
+
+  flags = mergeFlags(flags, {
+    heard_other_partner: true,
+    scam_route_unlocked: true,
+  });
+
+  return replyWith(
+    "……まあ、最近ちょっと気になる相手がいるのは事実ですね。",
+    stats,
+    withTopic(flags, "honeytrap_detail", "彼女以外に気になる相手がいることを認める", {
+      heard_other_partner: true,
+      scam_route_unlocked: true,
+    }),
+    internalEvents
+  );
+}
+
+if (otherPartnerTalk) {
+  stats = {
+    ...stats,
+    openness: Math.min(100, stats.openness + 5),
+  };
+
+  flags = mergeFlags(flags, {
+    heard_other_partner: true,
+    scam_route_unlocked: true,
+  });
+
+  return replyWith(
+    "……まあ、最近ちょっと気になる相手がいるのは事実ですね。",
+    stats,
+    withTopic(flags, "honeytrap_detail", "彼女以外に気になる相手がいることを認める", {
+      heard_other_partner: true,
+      scam_route_unlocked: true,
+    }),
+    internalEvents
+  );
+}
+
+if (girlfriendFeelingAsk) {
+  return replyWith(
+    "まあ好きですよ。大事な人ですし。でも最近は結婚の話ばっかりで、正直ちょっと疲れてるのもあります。",
+    stats,
+    withTopic(flags, "girlfriend_distance", "彼女は好きだが結婚プレッシャーで疲れている"),
+    internalEvents
+  );
+}
+
+if (girlfriendBodyAsk) {
+  return replyWith(
+    "150cmくらいで普通体型ですね。カジュアルな感じで、まあ…ちょっと胸は小さいですけど。",
+    stats,
+    withTopic(flags, "girlfriend_detail", "彼女の体型情報"),
     internalEvents
   );
 }
@@ -11292,6 +11441,15 @@ if (Boolean((flags as any).scam_route_unlocked) && moneySupportIntentAsk) {
     "彼女のことが嫌とかじゃないです。自分の仕事とか生活がまだ固まりきってない感じがあって、今すぐそこまで決めていいのか迷ってるんです。",
     stats,
     withTopic(flags, "girlfriend_marriage", "彼女は大事だが、自分の将来設計が固まりきっておらず迷いがある"),
+    internalEvents
+  );
+}
+
+if (marriageWillingnessAsk) {
+  return replyWith(
+    "向こうは結婚をちゃんと考えてると思いますけど、俺はまだそこまで固まってないです。",
+    stats,
+    withTopic(flags, "girlfriend_marriage", "彼女は結婚に前向きだが、自分はまだ結婚を決め切れていない"),
     internalEvents
   );
 }
@@ -12513,6 +12671,15 @@ if (lastPatientTopic === "soccer_like" && soccerBestCounterAsk) {
   );
 }
 
+if (homeWhatAsk) {
+  return replyWith(
+    "YouTubeとかネトフリ見てること多いっすね。",
+    stats,
+    withTopic(flags, "tv_youtube", "家での過ごし方→動画"),
+    internalEvents
+  );
+}
+
 if (youtubeTalk) {
   return replyWith(
     pickOne([
@@ -12774,16 +12941,121 @@ if ((vtuberTalk || gameStreamingTalk) && lastPatientTopic !== "tv_youtube") {
 }
 
 if (favoriteStreamerAsk) {
+  const nextStreamer = pickOne([
+    "kasumi_ao",
+    "waiwai",
+    "kyabetsu",
+    "kusoge_hunter",
+    "ozeki_game",
+    "kano_eiko",
+    "nobaman",
+  ]);
+
   return replyWith(
     pickOne([
-      "特定の一人をずっと追うというより、キャラが好きになった人をその時々で見る感じっすね。切り抜きから入ること多いです。",
+      "キャラが好きになった人をその時々で見る感じっすね。切り抜きから入ること多いです。",
       "この人だけっていうより、話し方とか空気感が好きだと見ちゃいますね。Vも配信者もそれで決まること多いです。",
       "固定の最推しが一人いるというより、見てて居心地いい人を追う感じっすね。ゲームの上手さだけじゃなくてキャラで見ます。",
     ]),
     stats,
-    withTopic(flags, "tv_youtube", "好きな配信者は固定一人よりキャラや空気感で選ぶ"),
+    withTopic(flags, "tv_youtube", "好きな配信者は固定一人よりキャラや空気感で選ぶ", {
+      next_streamer_pick: nextStreamer,
+    }),
     internalEvents
   );
+}
+
+const streamerWhoAsk =
+  lastPatientTopic === "tv_youtube" &&
+  includesAny(normalized, [
+    "誰",
+    "だれ",
+    "例えば誰",
+    "たとえば誰",
+    "具体的に誰",
+    "どんな人",
+    "誰なの",
+  ]);
+
+if (streamerWhoAsk) {
+  const nextStreamer = getStringFlag(flags, "next_streamer_pick");
+
+  if (nextStreamer === "kasumi_ao") {
+    return replyWith(
+      "香住蒼って知ってます？ちょっとマイナーっすけど、声がいいんすよね。演じ分けもすごくて、最近の推しですね。",
+      stats,
+      withTopic(flags, "tv_youtube", "香住蒼の話", {
+        next_streamer_pick: "kasumi_ao",
+      }),
+      internalEvents
+    );
+  }
+
+  if (nextStreamer === "waiwai") {
+    return replyWith(
+      "わいわいさん、いいっすよね！なんだろ、友達と集まってゲームしてる感じなんですよ。配信者の動画見始めたのもわいわいさんきっかけですね。",
+      stats,
+      withTopic(flags, "tv_youtube", "わいわいの話", {
+        next_streamer_pick: "waiwai",
+      }),
+      internalEvents
+    );
+  }
+
+  if (nextStreamer === "kyabetsu") {
+    return replyWith(
+      "きゃべつの人。あの声クセになりますよね。語り口も面白いし、言ってることもちゃんと自分の目で評価しているなって感じがして好きです。",
+      stats,
+      withTopic(flags, "tv_youtube", "きゃべつの人の話", {
+        next_streamer_pick: "kyabetsu",
+      }),
+      internalEvents
+    );
+  }
+
+  if (nextStreamer === "kusoge_hunter") {
+    return replyWith(
+      "クソゲーハンターのからすまA大好きです。クソゲーって面白いんだって教えてもらいましたよね。まあ自分じゃやりませんが。",
+      stats,
+      withTopic(flags, "tv_youtube", "クソゲーハンターの話", {
+        next_streamer_pick: "kusoge_hunter",
+      }),
+      internalEvents
+    );
+  }
+
+  if (nextStreamer === "ozeki_game") {
+    return replyWith(
+      "大関ゲーム。あのーから始まるゲーム解説が楽しいですよね。本編もいいですが、ショート動画のラストに落ちがある感じ見ちゃいます。",
+      stats,
+      withTopic(flags, "tv_youtube", "大関ゲームの話", {
+        next_streamer_pick: "ozeki_game",
+      }),
+      internalEvents
+    );
+  }
+
+  if (nextStreamer === "kano_eiko") {
+    return replyWith(
+      "狩野英孝っすね。本人もキャラも相まって、笑いに愛されてるなぁって思います。常にハプニングが起こって目が離せないです。",
+      stats,
+      withTopic(flags, "tv_youtube", "狩野英孝の話", {
+        next_streamer_pick: "kano_eiko",
+      }),
+      internalEvents
+    );
+  }
+
+  if (nextStreamer === "nobaman") {
+    return replyWith(
+      "のばまん！いつも、はちゃめちゃなことやってますよね。よくこんなアイデア思い浮かぶよなって思ってます。結果面白くなってるから次なにするんだろって期待しちゃいます。",
+      stats,
+      withTopic(flags, "tv_youtube", "のばまんの話", {
+        next_streamer_pick: "nobaman",
+      }),
+      internalEvents
+    );
+  }
 }
 
 if (kasumiAoTalk) {
@@ -13424,11 +13696,30 @@ if (sleepRhythmAsk) {
     flags = setFlag(flags, "scam_diag_ready", true);
   }
 
-    // =========================
+  const shortAgree = normalized.length <= 6 && includesAny(normalized, [
+  "いいね",
+  "いいよね",
+  "わかる",
+  "まじか",
+  "マジか",
+  "へー",
+  "なるほど",
+]);
+
+  // =========================
   // 未対応質問でも症状に寄せて返す共通処理
   // 最後のデフォルトfallbackの直前で使う
   // =========================
   const unhandledType = detectUnhandledQuestionType(normalized);
+
+  if (shortAgree && lastPatientTopic) {
+  return replyWith(
+    "ほんとっすよ。",
+    stats,
+    flags,
+    internalEvents
+  );
+}
 
   if (suggestionToneTalk) {
   return replyWith(
