@@ -279,6 +279,7 @@ function isMedicalTalk(normalized: string): boolean {
     "痰",
     "黄色い痰",
     "息苦",
+    "呼吸困難",
     "呼吸苦",
     "息切れ",
     "胸痛",
@@ -4305,7 +4306,7 @@ const girlsBarTalk =
   ]);
 
 const okinawaAffairAsk =
-  (lastPatientTopic === "honeytrap_detail" || lastPatientTopic === "travel_okinawa") &&
+  lastPatientTopic === "honeytrap_detail" &&
   includesAny(normalized, [
     "沖縄",
     "旅行もその人",
@@ -4315,14 +4316,27 @@ const okinawaAffairAsk =
     "その女性と旅行",
     "その子と旅行",
     "どこに旅行",
-"どこに旅行に行った",
-"どこに旅行行った",
-"旅行先",
-"どこ行った",
-"どこに行ったんですか",
-"旅行はどこ",
-"どこへ旅行",
-"旅行どこ",
+    "どこに旅行に行った",
+    "どこに旅行行った",
+    "旅行先",
+    "どこ行った",
+    "どこに行ったんですか",
+    "旅行はどこ",
+    "どこへ旅行",
+    "旅行どこ",
+  ]);
+
+  const whoWontMeetAsk =
+  lastPatientTopic === "honeytrap_detail" &&
+  includesAny(normalized, [
+    "誰が会ってくれないの",
+    "誰が会ってくれないんですか",
+    "誰が忙しいの",
+    "誰のこと",
+    "それって誰",
+    "その人って誰",
+    "会ってくれないのは誰",
+    "忙しいって言ってるのは誰",
   ]);
 
 const expensiveGiftAsk =
@@ -7616,6 +7630,19 @@ const girlfriendMeetFrequencyAsk =
     "一緒に行った人",
   ]);
 
+  const travelWhenAsk =
+  lastPatientTopic === "travel_okinawa" &&
+  includesAny(normalized, [
+    "いつ行った",
+    "いつ行ったの",
+    "いつ沖縄に行った",
+    "いつ沖縄行った",
+    "沖縄いつ行った",
+    "いつの沖縄",
+    "時期は",
+    "いつ頃",
+  ]);
+
 const travelBestPartAsk =
   lastPatientTopic === "travel_okinawa" &&
   includesAny(normalized, [
@@ -9132,13 +9159,16 @@ const familyKnowsCurrentIllnessAsk =
   ]);
 
   const dyspneaAsk = includesAny(normalized, [
-    "息切れ",
-    "呼吸苦",
-    "苦しい",
-    "息苦しい",
-    "呼吸は苦しい",
-    "息は苦しい",
-  ]);
+  "呼吸困難",
+  "息切れ",
+  "呼吸苦",
+  "息苦しい",
+  "息苦しさ",
+  "息がしんどい",
+  "息が上がる",
+  "呼吸は苦しい",
+  "息は苦しい",
+]);
 
   const appetiteAsk = includesAny(normalized, [
     "食欲",
@@ -11127,6 +11157,24 @@ if (Boolean((flags as any).scam_route_unlocked) && okinawaAffairAsk) {
   );
 }
 
+if (Boolean((flags as any).scam_route_unlocked) && whoWontMeetAsk) {
+  flags = mergeFlags(flags, {
+    heard_other_partner: true,
+    heard_girlsbar: true,
+  });
+
+  return replyWith(
+    "ガールズバーで知り合った子です。その子と一緒に行ったんです。店に行けば会えるんですけど、店の外はなかなか予定合わなくて……",
+    stats,
+    withTopic(
+      flags,
+      "honeytrap_detail",
+      "会ってくれない相手はガールズバーで知り合った女性だと明かす"
+    ),
+    internalEvents
+  );
+}
+
 if (Boolean((flags as any).scam_route_unlocked) && affairWhyInterestAsk) {
   flags = setFlag(flags, "heard_other_partner", true);
 
@@ -11659,6 +11707,28 @@ if (travelWhoAsk) {
     "友達と行った時もありますし、誰かと予定合わせて行くほうが多いです。一人でがっつりって感じではないです。",
     stats,
     withTopic(flags, "travel_okinawa", "旅行は誰かと行くことが多い"),
+    internalEvents
+  );
+}
+
+if (travelWhenAsk) {
+  return replyWith(
+    "この前の夏です。",
+    stats,
+    withTopic(flags, "travel_okinawa", "沖縄に行った時期はこの前の夏"),
+    internalEvents
+  );
+}
+
+if (travelTalk && lastPatientTopic === "travel_okinawa" && !Boolean((flags as any).scam_route_unlocked)) {
+  return replyWith(
+    pickOne([
+      "沖縄よかったっすよ。海もきれいでしたし、かなり気分転換になりました。",
+      "沖縄は楽しかったです。海もよかったし、のんびりできました。",
+      "沖縄、普通に良かったっす。観光もできたし、海もきれいでした。",
+    ]),
+    stats,
+    withTopic(flags, "travel_okinawa", "沖縄旅行の雑談を続ける"),
     internalEvents
   );
 }

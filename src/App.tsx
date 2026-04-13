@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useCallback } from "react";
+import React, { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import { case01 } from "./data/case01";
 import type {
   ChatMessage,
@@ -807,6 +807,8 @@ export default function App() {
   const [seconds, setSeconds] = useState<number>(0);
   const [timerStarted, setTimerStarted] = useState(false);
   const [input, setInput] = useState<string>("");
+  const [isComposing, setIsComposing] = useState(false);
+  const compositionJustEndedRef = useRef(false);
   const [testsDone, setTestsDone] = useState<Partial<Record<TestKey, boolean>>>({});
   const [results, setResults] = useState<TestResult[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<TestCategory | null>(null);
@@ -2077,72 +2079,77 @@ function queuePatientEndingLines(lines: string[], onDone: () => void) {
   function onSend() {
   if (gameOver) return;
 
+  // Macの日本語変換確定直後は送信しない
+  if (isComposing || compositionJustEndedRef.current) return;
+
   const text = input.trim();
   if (!text) return;
 
   unlockAudio();
 
+  // 先に退避してから即クリア
+  const sendingText = text;
   setInput("");
 
-  pushMessage("DOCTOR", text);
+  pushMessage("DOCTOR", sendingText);
 
   setQuestionCount((prev) => prev + 1);
 
-  const out = patientReplyEngine({ text, stats, flags });
+  const out = patientReplyEngine({ text: sendingText, stats, flags });
 
-const nextStats: Stats = {
-  ...out.stats,
-  condition: Math.max(0, out.stats.condition - 5),
-};
+  const nextStats: Stats = {
+    ...out.stats,
+    condition: Math.max(0, out.stats.condition - 5),
+  };
 
-let nextFlags = out.flags;
+  let nextFlags = out.flags;
 
-setStats(nextStats);
-pushMessage("PATIENT", out.reply);
+  setStats(nextStats);
+  pushMessage("PATIENT", out.reply);
 
-// father診断導線がこのターンで初めて成立したら、医師の独白を1回だけ出す
-const fatherDiagJustUnlocked =
-  !Boolean((flags as any).father_diag_ready) &&
-  Boolean((nextFlags as any).father_diag_ready) &&
-  !Boolean((nextFlags as any).father_diag_prompted);
+  // father診断導線がこのターンで初めて成立したら、医師の独白を1回だけ出す
+  const fatherDiagJustUnlocked =
+    !Boolean((flags as any).father_diag_ready) &&
+    Boolean((nextFlags as any).father_diag_ready) &&
+    !Boolean((nextFlags as any).father_diag_prompted);
 
-if (fatherDiagJustUnlocked) {
-  window.setTimeout(() => {
-    const text =
-      "（ふらつき、嘔吐、頭痛、性格変化。そして父方はがんの家系。もしかしたら、お父さんは……？）";
+  if (fatherDiagJustUnlocked) {
+    window.setTimeout(() => {
+      const text =
+        "（ふらつき、嘔吐、頭痛、性格変化。そして父方はがんの家系。もしかしたら、お父さんは……？）";
 
-    startDoctorMonologueBubble(text);
-    pushMessage("DOCTOR", text, { color: "#ff4d4f" });
-  }, 3000);
+      startDoctorMonologueBubble(text);
+      pushMessage("DOCTOR", text, { color: "#ff4d4f" });
+    }, 3000);
 
-  nextFlags = {
-    ...(nextFlags as any),
-    father_diag_prompted: true,
-  } as Flags;
-}
+    nextFlags = {
+      ...(nextFlags as any),
+      father_diag_prompted: true,
+    } as Flags;
+  }
 
-const scamDiagJustUnlocked =
-  !Boolean((flags as any).scam_diag_ready) &&
-  Boolean((nextFlags as any).scam_diag_ready) &&
-  !Boolean((nextFlags as any).scam_diag_prompted);
+  const scamDiagJustUnlocked =
+    !Boolean((flags as any).scam_diag_ready) &&
+    Boolean((nextFlags as any).scam_diag_ready) &&
+    !Boolean((nextFlags as any).scam_diag_prompted);
 
-if (scamDiagJustUnlocked) {
-  window.setTimeout(() => {
-    const text = "（これって、あの病なんじゃ……。）";
+  if (scamDiagJustUnlocked) {
+    window.setTimeout(() => {
+      const text = "（これって、あの病なんじゃ……。）";
 
-    startDoctorMonologueBubble(text);
-    pushMessage("DOCTOR", text, { color: "#ff4d4f" });
-  }, 3300);
+      startDoctorMonologueBubble(text);
+      pushMessage("DOCTOR", text, { color: "#ff4d4f" });
+    }, 3300);
 
-  nextFlags = {
-    ...(nextFlags as any),
-    scam_diag_prompted: true,
-  } as Flags;
-}
+    nextFlags = {
+      ...(nextFlags as any),
+      scam_diag_prompted: true,
+    } as Flags;
+  }
 
-setFlags(nextFlags);
+  setFlags(nextFlags);
 
-evaluateEndConditions(nextStats, seconds);
+  evaluateEndConditions(nextStats, seconds);
 }
 
 function confirmDiagnosis() {
@@ -4115,26 +4122,57 @@ return (
 }}
       >
         <textarea
-          disabled={!!gameOver}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="問診を入力"
-          rows={3}
-          style={{
-  width: "100%",
-  minWidth: 0,
-  padding: isPhone ? "14px 16px" : undefined,
-  fontSize: isPhone ? 18 : undefined,
-}}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              onSend();
-            }
-          }}
-        />
+  disabled={!!gameOver}
+  value={input}
+  onChange={(e) => setInput(e.target.value)}
+  onCompositionStart={() => {
+    setIsComposing(true);
+    compositionJustEndedRef.current = false;
+  }}
+  onCompositionEnd={(e) => {
+    setIsComposing(false);
+
+    // 変換確定直後の Enter 誤爆対策
+    compositionJustEndedRef.current = true;
+
+    // 確定後の文字列を state に反映
+    setInput(e.currentTarget.value);
+
+    window.setTimeout(() => {
+      compositionJustEndedRef.current = false;
+    }, 0);
+  }}
+  placeholder="問診を入力"
+  rows={3}
+  style={{
+    width: "100%",
+    minWidth: 0,
+    padding: isPhone ? "14px 16px" : undefined,
+    fontSize: isPhone ? 18 : undefined,
+  }}
+  onKeyDown={(e) => {
+    if (e.key !== "Enter" || e.shiftKey) return;
+
+    const native = e.nativeEvent as KeyboardEvent & {
+      isComposing?: boolean;
+    };
+
+    if (
+      isComposing ||
+      native.isComposing ||
+      compositionJustEndedRef.current ||
+      (e as any).keyCode === 229
+    ) {
+      return;
+    }
+
+    e.preventDefault();
+    onSend();
+  }}
+/>
         <button
   onClick={() => {
+    if (isComposing || compositionJustEndedRef.current) return;
     onSend();
   }}
   disabled={!!gameOver}
