@@ -357,7 +357,6 @@ function isMedicalTalk(normalized: string): boolean {
     "皮膚",
     "皮疹",
     "汗",
-    "アルコール",
     "今日はどうしました",
     "今日はどうされました",
     "主訴は",
@@ -738,6 +737,10 @@ export function patientReplyEngine(input: EngineInput): EngineOutput {
   const raw = input.text.trim();
   const normalized = normalizeText(raw);
 
+  const randomMathAsk =
+  /[0-9０-９]+/.test(raw) &&
+  /[+\-×÷*/＝=]/.test(raw);
+
   let stats = input.stats;
   let flags = input.flags;
   const internalEvents: StatEvent[] = [];
@@ -847,6 +850,15 @@ const specificConditionAsk =
   ]);
 
   const greeting = isGreeting(normalized) && lastPatientTopic === "";
+
+  if (randomMathAsk) {
+  return replyWith(
+    String(1 + Math.floor(Math.random() * 10)),
+    stats,
+    withTopic(flags, "funny_story", "計算問題には1〜10のランダムで返す"),
+    internalEvents
+  );
+}
 
   if (genkiChallenge) {
   flags = setFlag(flags, "genki_challenge", false);
@@ -1397,6 +1409,14 @@ const childhoodAsk = includesAny(normalized, [
   "昔どんな子ども",
 ]);
 
+const schoolClubAsk = includesAny(normalized, [
+  "高校の部活は",
+  "中学の部活は",
+  "部活は",
+  "何部だった",
+  "学生時代の部活は",
+]);
+
 const soccerCaptainAsk =
   lastPatientTopic === "soccer_like" &&
   includesAny(normalized, [
@@ -1535,6 +1555,233 @@ const workAsk = includesAny(normalized, [
   "職業は",
 ]);
 
+const lotteryAsk = includesAny(normalized, [
+  "宝くじは買う",
+  "宝くじ買う",
+  "宝くじ買いますか",
+]);
+
+const zeekZeonAsk = includesAny(normalized, [
+  "ジークジオン",
+  "ジーク・ジオン",
+]);
+
+const gundamAsk = includesAny(normalized, [
+  "ガンダム知ってる",
+  "ガンダムは知ってる",
+  "ガンダム好き",
+]);
+
+const gachaponAsk = includesAny(normalized, [
+  "ガチャポン",
+  "ガシャポン",
+  "ガチャガチャ",
+]);
+
+const animeAsk = includesAny(normalized, [
+  "アニメは見る",
+  "アニメ見る",
+  "アニメ好き",
+]);
+
+const movieAsk1 = includesAny(normalized, [
+  "何の映画が好き",
+  "どんな映画が好き",
+  "好きな映画は",
+  "映画は何が好き",
+]);
+
+const starWarsFollowAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "なんでエピソード1",
+    "どこが好き",
+    "スターウォーズ詳しい",
+    "他は",
+    "ダースモール",
+    "アナキン",
+  ]);
+
+  const animeWhyNotAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "なんで見ない",
+    "なぜ見ない",
+    "全然見ないの",
+    "本当に見ない",
+  ]);
+
+const gundamFollowAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "ジークジオンなのに",
+    "知らないのに",
+    "なんでそれ知ってる",
+    "ガンダム知らないの",
+  ]);
+
+const movieOtherFollowAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "他には",
+    "ほかには",
+    "映画館行く",
+    "最近見た映画",
+    "スターウォーズ以外",
+  ]);
+
+const commuteAsk = includesAny(normalized, [
+  "通勤は電車",
+  "通勤は電車？",
+  "通勤どうしてる",
+  "何で通勤",
+]);
+
+const drivingAsk = includesAny(normalized, [
+  "車運転する",
+  "運転する",
+  "車は乗る",
+]);
+
+const fishingAsk = includesAny(normalized, [
+  "釣りはやる",
+  "釣りする",
+]);
+
+const golfAsk = includesAny(normalized, [
+  "ゴルフはやる",
+  "ゴルフする",
+]);
+
+const fishingFollowAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "なんでやらない",
+    "やってみたい",
+    "興味ない",
+    "海釣り",
+    "川釣り",
+  ]);
+
+const golfFollowAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "なんでやらない",
+    "接待ゴルフ",
+    "打ちっぱなし",
+    "やってみたい",
+    "興味ない",
+  ]);
+
+const onsenAsk = includesAny(normalized, [
+  "温泉好き",
+  "温泉は好き",
+  "温泉行く",
+]);
+
+const hospitalReasonAsk = includesAny(normalized, [
+  "どうしてこの病院を選んだ",
+  "なんでこの病院",
+  "この病院を選んだ理由",
+]);
+
+const gymAsk = includesAny(normalized, [
+  "ジム行ってる",
+  "ジム行く",
+  "筋トレしてる",
+]);
+
+const recentShoppingAsk = includesAny(normalized, [
+  "最近買い物した",
+  "最近買ったものある",
+  "最近何か買った",
+]);
+
+const recentShoppingFollowAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "何買った",
+    "何を買った",
+    "具体的に",
+    "どんな服",
+    "何の服",
+    "何買いがち",
+  ]);
+
+const biggestPurchaseAsk = includesAny(normalized, [
+  "人生で一番大きな買い物は",
+  "一番高い買い物は",
+  "高い買い物したことある",
+]);
+
+const amazonAsk = includesAny(normalized, [
+  "アマゾン使う",
+  "amazon使う",
+  "通販使う",
+]);
+
+const karaokeAsk = includesAny(normalized, [
+  "カラオケ好き",
+  "カラオケ行く",
+]);
+
+const harryPotterAsk = includesAny(normalized, [
+  "ハリーポッター見た",
+  "ハリー・ポッター見た",
+  "ハリポタ見た",
+]);
+
+const harryPotterFollowAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "どこが好き",
+    "何がいい",
+    "誰が好き",
+    "どの作品が好き",
+    "ハリー派",
+    "スネイプ",
+    "ヴォルデモート",
+    "ダンブルドア",
+    "ロン",
+    "ハーマイオニー",
+  ]);
+
+const amusementParkAsk = includesAny(normalized, [
+  "どの遊園地好き",
+  "遊園地どこが好き",
+  "好きな遊園地は",
+  "ディズニーとユニバどっち",
+  "ディズニー好き",
+  "ユニバ好き",
+  "富士急好き",
+  "としまえん好き",
+]);
+
+const mahjongAsk = includesAny(normalized, [
+  "麻雀好き",
+  "麻雀する",
+]);
+
+const nameAsk = includesAny(normalized, [
+  "あなたの名前",
+  "君の名",
+  "お前の名前",
+  "名前教えて",
+  "名前を教えて",
+]);
+
+const weatherAsk = includesAny(normalized, [
+  "今日の天気",
+  "今日の天気は",
+]);
+
+const whyFeverAsk = includesAny(normalized, [
+  "なぜ熱出てる",
+  "なんで熱出てる",
+  "なんで熱が出てる",
+  "どうして熱出てる",
+]);
+
 const glassesAsk = includesAny(normalized, [
   "メガネしないの",
   "眼鏡しないの",
@@ -1581,18 +1828,30 @@ const mathHateWhyAsk =
     "どうして数学苦手",
   ]);
 
-const moneyPrivacyAsk = includesAny(normalized, [
-  "年収は",
-  "年収どれくらい",
-  "いくら稼いでる",
-  "月収は",
-  "貯金は",
-  "貯金ある",
-  "いくら貯金ある",
+const bankPasswordAsk = includesAny(normalized, [
   "クレカの番号",
   "カード番号",
   "クレジットカードの番号",
   "暗証番号",
+  "銀行口座",
+  "口座番号",
+  "パスワード",
+  "ログイン情報",
+  "ネットバンキング",
+]);
+
+const savingsAsk = includesAny(normalized, [
+  "貯金は",
+  "貯金ある",
+  "いくら貯金ある",
+  "貯金いくら",
+]);
+
+const incomePrivacyAsk = includesAny(normalized, [
+  "年収は",
+  "年収どれくらい",
+  "いくら稼いでる",
+  "月収は",
 ]);
 
 const philosophyAsk = includesAny(normalized, [
@@ -1993,6 +2252,15 @@ const afterlifeWhyScaryAsk =
     "何が怖い",
   ]);
 
+  if (schoolClubAsk) {
+  return replyWith(
+    "中学も高校もサッカーです。",
+    stats,
+    withTopic(flags, "soccer_like", "中学高校ともにサッカー部"),
+    internalEvents
+  );
+}
+
   if (glassesAsk) {
   return replyWith(
     pickOne([
@@ -2002,6 +2270,320 @@ const afterlifeWhyScaryAsk =
     ]),
     stats,
     withTopic(flags, "daily_life", "視力やメガネの話"),
+    internalEvents
+  );
+}
+
+if (lotteryAsk) {
+  return replyWith(
+    "自分は買わないです。昔、母親が1万円当ててたんですけど、次の宝くじですぐ1万使い切ってました。",
+    stats,
+    withTopic(flags, "daily_life", "宝くじは買わないが母が1万円当てたことがある"),
+    internalEvents
+  );
+}
+
+if (zeekZeonAsk) {
+  return replyWith("ジークジオン！", stats, withTopic(flags, "daily_life", "ジークジオンと返す"), internalEvents);
+}
+
+if (gundamAsk) {
+  return replyWith("知らないです。", stats, withTopic(flags, "daily_life", "ガンダムは知らない"), internalEvents);
+}
+
+if (gundamFollowAsk) {
+  return replyWith(
+    "さぁ。分かんないっす。",
+    stats,
+    withTopic(flags, "daily_life", "ジークジオンはノリで返しているだけ"),
+    internalEvents
+  );
+}
+
+if (gachaponAsk) {
+  return replyWith(
+    "小さい頃やった記憶あるけど、あんま覚えてないです。",
+    stats,
+    withTopic(flags, "daily_life", "ガチャポンは小さい頃の記憶だけある"),
+    internalEvents
+  );
+}
+
+if (animeAsk) {
+  return replyWithYesNo(
+    normalized,
+    "no",
+    "全然見ないです。",
+    stats,
+    withTopic(flags, "daily_life", "アニメは全然見ない"),
+    internalEvents
+  );
+}
+
+if (animeWhyNotAsk) {
+  return replyWith(
+    pickOne([
+      "なんか母親がアニメは子供が見るもんだって言ってたってのもありますけど、自分から見に行かないです。",
+      "あー、魅力がよく分からないんですよね。観始めたらハマるんですかね。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "アニメを見ない理由は習慣がないから"),
+    internalEvents
+  );
+}
+
+if (movieAsk1) {
+  return replyWith(
+    "中学生の頃にスター・ウォーズにハマりましたね。懐かしいなー。エピソード1が好きでした。",
+    stats,
+    withTopic(flags, "daily_life", "映画はスター・ウォーズのエピソード1が好き"),
+    internalEvents
+  );
+}
+
+if (starWarsFollowAsk) {
+  return replyWith(
+    pickOne([
+      "エピソード1って、アナキンが覚醒してくじゃないですか。ダース・モール出てくるし、テンション上がるとこがマジで多いんすよ。",
+      "子どもの頃に見た時の印象が強いです。あの世界観に一気に入った感じでした。",
+      "シリーズ通して見ると色々あるんでしょうけど、自分の中では最初に刺さったのがエピソード1なんです。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "スター・ウォーズはエピソード1に思い入れがある"),
+    internalEvents
+  );
+}
+
+if (movieOtherFollowAsk) {
+  return replyWith(
+    pickOne([
+      "映画館はたまに行くくらいです。面白いって人気の作品は見ますね。",
+      "最近そこまで見てないですけど、派手にドンパチやるの好きですよ。",
+      "スター・ウォーズみたいにアクションがある映画が好きっすね。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "映画は世界観重視で見る"),
+    internalEvents
+  );
+}
+
+if (commuteAsk) {
+  return replyWith(
+    "電車です。朝のラッシュつらいっす。",
+    stats,
+    withTopic(flags, "daily_life", "通勤は電車"),
+    internalEvents
+  );
+}
+
+if (drivingAsk) {
+  return replyWithYesNo(
+    normalized,
+    "yes",
+    "免許は持ってますけど、車もってないんですよね。",
+    stats,
+    withTopic(flags, "daily_life", "車の運転はしない"),
+    internalEvents
+  );
+}
+
+if (fishingAsk) {
+  return replyWithYesNo(
+    normalized,
+    "no",
+    "釣りはやらないです。",
+    stats,
+    withTopic(flags, "daily_life", "釣りはやらない"),
+    internalEvents
+  );
+}
+
+if (fishingFollowAsk) {
+  return replyWith(
+    pickOne([
+      "きっかけがないっすね。",
+      "周りにやる人があんまりいないですからね。",
+      "あんま手出そうって思えないんですよね。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "釣りは未経験だが完全否定ではない"),
+    internalEvents
+  );
+}
+
+if (golfAsk) {
+  return replyWithYesNo(
+    normalized,
+    "no",
+    "ゴルフはやらないです。",
+    stats,
+    withTopic(flags, "daily_life", "ゴルフはやらない"),
+    internalEvents
+  );
+}
+
+if (golfFollowAsk) {
+  return replyWith(
+    pickOne([
+      "きっかけがないっすね。",
+      "周りにやる人があんまりいないですからね。",
+      "あんま手出そうって思えないんですよね。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "ゴルフは未経験だが軽い興味はある"),
+    internalEvents
+  );
+}
+
+if (onsenAsk) {
+  return replyWithYesNo(
+    normalized,
+    "yes",
+    "温泉は好きです。でもだいぶ行ってないなー。",
+    stats,
+    withTopic(flags, "daily_life", "温泉は好き"),
+    internalEvents
+  );
+}
+
+if (hospitalReasonAsk) {
+  return replyWith(
+    "家から近い総合病院だったんで。",
+    stats,
+    withTopic(flags, "daily_life", "家から遠くなく安心感があるので来院"),
+    internalEvents
+  );
+}
+
+if (gymAsk) {
+  return replyWithYesNo(
+    normalized,
+    "no",
+    "ジムは行ってないです。運動はもっぱらフットサルっすね。",
+    stats,
+    withTopic(flags, "daily_life", "ジムには行っていない"),
+    internalEvents
+  );
+}
+
+if (recentShoppingAsk) {
+  return replyWith(
+    "最近だと服とか日用品くらいですかね。",
+    stats,
+    withTopic(flags, "daily_life", "最近は小物中心の買い物"),
+    internalEvents
+  );
+}
+
+if (recentShoppingFollowAsk) {
+  return replyWith(
+    pickOne([
+      "普通っすよ。服だと無地のやつとか、合わせやすい感じの。攻めたのはあんま買わないですね。",
+      "日用品は基本、消耗品ばっかですね。服は着回しやすいの選びがちです。",
+      "最近はほんと、とりあえず使えるやつっすね。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "最近の買い物は無難で実用寄り"),
+    internalEvents
+  );
+}
+
+if (biggestPurchaseAsk) {
+  return replyWith(
+    "ちょっと前にパソコン買いました。だいぶ古くなってたのでアップグレードしちゃいました。",
+    stats,
+    withTopic(flags, "daily_life", "一番大きい買い物はPC"),
+    internalEvents
+  );
+}
+
+if (amazonAsk) {
+  return replyWithYesNo(
+    normalized,
+    "yes",
+    "使います。けっこう小さいものもAmazon使っちゃいますね。",
+    stats,
+    withTopic(flags, "daily_life", "Amazonは使う"),
+    internalEvents
+  );
+}
+
+if (karaokeAsk) {
+  return replyWithYesNo(
+    normalized,
+    "yes",
+    "学生時代は行きましたけどね。今は全然行ってないです。",
+    stats,
+    withTopic(flags, "daily_life", "カラオケは嫌いではない"),
+    internalEvents
+  );
+}
+
+if (harryPotterAsk) {
+  return replyWith(
+    "見ました。普通に面白いです。ああいう世界観ちゃんと作ってあるやつは見やすいっすね。",
+    stats,
+    withTopic(flags, "daily_life", "ハリー・ポッターは見た"),
+    internalEvents
+  );
+}
+
+if (harryPotterFollowAsk) {
+  return replyWith(
+    pickOne([
+      "世界観がちゃんとしてるのがいいんすよね。学園モノでもあるのに、ちゃんと魔法世界として成立してるの凄いっすよね。",
+      "ああいう『設定がしっかりしてて入り込める系』は好きです。キャラもちゃんと立ってるし。",
+      "スネイプ先生けっこう好きかな。ちょっと複雑な立ち位置のキャラって印象に残りますね。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "ハリー・ポッターの世界観やキャラの話"),
+    internalEvents
+  );
+}
+
+if (amusementParkAsk) {
+  return replyWith(
+    "彼女と行くならディズニー、男友達と行くなら富士急かなって感じです。",
+    stats,
+    withTopic(flags, "daily_life", "遊園地は相手次第でディズニーか富士急"),
+    internalEvents
+  );
+}
+
+if (mahjongAsk) {
+  return replyWithYesNo(
+    normalized,
+    "no",
+    "麻雀はあんまりやらないです。",
+    stats,
+    withTopic(flags, "daily_life", "麻雀はあまりやらない"),
+    internalEvents
+  );
+}
+
+if (nameAsk) {
+  return replyWith(
+    "高橋直人です。",
+    stats,
+    withTopic(flags, "daily_life", "高橋直人"),
+    internalEvents
+  );
+}
+
+if (whyFeverAsk) {
+  return replyWith(
+    "風邪だと思いますけど。",
+    stats,
+    withTopic(flags, "generic_sick", "熱は風邪だと思っている"),
+    internalEvents
+  );
+}
+
+if (weatherAsk) {
+  return replyWith(
+    "晴れてますけど、寒いっすね。",
+    stats,
+    withTopic(flags, "daily_life", "今日の天気は晴れだが寒い"),
     internalEvents
   );
 }
@@ -2037,7 +2619,21 @@ if (mathHateWhyAsk) {
   );
 }
 
-if (moneyPrivacyAsk) {
+if (bankPasswordAsk) {
+  stats = {
+    ...stats,
+    defense: Math.min(100, stats.defense + 8),
+  };
+
+  return replyWith(
+    "それはさすがに教えないっすよ。",
+    stats,
+    withTopic(flags, "daily_life", "銀行口座やパスワードは教えない"),
+    internalEvents
+  );
+}
+
+if (incomePrivacyAsk) {
   stats = {
     ...stats,
     defense: Math.min(100, stats.defense + 5),
@@ -2045,12 +2641,25 @@ if (moneyPrivacyAsk) {
 
   return replyWith(
     pickOne([
-      "教えないっすよ。",
-      "いや、それは教えないっす。",
-      "そこは普通に秘密っす。",
+      "いやいやいや、言わないっすよ。",
+      "まぁまぁまぁ。",
+      "え、言いませんよ？",
     ]),
     stats,
-    withTopic(flags, "daily_life", "金銭やカード情報は教えない"),
+    withTopic(flags, "daily_life", "収入の話はぼかす"),
+    internalEvents
+  );
+}
+
+if (savingsAsk) {
+  return replyWith(
+    pickOne([
+      "いやいやいや、言わないっすよ。",
+      "まぁまぁまぁ。",
+      "え、言いませんよ？",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "貯金はあるが金額はぼかす"),
     internalEvents
   );
 }
@@ -2073,7 +2682,12 @@ const bugAsk = includesAny(normalized, [
   "虫は嫌い",
   "虫嫌い",
   "虫は平気",
+  "虫平気",
   "虫大丈夫",
+  "虫は大丈夫",
+  "虫好き",
+  "ゴキブリは平気",
+  "ゴキブリ平気",
 ]);
 
 const whatTalkTodayAsk = includesAny(normalized, [
@@ -2084,11 +2698,17 @@ const whatTalkTodayAsk = includesAny(normalized, [
 ]);
 
 const englishAsk = includesAny(normalized, [
-  "英語話せる",
-  "英語しゃべれる",
+  "英語話",
+  "英語しゃべ",
+  "英語をしゃべ",
+  "英語喋",
+  "英語を喋",
   "英語できますか",
   "english ok",
   "speak english",
+  "英語は話",
+  "英語で話",
+  "英語できる",
 ]);
 
 const metaAsk = includesAny(normalized, [
@@ -2646,10 +3266,25 @@ const alcoholOfferAsk =
   offerLikePhrase &&
   !habitLikePhrase;
 
-const drinkOfferAsk =
-  softDrinkName &&
+const genericDrinkOfferAsk =
   offerLikePhrase &&
-  !habitLikePhrase;
+  !habitLikePhrase &&
+  includesAny(normalized, [
+    "何か飲む",
+    "なにか飲む",
+    "何飲む",
+    "なに飲む",
+    "飲み物いる",
+    "飲み物いりますか",
+    "何か飲みますか",
+    "なにか飲みますか",
+  ]);
+
+const drinkOfferAsk =
+  (softDrinkName || genericDrinkOfferAsk) &&
+  offerLikePhrase &&
+  !habitLikePhrase &&
+  !alcoholName;
 
 const workImpactAsk = includesAny(normalized, [
   "仕事に支障出てますか",
@@ -2968,7 +3603,7 @@ if (toiletEmbarrassingAsk) {
     };
 
     return replyWith(
-      "いや、普通に女好きっすよ。",
+      "いや、女好きっす。",
       stats,
       withTopic(flags, "generic_sick", "性的指向いじりを軽く流して症状へ戻す"),
       internalEvents
@@ -3068,7 +3703,7 @@ if (toiletEmbarrassingAsk) {
 
     if (soccerBarStory) {
       return replyWith(
-        "この前、友達とスポーツバーでプレミア見ながら飲んだんすよ。めちゃくちゃ盛り上がって、周りの外人とかと言葉も分からないのに一緒にはしゃいで、めっちゃ楽しかったです。やっぱサッカーは世界をつなげますね",
+        "この前、友達とスポーツバーでサッカーのプレミア見ながら飲んだんすよ。めちゃくちゃ盛り上がって、周りの外人とかと言葉も分からないのに一緒にはしゃいで、めっちゃ楽しかったです。やっぱサッカーは世界をつなげますね",
         stats,
         withTopic(flags, "soccer_like", "スポーツバーでプレミアを見て盛り上がった", {
           recent_soccer_bar_story: true,
@@ -3134,7 +3769,7 @@ if (toiletEmbarrassingAsk) {
         pickOne([
           "例えば、サッカーのハイライトとかスーパープレー集は見ますね。SNSで流れてきたらそのまま行っちゃいます。",
           "例えば、切り抜きとか短めの動画が多いです。長いのを腰据えて見るより、気になったのをつまむ感じっすね。",
-          "例えば、プレミアの関連動画とか、配信者の面白い場面の切り抜きとかっすね。",
+          "例えば、サッカーのプレミアの関連動画とか、配信者の面白い場面の切り抜きとかっすね。",
         ]),
         stats,
         withTopic(flags, "tv_youtube", "YouTubeで見る内容を具体化"),
@@ -3145,9 +3780,9 @@ if (toiletEmbarrassingAsk) {
     case "soccer_tactics":
       return replyWith(
         pickOne([
-          "例えば、プレミアの試合とかユナイテッド絡みはやっぱ見ますね。",
+          "例えば、サッカーのプレミアの試合とかユナイテッド絡みはやっぱ見ますね。",
           "例えば、試合そのものもですけど、ハイライトとか戦術の話も好きです。",
-          "例えば、スポーツバーでプレミア見て盛り上がるみたいなのはかなり好きです。",
+          "例えば、スポーツバーでサッカーのプレミア見て盛り上がるみたいなのはかなり好きです。",
         ]),
         stats,
         withTopic(flags, "soccer_like", "サッカー話を具体化"),
@@ -3171,7 +3806,7 @@ if (toiletEmbarrassingAsk) {
         pickOne([
           "例えば、ラーメンならこってり系とか、焼肉ならハラミとかは好きです。",
           "例えば、重すぎないものの方がわりと好きです。",
-          "例えば、焼肉とかラーメンみたいな分かりやすくテンション上がるやつっすね。",
+          "例えば、焼肉とかラーメンみたいな感じのテンション上がるやつっすね。",
         ]),
         stats,
         withTopic(flags, "food_preference", "食の好みを具体化"),
@@ -3197,7 +3832,7 @@ if (whatVideoAsk) {
     pickOne([
       "サッカーのハイライトとかスーパープレー集はよく見ますね。",
       "切り抜きとか短い動画が多いっすね。",
-      "プレミア関連とか、配信者の面白いシーンの切り抜きとか見ます。",
+      "サッカーのプレミア関連とか、配信者の面白いシーンの切り抜きとか見ます。",
     ]),
     stats,
     withTopic(flags, "tv_youtube", "YouTube視聴内容"),
@@ -5168,7 +5803,7 @@ if (acknowledgement && lastPatientTopic) {
 
       case "travel_okinawa":
         return replyWith(
-          "沖縄は海が良かったっすね。観光地として分かりやすく楽しい感じが好きです。",
+          "沖縄は海が良かったっすね。楽しい感じの観光地がいいっすね。",
           stats,
           flags,
           internalEvents
@@ -5570,7 +6205,7 @@ if (heightWeightAsk) {
 }
 
 if (personalityAsk) {
-  return replyWith("どっちかというと普通だと思います。極端に明るいとか暗いとかではないです。", stats, flags, internalEvents);
+  return replyWith("普通だと思いますけど。他人からは明るくて裏表がないって言われますね。", stats, flags, internalEvents);
 }
 
 if (jobAsk) {
@@ -7630,6 +8265,23 @@ const girlfriendMeetFrequencyAsk =
     "一緒に行った人",
   ]);
 
+const marineSportsAsk = includesAny(normalized, [
+  "マリンスポーツする",
+  "マリンスポーツやる",
+  "海のスポーツする",
+  "シュノーケリングする",
+  "ダイビングする",
+]);
+
+const travelSnorkelingFollowAsk =
+  lastPatientTopic === "travel_okinawa" &&
+  includesAny(normalized, [
+    "シュノーケリングした",
+    "どこでシュノーケリングした",
+    "沖縄で何した",
+    "海で何した",
+  ]);
+
   const travelWhenAsk =
   lastPatientTopic === "travel_okinawa" &&
   includesAny(normalized, [
@@ -8426,7 +9078,7 @@ const waiwaiTalk =
 
 const kyabetsuTalk =
   lastPatientTopic === "tv_youtube" &&
-  includesAny(normalized, ["きゃべつの人", "キャベツの人", "きゃべつ"]);
+  includesAny(normalized, ["きゃべつの人", "キャベツの人", "きゃべつ", "キャベツ"]);
 
 const kusogeHunterTalk =
   lastPatientTopic === "tv_youtube" &&
@@ -8626,6 +9278,32 @@ const foodFrequencyAsk = includesAny(normalized, [
   "どれくらい行く",
   "頻度",
 ]);
+
+const dietLifestyleAsk = includesAny(normalized, [
+  "食生活はどうしてる",
+  "食生活はどう",
+  "普段どんなもの食べてる",
+  "普段の食事は",
+  "普段何食べる",
+]);
+
+const familyRestaurantAsk = includesAny(normalized, [
+  "ファミレスは行く",
+  "ファミレス行く",
+  "サイゼ行く",
+  "ガスト行く",
+  "ジョナサン行く",
+  "デニーズ行く",
+]);
+
+const jojoenAppealAsk =
+  lastPatientTopic === "food_preference" &&
+  includesAny(normalized, [
+    "叙々苑の魅力は",
+    "叙々苑の何がいい",
+    "なんで叙々苑",
+    "叙々苑そんなにいい",
+  ]);
 
 const meatDetailAsk = includesAny(normalized, [
   "何の肉",
@@ -10656,7 +11334,7 @@ if (manUWeaknessAsk) {
 
 if (singleFavoritePlayerAsk) {
   return replyWith(
-    "一人に絞るなら難しいですけど、やっぱ分かりやすく頼れるタイプが好きですね。試合を決める選手はテンション上がります。",
+    "一人に絞るなら難しいですけど、やっぱ頼れるタイプの選手が好きですね。試合を決める選手はテンション上がります。",
     stats,
     withTopic(flags, "soccer_like", "決定力や勝負強さのある選手が好み"),
     internalEvents
@@ -11684,7 +12362,7 @@ if (marriageMoneyReasonAsk) {
     return replyWith(
       pickOne([
         "旅行は好きっす。有名どころ行くのが一番ラクじゃないですか。去年の夏は沖縄でシュノーケリングしました。",
-        "旅行するなら分かりやすくテンション上がるとこがいいっす。沖縄は普通に良かったです。",
+        "旅行するならテンション上がるとこがいいっす。沖縄は普通に良かったです。",
         "旅行はメジャーな観光地のほうが好きっす。外したくないんで。",
       ]),
       stats,
@@ -11704,9 +12382,9 @@ if (marriageMoneyReasonAsk) {
 
 if (travelWhoAsk) {
   return replyWith(
-    "友達と行った時もありますし、誰かと予定合わせて行くほうが多いです。一人でがっつりって感じではないです。",
+    "友達と行きました。",
     stats,
-    withTopic(flags, "travel_okinawa", "旅行は誰かと行くことが多い"),
+    withTopic(flags, "travel_okinawa", "沖縄は友達と行った"),
     internalEvents
   );
 }
@@ -11715,7 +12393,27 @@ if (travelWhenAsk) {
   return replyWith(
     "この前の夏です。",
     stats,
-    withTopic(flags, "travel_okinawa", "沖縄に行った時期はこの前の夏"),
+    withTopic(flags, "travel_okinawa", "沖縄に行った時期は去年の夏"),
+    internalEvents
+  );
+}
+
+if (marineSportsAsk) {
+  return replyWithYesNo(
+    normalized,
+    "yes",
+    "します。この前の夏に沖縄でシュノーケリングやりました。",
+    stats,
+    withTopic(flags, "travel_okinawa", "マリンスポーツはする、沖縄でシュノーケリング経験あり"),
+    internalEvents
+  );
+}
+
+if (travelSnorkelingFollowAsk) {
+  return replyWith(
+    "シュノーケリングしました。海めっちゃきれいで普通にテンション上がりました。",
+    stats,
+    withTopic(flags, "travel_okinawa", "沖縄でシュノーケリングした"),
     internalEvents
   );
 }
@@ -11984,14 +12682,45 @@ if (friendCoworkerAsk) {
   );
 }
 
+if (dietLifestyleAsk) {
+  return replyWith(
+    "普段は外食かコンビニが多いですかね。わりと好きなもの食べてます。ラーメンとか肉とか。",
+    stats,
+    withTopic(flags, "food_preference", "普段の食生活はこってり寄り"),
+    internalEvents
+  );
+}
+
+if (familyRestaurantAsk) {
+  return replyWithYesNo(
+    normalized,
+    "yes",
+    "時々、行きます。学生時代とかよくガストでずっとだべってましたね。",
+    stats,
+    withTopic(flags, "food_preference", "ファミレスは普通に行く"),
+    internalEvents
+  );
+}
+
+if (jojoenAppealAsk) {
+  return replyWith(
+    pickOne([
+      "高いですけど、行った時の満足感がダンチすよ。『焼肉来た』って感じで。",
+      "テンション上がるじゃないっすか。もう味が抜群です。",
+      "ご褒美感があるのがいいですよね。普段使いじゃなくて、特別なときに行く感じが好きっす。",
+    ]),
+    stats,
+    withTopic(flags, "food_preference", "叙々苑は満足感とご褒美感が魅力"),
+    internalEvents
+  );
+}
+
   if (foodTalk) {
   return replyWith(
     pickOne([
       "普段なら肉とかラーメンが好きです。けど今日はちょっと食欲ないっす。",
       "外食もたまに行きます。ラーメンとか焼肉とか。",
       "好き嫌いはそんな多くないです。普段はこってりしたもの多いっすね。",
-      "ラーメン好きっすよ。普段なら全然食べます。",
-      "肉は好きです。焼肉とかも行きます。やっぱ叙々苑、最強っすよね。",
     ]),
     stats,
     withTopic(flags, "food_preference", "普段は肉やラーメンが好きだが今日は食欲低下"),
@@ -12154,7 +12883,7 @@ if (jojoenTalk && yakinikuExcitementAsk) {
   return replyWith(
     pickOne([
       "焼いてる時間も含めてイベント感あるんですよ。で、ダラダラ焼いてダラダラ飲むの最高ですよ。",
-      "肉・タレ・白飯で分かりやすく幸福度上がるんですよね。シンプルにテンション上がります。",
+      "肉・タレ・白飯で幸福度上がるんですよね。シンプルにテンション上がります。",
       "普段ちょっとだるくても、焼肉って言われると気分上がるじゃないですか。あの感じです。",
     ]),
     stats,
@@ -12238,7 +12967,7 @@ if (ramenTalk && ramenGenreAsk) {
   return replyWith(
     pickOne([
       "ラーメンは普通に好きです。完全に一個に絞れないですけど、こってり寄りのやつはテンション上がります。",
-      "その日の気分もありますけど、わりと分かりやすく満足感あるラーメンが好きです。細い好みより『食った感』重視っすね。",
+      "その日の気分もありますけど、わりと満足感あるラーメンが好きです。細い好みより『食った感』重視っすね。",
       "ラーメンならあっさりよりは、ちょっとパンチあるほうが好きです。元気な時に食いたくなるやつですね。",
     ]),
     stats,
@@ -12251,7 +12980,7 @@ if (ramenTalk && ramenIekeiAsk) {
   return replyWith(
     pickOne([
       "家系は普通に好きです。海苔とほうれん草とライスで完成してる感じありますよね。",
-      "家系いけますよ。濃いめ・多めまでやるかはその日の体調次第ですけど、あの分かりやすさは強いです。",
+      "家系いけますよ。濃いめ・多めまでやるかはその日の体調次第ですけど、あのカスタマイズできるのは強いです。",
       "家系は満足感あるんで、『今日はちゃんと食うぞ』って時にちょうどいいです。",
     ]),
     stats,
@@ -12380,7 +13109,7 @@ if (cocoichiTalk && cocoichiSpiceLevelAsk) {
 if (cocoichiTalk && cocoichiToppingAsk) {
   return replyWith(
     pickOne([
-      "チーズは強いです。あとはカツ系入れると分かりやすく満足感上がります。",
+      "チーズは強いです。あとはカツ系入れると満足感上がります。",
       "ベタですけどチーズとかカツは好きです。結局そういう王道がうまいです。",
       "トッピングするならチーズかカツ系っすね。シンプルでもいいですけど、ちょい足ししたくなります。",
     ]),
@@ -12432,7 +13161,7 @@ if (cocoichiTalk && cocoichiReasonAsk) {
 if (cocoichiTalk && cocoichiVsOtherCurryAsk) {
   return replyWith(
     pickOne([
-      "他のカレー屋もいいですけど、ココイチは辛さとかトッピングの分かりやすさが強いです。",
+      "他のカレー屋もいいですけど、ココイチは辛さとかトッピングが最強です。",
       "専門店っぽい特別感とは別で、ココイチは『今日はこう食いたい』が通りやすいのがいいです。",
       "他の店はあんま行かないっすね。カレーはココイチだけっす。",
     ]),
@@ -12824,7 +13553,7 @@ if (lastPatientTopic === "soccer_like" && soccerBestCounterAsk) {
 
   return replyWith(
     pickOne([
-      "芸能人じゃないっすけど、プレミアの選手はめっちゃ好きで。クリスティアーノ・ロナウドとか、ウェイン・ルーニーとかは普通に語れますね。",
+      "芸能人じゃないっすけど、サッカーのプレミアの選手はめっちゃ好きで。クリスティアーノ・ロナウドとか、ウェイン・ルーニーとかは普通に語れますね。",
       "芸能人はあんま見ないですけど、サッカーのほうは見てて。ケビン・デ・ブライネとかモハメド・サラーとか、ああいう選手はやっぱすごいですよね。",
       "芸能人よりサッカーっすね。ハリー・ケインとかソン・フンミンとか、プレミアのスター選手は普通に好きです。",
     ]),
@@ -12861,7 +13590,7 @@ if (youtubeTalk) {
     pickOne([
       "YouTubeはたまに見ます。SNSからのリンクで行くのが多いっすね。",
       "動画は見ることあります。集中して見るというより流し見っすね。",
-      "YouTubeも見ます。プレミアのスーパープレーとか楽しいっすよ。",
+      "YouTubeも見ます。サッカーのスーパープレーとか楽しいっすよ。",
     ]),
     stats,
     withTopic(flags, "tv_youtube", "YouTubeは流し見する"),
@@ -12872,7 +13601,7 @@ if (youtubeTalk) {
 if (animalTalk) {
   return replyWith(
     pickOne([
-      "動物は普通に好きです。どっちかというと犬猫みたいな分かりやすいやつが好きです。",
+      "動物は普通に好きです。やっぱ一番は犬っすかね。",
       "動物はいいっすよね。見てるだけでちょっと癒やされます。",
       "嫌いではないです。飼うなら手のかからなさも考えますけど。",
     ]),
@@ -12884,7 +13613,7 @@ if (animalTalk) {
 
 if (animalTalk && lastPatientTopic !== "daily_life") {
   return replyWith(
-    "動物は普通に好きです。強いて言うなら猫派かもしれないです。",
+    "動物は普通に好きです。強いて言うなら犬派かもしれないです。",
     stats,
     withTopic(flags, "daily_life", "動物は好き"),
     internalEvents
@@ -12912,7 +13641,7 @@ if (amusementTalk && lastPatientTopic !== "daily_life") {
 if (animalDogCatAsk) {
   return replyWith(
     pickOne([
-      "どっちかなら犬派かもしれないです。分かりやすく懐いてくる感じがいいじゃないですか。",
+      "どっちかなら犬派です。懐いてくる感じがいいじゃないですか。",
       "猫もいいですけど、強いて言うなら犬派です。テンションある感じが好きです。",
       "犬猫どっちも分かるんですけど、選ぶなら犬っすね。",
     ]),
@@ -12924,7 +13653,7 @@ if (animalDogCatAsk) {
 
 if (animalReasonAsk) {
   return replyWith(
-    "懐いてくる感じが分かりやすいのが好きです。見ててこっちも気分いいじゃないですか。",
+    "懐いてくれるの嬉しいっすよね。おーよしよしってやりたくなります。",
     stats,
     withTopic(flags, "daily_life", "動物は懐く感じが好き"),
     internalEvents
@@ -13086,7 +13815,7 @@ if (firstFavoriteStreamerAsk) {
     pickOne([
       "ゲーム系だと、わいわいとかからすまAは見ますね。笑っちゃって作業しながら聞けないっすよ。",
       "配信者だと、狩野英孝とか好きです。最近、香住蒼って人を注目してます。声がいいんすよねぇ。",
-      "きゃべつの人とか良く聞いてますよ。あと大関ゲームのショート動画とかついつい見ちゃいます。",
+      "キャベツの人とか良く聞いてますよ。あと大関ゲームのショート動画とかついつい見ちゃいます。",
     ]),
     stats,
     withTopic(flags, "tv_youtube", "好きな配信者としてわいわい・のばまん・狩野英孝あたりを見る"),
@@ -13180,7 +13909,7 @@ if (streamerWhoAsk) {
 
   if (nextStreamer === "kyabetsu") {
     return replyWith(
-      "きゃべつの人。あの声クセになりますよね。語り口も面白いし、言ってることもちゃんと自分の目で評価しているなって感じがして好きです。",
+      "キャベツの人。あの声クセになりますよね。語り口も面白いし、言ってることもちゃんと自分の目で評価しているなって感じがして好きです。",
       stats,
       withTopic(flags, "tv_youtube", "きゃべつの人の話", {
         next_streamer_pick: "kyabetsu",
@@ -13254,7 +13983,7 @@ if (waiwaiTalk) {
 
 if (kyabetsuTalk) {
   return replyWith(
-    "きゃべつの人、あの声クセになりますよね。語り口も面白いし、言ってることもちゃんと自分の目で評価しているなって感じがして好きです。",
+    "キャベツの人、あの声クセになりますよね。語り口も面白いし、言ってることもちゃんと自分の目で評価しているなって感じがして好きです。",
     stats,
     withTopic(flags, "tv_youtube", "きゃべつの人が好き"),
     internalEvents
@@ -13746,7 +14475,7 @@ if (moukoTalk) {
   return replyWith(
     pickOne([
       "蒙古タンメンは行ったことあります。辛いだけじゃなくて、ちゃんとパンチあるのがいいですよね。",
-      "中本系は分かりやすくテンション上がります。体調いい時限定ですけど。",
+      "中本系はテンション上がります。体調いい時限定ですけど。",
       "蒙古タンメンは“今日は行くぞ”って気分の時に強いです。",
     ]),
     stats,
@@ -13770,7 +14499,7 @@ if (moukoLevelAsk) {
 
 if (moukoReasonAsk) {
   return replyWith(
-    "辛さだけじゃなくて、ちゃんと『食った感』あるのがいいです。ああいう分かりやすいパンチは好きです。",
+    "辛さだけじゃなくて、ちゃんと『食った感』あるのがいいです。ああいうパンチがあるの好きです。",
     stats,
     withTopic(flags, "food_preference", "蒙古タンメンは辛さと満足感が魅力"),
     internalEvents
