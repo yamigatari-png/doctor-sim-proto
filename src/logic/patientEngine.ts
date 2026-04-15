@@ -1600,12 +1600,15 @@ const movieAsk1 = includesAny(normalized, [
 const starWarsFollowAsk =
   lastPatientTopic === "daily_life" &&
   includesAny(normalized, [
-    "なんでエピソード1",
-    "どこが好き",
-    "スターウォーズ詳しい",
-    "他は",
-    "ダースモール",
+    "スターウォーズ",
+    "エピソード",
     "アナキン",
+    "ダースモール",
+  ]) &&
+  includesAny(normalized, [
+    "なんで",
+    "どこが好き",
+    "何がいい",
   ]);
 
   const animeWhyNotAsk =
@@ -2726,6 +2729,7 @@ const englishAsk = includesAny(normalized, [
 const metaAsk = includesAny(normalized, [
   "てべ猫games",
   "てべ猫gamesについて",
+  "てべ猫",
   "開発者",
   "作者",
   "このゲーム誰が作った",
@@ -3071,6 +3075,7 @@ const hometownAsk = includesAny(normalized, [
   "実家どこ",
   "地元どこ",
   "どこ出身",
+  "出身",
 ]);
 
 const iseJinguAsk =
@@ -3082,7 +3087,7 @@ const iseJinguAsk =
   ]);
 
 const iseJinguWhyNotNowAsk =
-  lastPatientTopic === "travel_ise" &&
+  lastPatientTopic === "daily_life" &&
   includesAny(normalized, [
     "なぜ",
     "なんで",
@@ -3091,7 +3096,7 @@ const iseJinguWhyNotNowAsk =
     "なぜ行ってない",
     "今は行かないの",
   ]);
-  
+
 const akafukuAsk =
   lastPatientTopic === "daily_life" &&
   includesAny(normalized, [
@@ -3195,6 +3200,14 @@ const recentFateAsk =
     "出会いあった",
     "特別な出会いあった",
     "最近そういう人いた",
+  ]);
+
+  const affairWhereMeetAsk =
+  lastPatientTopic === "honeytrap_detail" &&
+  includesAny(normalized, [
+    "どこで知り合った",
+    "どこで出会った",
+    "どこで会った",
   ]);
 
 const orientationTestAsk = includesAny(normalized, [
@@ -4940,6 +4953,7 @@ const affairMoralityAsk =
     "裏切ってると思わない",
     "それってだめじゃない",
   ]);
+
 const girlsBarTalk =
   (lastPatientTopic === "honeytrap_detail" || Boolean((flags as any).heard_other_partner)) &&
   includesAny(normalized, [
@@ -7219,7 +7233,7 @@ if (hometownAsk) {
   return replyWith(
     "三重っす。伊勢です。",
     stats,
-    withTopic(flags, "travel_okinawa", "出身地は三重県伊勢"),
+    withTopic(flags, "daily_life", "出身地は三重県伊勢"),
     internalEvents
   );
 }
@@ -8893,6 +8907,12 @@ const animalPetAsk =
     "飼ったことある",
   ]);
 
+  const dogLikeAsk = includesAny(normalized, [
+  "犬のどこが好き",
+  "イヌのどこが好き",
+  "犬好き",
+]);
+
   const alcoholTalk = includesAny(normalized, [
   "酒",
   "お酒",
@@ -10264,6 +10284,34 @@ const friendCoworkerAsk =
     "紙巻きじゃなくてもタバコ",
   ]);
 
+  const strengthAsk = includesAny(normalized, [
+  "強さってなんだろ",
+  "強さって何",
+  "強さとは",
+  "強さってなんですか",
+]);
+
+const strengthFollowAsk =
+  lastPatientTopic === "daily_life" &&
+  includesAny(normalized, [
+    "どういうこと",
+    "詳しく",
+    "具体的に",
+    "どういう意味",
+  ]);
+
+  const moneyAsk = includesAny(normalized, [
+  "お金欲しい",
+  "金欲しい",
+  "お金ほしい",
+]);
+
+const makeupAsk = includesAny(normalized, [
+  "メイクする",
+  "化粧する",
+  "化粧してる",
+]);
+
   if (iqosIsTobaccoReply) {
   return replyWith(
     pickOne([
@@ -10273,6 +10321,44 @@ const friendCoworkerAsk =
     ]),
     stats,
     withTopic(flags, "smoking_iqos", "IQOSもタバコだと教えられて受け入れる"),
+    internalEvents
+  );
+}
+
+if (strengthAsk) {
+  return replyWith(
+    pickOne([
+      "そうっすね。折れない心とかですかね。",
+      "それは、ちゃんと向き合えることじゃないですか。全てのことに。",
+      "逃げないこと…とかですかね。",
+      "愛……ですかね。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "強さについての雑談"),
+    internalEvents
+  );
+}
+
+if (strengthFollowAsk) {
+  return replyWith(
+    pickOne([
+      "しんどくてもやり遂げる。それが強さってもんでしょ。",
+      "嫌なことから逃げない。それが強さってもんでしょ。",
+      "自分に負けないこと。逃げ出さないこと。自分を信じぬく事。それが強さってもんでしょ。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "強さの定義を少し深掘り"),
+    internalEvents
+  );
+}
+
+if (makeupAsk) {
+  return replyWithYesNo(
+    normalized,
+    "no",
+    "しないです。",
+    stats,
+    withTopic(flags, "daily_life", "メイクはしない"),
     internalEvents
   );
 }
@@ -11816,6 +11902,15 @@ if (affairLabelAsk) {
   );
 }
 
+if (affairWhereMeetAsk) {
+  return replyWith(
+    "ガールズバーで知り合いました。",
+    stats,
+    withTopic(flags, "honeytrap_detail", "ガールズバーで出会った"),
+    internalEvents
+  );
+}
+
 if (Boolean((flags as any).scam_route_unlocked) && otherPartnerDetailAsk) {
   flags = mergeFlags(flags, {
     heard_other_partner: true,
@@ -12970,11 +13065,11 @@ if (jojoenTalk && yakinikuExcitementAsk) {
   );
 }
 
-if (breadRiceAsk) {
+if (moneyAsk) {
   return replyWith(
-    "どっちも好きですけど、どっちかって言うとご飯派っすね。",
+    "そりゃ欲しいですけどね。",
     stats,
-    withTopic(flags, "food_preference", "ご飯派"),
+    withTopic(flags, "daily_life", "お金は欲しいが執着は強くない"),
     internalEvents
   );
 }
@@ -13770,6 +13865,15 @@ if (youtubeTalk) {
     ]),
     stats,
     withTopic(flags, "tv_youtube", "YouTubeは流し見する"),
+    internalEvents
+  );
+}
+
+if (dogLikeAsk) {
+  return replyWith(
+    "表情豊かなとこですかね。あと懐いてくる感じがいいっす。",
+    stats,
+    withTopic(flags, "daily_life", "犬が好き"),
     internalEvents
   );
 }

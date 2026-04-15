@@ -3208,12 +3208,12 @@ return (
           padding: isResultPhone ? 12 : isResultCompact ? 16 : 18,
           display: "grid",
           gap: isResultPhone ? 10 : 12,
-          background: "rgba(7,12,24,0.74)",
+          background: "rgba(7,12,24,0.52)",
           border: "1px solid rgba(255,255,255,0.10)",
           borderRadius: isResultPhone ? 16 : 22,
           boxShadow: "0 18px 50px rgba(0,0,0,0.28)",
           color: "#fff",
-          backdropFilter: "blur(4px)",
+          backdropFilter: "blur(2px)",
           boxSizing: "border-box",
         }}
       >
