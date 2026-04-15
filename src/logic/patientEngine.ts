@@ -1135,11 +1135,15 @@ const lostTrackOfTimeAsk = includesAny(normalized, [
 }
 
   const isEmpathy = includesAny(normalized, [
-  "つらい",
-  "ツライ",
-  "ツラい",
+  "つらいです",
+  "ツライです",
+  "ツラいです",
+  "つらいね",
+  "ツライね",
+  "ツラいね",
   "大丈夫",
-  "しんどい",
+  "しんどいです",
+  "しんどいね",
   "心配",
   "不安",
   "大変ですね",
@@ -1373,6 +1377,8 @@ const sweatTalk = includesAny(normalized, [
     "気にしない",
     "汗臭くない",
     "におわない",
+    "そんなことない",
+    "そんなことないよ",
   ]);
 
 const smellInsultTalk =
@@ -1795,7 +1801,11 @@ const glassesAsk = includesAny(normalized, [
 ]);
 
 const jobChangeAsk =
-  (lastPatientTopic === "work_anxiety" || lastPatientTopic === "daily_life") &&
+  (
+    lastPatientTopic === "work_anxiety" ||
+    lastPatientTopic === "daily_life" ||
+    includesAny(normalized, ["転職", "仕事辞めたい", "別の仕事"])
+  ) &&
   includesAny(normalized, [
     "転職する気はない",
     "転職する気ない",
@@ -1805,6 +1815,8 @@ const jobChangeAsk =
     "今の仕事辞めたい",
     "別の仕事したい",
     "転職したい",
+    "転職は考えてる",
+    "転職考えてる",
   ]);
 
 const goodSubjectAsk = includesAny(normalized, [
@@ -3062,7 +3074,7 @@ const hometownAsk = includesAny(normalized, [
 ]);
 
 const iseJinguAsk =
-  (lastPatientTopic === "travel_okinawa" || lastPatientTopic === "daily_life") &&
+  lastPatientTopic === "daily_life" &&
   includesAny(normalized, [
     "伊勢神宮は行った",
     "伊勢神宮行った",
@@ -3070,7 +3082,7 @@ const iseJinguAsk =
   ]);
 
 const iseJinguWhyNotNowAsk =
-  lastPatientTopic === "travel_okinawa" &&
+  lastPatientTopic === "travel_ise" &&
   includesAny(normalized, [
     "なぜ",
     "なんで",
@@ -3079,9 +3091,9 @@ const iseJinguWhyNotNowAsk =
     "なぜ行ってない",
     "今は行かないの",
   ]);
-
+  
 const akafukuAsk =
-  (lastPatientTopic === "travel_okinawa" || lastPatientTopic === "daily_life") &&
+  lastPatientTopic === "daily_life" &&
   includesAny(normalized, [
     "赤福は",
     "赤福好き",
@@ -3790,16 +3802,16 @@ if (toiletEmbarrassingAsk) {
       );
 
     case "travel_okinawa":
-      return replyWith(
-        pickOne([
-          "例えば、海がきれいだったのと、シュノーケリングがめっちゃ良かったです。",
-          "例えば、のんびり景色見たり、美味しいもの食べたりがよかったですね。",
-          "例えば、普段と全然違う空気感なのが一番よかったです。",
-        ]),
-        stats,
-        withTopic(flags, "travel_okinawa", "旅行の良かった点を具体化"),
-        internalEvents
-      );
+  return replyWith(
+    pickOne([
+      "例えば、沖縄です。海きれいだし、シュノーケリングもできるし、ベタですけどやっぱ良かったです。",
+      "例えば、沖縄は良かったですね。メジャーですけど外しにくいし、景色もご飯もちゃんとしてるんで。",
+      "例えば、沖縄とか好きです。観光地として分かりやすく満足感あるのがいいです。",
+    ]),
+    stats,
+    withTopic(flags, "travel_okinawa", "旅行の具体例として沖縄を挙げる"),
+    internalEvents
+  );
 
     case "food_preference":
       return replyWith(
@@ -9288,12 +9300,11 @@ const dietLifestyleAsk = includesAny(normalized, [
 ]);
 
 const familyRestaurantAsk = includesAny(normalized, [
-  "ファミレスは行く",
-  "ファミレス行く",
-  "サイゼ行く",
-  "ガスト行く",
-  "ジョナサン行く",
-  "デニーズ行く",
+  "ファミレス",
+  "サイゼ",
+  "ガスト",
+  "ジョナサン",
+  "デニーズ",
 ]);
 
 const jojoenAppealAsk =
@@ -9435,6 +9446,73 @@ const yakinikuExcitementAsk =
   "自炊する",
   "自分で作る",
   "料理好き",
+]);
+
+const breadRiceAsk = includesAny(normalized, [
+  "パン派",
+  "ごはん派",
+  "ゴハン派",
+  "米派",
+]);
+
+const liveAsk = includesAny(normalized, [
+  "どこに住んでる",
+  "どこ住んでる",
+  "どこ住み",
+  "住んでる場所",
+]);
+
+const papakatsuAsk = includesAny(normalized, [
+  "パパ活",
+  "パパ活は興味ある",
+  "パパ活興味ある",
+]);
+
+const afterWorkAsk = includesAny(normalized, [
+  "今日帰ったら何する",
+  "帰ったら何する",
+  "今日帰ったらどうする",
+  "家帰ったら何する",
+]);
+
+const skiAsk = includesAny(normalized, [
+  "スキーは行く",
+  "スキー行く",
+  "スキーする",
+  "スノボする",
+  "スノーボードする",
+]);
+
+const childCountWishAsk = includesAny(normalized, [
+  "子供は何人欲しい",
+  "子どもは何人欲しい",
+  "何人子供欲しい",
+  "何人ほしい",
+]);
+
+const popularityAsk = includesAny(normalized, [
+  "モテるでしょ",
+  "モテるでしょ？",
+  "モテそう",
+  "モテるタイプ",
+]);
+
+const soccerInviteAsk =
+  lastPatientTopic === "soccer_like" &&
+  includesAny(normalized, [
+    "今度サッカーしよう",
+    "サッカーしよう",
+    "一緒にサッカーしよう",
+    "今度フットサルしよう",
+    "フットサルしよう",
+  ]);
+
+const recentHardTimeAsk = includesAny(normalized, [
+  "最近つらいことあった",
+  "最近ツラいことあった",
+  "最近しんどいことあった",
+  "最近嫌なことあった",
+  "最近きついことあった",
 ]);
 
 if (lifestyleSmallTalk) {
@@ -12888,6 +12966,104 @@ if (jojoenTalk && yakinikuExcitementAsk) {
     ]),
     stats,
     withTopic(flags, "food_preference", "焼肉はイベント感と幸福感でテンションが上がる"),
+    internalEvents
+  );
+}
+
+if (breadRiceAsk) {
+  return replyWith(
+    "どっちも好きですけど、どっちかって言うとご飯派っすね。",
+    stats,
+    withTopic(flags, "food_preference", "ご飯派"),
+    internalEvents
+  );
+}
+
+if (liveAsk) {
+  return replyWith(
+    "この近くで一人暮らししてます。",
+    stats,
+    withTopic(flags, "living_status", "都内一人暮らし"),
+    internalEvents
+  );
+}
+
+if (papakatsuAsk) {
+  return replyWithYesNo(
+    normalized,
+    "no",
+    "いや、ないっす。お金出さなきゃ会えない関係ってあり得ないっすから。",
+    stats,
+    withTopic(flags, "daily_life", "パパ活には興味がない"),
+    internalEvents
+  );
+}
+
+if (breadRiceAsk) {
+  return replyWith(
+    "どっちかって言うとパン派っすね。",
+    stats,
+    withTopic(flags, "food_preference", "ご飯派"),
+    internalEvents
+  );
+}
+
+if (afterWorkAsk) {
+  return replyWith(
+    "さすがに寝ますよ。熱あるんで。",
+    stats,
+    withTopic(flags, "daily_life", "帰宅後は家で休む"),
+    internalEvents
+  );
+}
+
+if (skiAsk) {
+  return replyWithYesNo(
+    normalized,
+    "no",
+    "スキーとかスノボはあんまり行かないですね。",
+    stats,
+    withTopic(flags, "daily_life", "スキーはあまり行かない"),
+    internalEvents
+  );
+}
+
+if (childCountWishAsk) {
+  return replyWith(
+    "ゆくゆくは欲しいっすけど、そもそも結婚は今じゃないってゆーか……。",
+    stats,
+    withTopic(flags, "girlfriend_marriage", "子どもの人数までは具体的に考えていない"),
+    internalEvents
+  );
+}
+
+if (popularityAsk) {
+  return replyWith(
+    pickOne([
+      "いやぁ、まぁ、全然そんなことないっすけどねー。",
+      "いやいや、そんなことないっすけど。まぁまぁ。",
+      "そう見えちゃいますかー。まぁ普通っすね。",
+    ]),
+    stats,
+    withTopic(flags, "daily_life", "モテる話は否定してるようで"),
+    internalEvents
+  );
+}
+
+if (soccerInviteAsk) {
+  return replyWith(
+    "もうちょい仲良くなったら、行きましょう！",
+    stats,
+    withTopic(flags, "soccer_like", "サッカーの誘いには前向き"),
+    internalEvents
+  );
+}
+
+if (recentHardTimeAsk) {
+  return replyWith(
+    "え、今っす",
+    stats,
+    withTopic(flags, "daily_life", "最近しんどいことはある"),
     internalEvents
   );
 }
