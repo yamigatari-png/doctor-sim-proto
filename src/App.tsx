@@ -4779,16 +4779,14 @@ return (
 ) : (
   <div
   style={{
-    width:
-      orderCategory === "vital"
-        ? "min(100%, 560px)"
-        : "min(100%, 640px)",
-    justifySelf: "start",
+    width: "100%",
+    maxWidth: orderCategory === "vital" ? "560px" : "640px",
+    justifySelf: "stretch",
     display: "grid",
     gap: 12,
     minHeight: 0,
-    maxHeight: isPhone ? "70vh" : "none",
-    overflowY: isPhone ? "auto" : "visible",
+    maxHeight: isPhone ? "72vh" : "74vh",
+    overflowY: "auto",
     overflowX: "hidden",
   }}
 >
@@ -5650,7 +5648,17 @@ return (
   }}
   title="検査結果一覧"
 >
-          <div style={{ display: "grid", gap: 10, maxHeight: "60vh", overflow: "auto" }}>
+          <div
+  style={{
+    display: "grid",
+    gap: 10,
+    maxHeight: isPhone ? "72vh" : "78vh",
+    overflowY: "auto",
+    overflowX: "hidden",
+    minHeight: 0,
+    paddingRight: 4,
+  }}
+>
                         {sortedResults.length === 0 ? (
               <div style={{ opacity: 0.7 }}>まだ検査結果はありません。</div>
             ) : (
@@ -5740,27 +5748,54 @@ function Modal(props: {
         display: "grid",
         placeItems: "center",
         zIndex: 1000,
-        padding: 20,
+        padding: "min(20px, 2.5vw)",
       }}
       onClick={onClose}
     >
       <div
         className="card"
         style={{
-          width: width ?? "min(1080px, 92vw)",
-          maxHeight: "85vh",
-          padding: 16,
+          width: width ?? "min(1080px, calc(100vw - 16px))",
+          maxWidth: "calc(100vw - 16px)",
+          maxHeight: "calc(100vh - 16px)",
+          padding: "clamp(10px, 1.8vw, 16px)",
           display: "grid",
           gridTemplateRows: "auto 1fr",
           gap: 12,
+          overflow: "hidden",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ fontSize: 20, fontWeight: 900 }}>{title}</div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 12,
+            minWidth: 0,
+            flexWrap: "wrap",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "clamp(16px, 2.2vw, 20px)",
+              fontWeight: 900,
+              minWidth: 0,
+            }}
+          >
+            {title}
+          </div>
           <button onClick={onClose}>閉じる</button>
         </div>
-        <div style={{ minHeight: 0 }}>{children}</div>
+
+        <div
+          style={{
+            minHeight: 0,
+            overflow: "hidden",
+          }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );
