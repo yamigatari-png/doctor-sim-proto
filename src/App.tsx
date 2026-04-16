@@ -1577,7 +1577,6 @@ function getDiagnosisShareLabel() {
 
 function buildChartShareText() {
   const endingTitle = endingId ? ENDING_TITLE_MAP[endingId] : "不明";
-  const diagnosisLabel = getDiagnosisShareLabel();
   const memo = chartReviewText.trim();
 
   return [
