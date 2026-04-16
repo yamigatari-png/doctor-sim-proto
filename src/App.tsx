@@ -4892,34 +4892,36 @@ overflowX: "hidden",
   setInfectionSubModalOpen(false);
 }}
         >
-          <div style={{ display: "grid", gap: 14 }}>
-            <div style={{ fontSize: 13, opacity: 0.8 }}>
-              検査項目を選択してください。外注検査は実施できますが、このゲーム中には結果が返りません。
-            </div>
-
-            <div
+         <div
   style={{
     display: "grid",
-    gridTemplateColumns: modalCols3,
-    gap: 12,
-    alignItems: "start",
-    maxHeight: "62vh",
-    overflowY: "auto",
-    overflowX: "hidden",
-    paddingRight: 4,
+    gridTemplateRows: "auto minmax(0,1fr) auto",
+    gap: 14,
+    minHeight: 0,
+    height: isPhone ? "72vh" : "min(78vh, 900px)",
   }}
 >
-              {/* 左：迅速・院内結果あり（全部ここ） */}
-              <div className="card"
-              style={{
-  padding: 12,
-  display: "grid",
-  gap: 8,
-  maxHeight: isPhone ? "58vh" : "none",
-  overflowY: isPhone ? "auto" : "visible",
-  overflowX: "hidden",
-}}
-              >
+  <div style={{ fontSize: 13, opacity: 0.8 }}>
+    検査項目を選択してください。外注検査は実施できますが、このゲーム中には結果が返りません。
+  </div>
+
+  {/* スクロールはここだけ */}
+  <div
+    style={{
+      minHeight: 0,
+      overflowY: "auto",
+      overflowX: "hidden",
+      paddingRight: 4,
+    }}
+  >
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: modalCols3,
+        gap: 12,
+        alignItems: "start",
+      }}
+    >
                 <div style={{ fontWeight: 800 }}>迅速・院内結果あり</div>
                 {OTHER_GROUP_INFECTION_RAPID.map((key) => {
                   const tr = cp.tests[key];
