@@ -1583,7 +1583,6 @@ function buildChartShareText() {
   return [
     "【症例考察ノート】",
     `エンド：${endingTitle}`,
-    `診断：${diagnosisLabel}`,
     `経過時間：${clockText}`,
     memo ? `診療メモ：${memo}` : "",
     resultFeedback ? `評価：${getFeedbackLabel(resultFeedback)}` : "",
