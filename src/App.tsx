@@ -847,6 +847,7 @@ const isResultPhone = viewportWidth <= 640;
 
 const isPhone = viewportWidth <= 820;
 const isTablet = viewportWidth <= 1180;
+const isGameCompact = viewportWidth <= 1360;
 
 const modalCols3 = isPhone
   ? "1fr"
@@ -3593,10 +3594,16 @@ return (
   overflowY: isPhone ? "auto" : "hidden",
   padding: isPhone ? 8 : 12,
   display: "grid",
-  gridTemplateColumns: isPhone ? "1fr" : "320px minmax(520px, 1fr) 420px",
-  gridTemplateRows: isPhone
-    ? "auto minmax(320px, 46vh) minmax(220px, 30vh) auto"
-    : "1fr 120px",
+gridTemplateColumns: isPhone
+  ? "1fr"
+  : isGameCompact
+  ? "300px minmax(0, 1fr)"
+  : "320px minmax(520px, 1fr) 420px",
+gridTemplateRows: isPhone
+  ? "auto minmax(320px, 46vh) minmax(220px, 30vh) auto"
+  : isGameCompact
+  ? "minmax(320px, 1fr) minmax(220px, 32vh) auto"
+  : "1fr 120px",
   gap: isPhone ? 8 : 12,
   background: "#0b0d12",
   cursor:
@@ -3619,8 +3626,8 @@ return (
   gridTemplateRows: "auto auto auto 1fr auto auto",
   gap: isPhone ? 8 : 10,
   minHeight: 0,
-  gridRow: isPhone ? "auto" : "1 / span 2",
-  order: isPhone ? 1 : undefined,
+gridRow: isPhone ? "auto" : isGameCompact ? "1 / span 3" : "1 / span 2",
+order: isPhone ? 1 : undefined,
 }}
       >
         <div style={{ fontSize: 22, fontWeight: 900 }}>28歳男性　主訴：発熱</div>
@@ -3901,7 +3908,9 @@ return (
   gridTemplateRows: "auto 1fr auto",
   padding: isPhone ? 10 : 16,
   gap: isPhone ? 8 : 12,
-  order: isPhone ? 2 : undefined,
+  gridColumn: isPhone ? "auto" : isGameCompact ? "2" : "auto",
+gridRow: isPhone ? "auto" : isGameCompact ? "1" : "auto",
+order: isPhone ? 2 : undefined,
 }}
       >
         <div
@@ -4085,8 +4094,10 @@ return (
   overflow: "hidden",
   display: "grid",
   gridTemplateRows: "auto 1fr",
-  order: isPhone ? 3 : undefined,
-  height: isPhone ? "30vh" : "auto",
+  gridColumn: isPhone ? "auto" : isGameCompact ? "2" : "auto",
+gridRow: isPhone ? "auto" : isGameCompact ? "2" : "auto",
+order: isPhone ? 3 : undefined,
+height: isPhone ? "30vh" : isGameCompact ? "minmax(220px, 32vh)" : "auto",
 }}
       >
         <div
@@ -4109,7 +4120,8 @@ return (
       <div
         className="card"
         style={{
-  gridColumn: isPhone ? "auto" : "2 / 4",
+  gridColumn: isPhone ? "auto" : isGameCompact ? "2" : "2 / 4",
+gridRow: isPhone ? "auto" : isGameCompact ? "3" : "auto",
   minHeight: 0,
   padding: isPhone ? 10 : 12,
   display: "grid",
@@ -4192,8 +4204,9 @@ return (
     display: "grid",
     gridTemplateColumns: modalCols3,
     gap: 10,
-    maxHeight: "60vh",
-    overflow: "auto",
+    maxHeight: isPhone ? "72vh" : "78vh",
+overflowY: "auto",
+overflowX: "hidden",
     alignItems: "start",
   }}
 >
@@ -4880,7 +4893,7 @@ return (
         </div>
       )}
 
-      {infectionSubModalOpen && !isPhone && (
+      {infectionSubModalOpen && (
         <Modal
           title="感染症検査"
           onClose={() => {
@@ -5255,8 +5268,9 @@ return (
                 display: "grid",
                 gridTemplateColumns: modalCols3,
                 gap: 10,
-                maxHeight: "60vh",
-                overflow: "auto",
+                maxHeight: isPhone ? "72vh" : "78vh",
+overflowY: "auto",
+overflowX: "hidden",
                 alignItems: "start",
               }}
             >
@@ -5748,16 +5762,16 @@ function Modal(props: {
         display: "grid",
         placeItems: "center",
         zIndex: 1000,
-        padding: "min(20px, 2.5vw)",
+        padding: "min(12px, 2.5vw)",
       }}
       onClick={onClose}
     >
       <div
         className="card"
         style={{
-          width: width ?? "min(1080px, calc(100vw - 16px))",
-          maxWidth: "calc(100vw - 16px)",
-          maxHeight: "calc(100vh - 16px)",
+          width: width ?? "min(1080px, calc(100vw - 12px))",
+          maxWidth: "calc(100vw - 12px)",
+          maxHeight: "calc(100vh - 12px)",
           padding: "clamp(10px, 1.8vw, 16px)",
           display: "grid",
           gridTemplateRows: "auto 1fr",
@@ -5772,8 +5786,8 @@ function Modal(props: {
             justifyContent: "space-between",
             alignItems: "center",
             gap: 12,
-            minWidth: 0,
             flexWrap: "wrap",
+            minWidth: 0,
           }}
         >
           <div
