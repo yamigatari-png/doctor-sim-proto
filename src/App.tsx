@@ -4253,540 +4253,530 @@ overflowX: "hidden",
     }
   >
     {orderCategory === "blood" ? (
-<div
-  style={{
-    display: "grid",
-    gap: 16,
-    background: "rgba(18,20,28,0.96)",
-    border: "1px solid rgba(255,255,255,0.10)",
-    borderRadius: 16,
-    padding: 16,
-    opacity: 1,
-    minHeight: 0,
-    maxHeight: isPhone ? "70vh" : "none",
-    overflowY: isPhone ? "auto" : "visible",
-    overflowX: "hidden",
-  }}
->
+  <div
+    style={{
+      display: "grid",
+      gridTemplateRows: "auto minmax(0, 1fr) auto",
+      gap: 16,
+      background: "rgba(18,20,28,0.96)",
+      border: "1px solid rgba(255,255,255,0.10)",
+      borderRadius: 16,
+      padding: 16,
+      opacity: 1,
+      minHeight: 0,
+      height: isPhone ? "72vh" : "min(78vh, 900px)",
+      overflow: "hidden",
+    }}
+  >
     <div style={{ fontSize: 13, opacity: 0.8 }}>
       検査項目を選択してください。まとめて実施した場合、経過時間は最長の検査時間のみ加算されます。
     </div>
 
     <div
-  style={{
-    display: "grid",
-    gridTemplateColumns: modalCols4,
-    gap: 12,
-    alignItems: "start",
-  }}
->
-
-      {/* 1列目 */}
-      <div
-  className="card"
-  style={{
-    padding: 10,
-    display: "grid",
-    gap: 8,
-    background: "#232330",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 12,
-    opacity: 1,
-  }}
->
-        <div style={{ fontWeight: 700 }}>血算・凝固</div>
-        {BLOOD_COLUMN_1.map((key) => {
-          const tr = cp.tests[key];
-          const checked = isQueuedOrDrafted(key);
-          const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
-
-          return (
-            <button
-  key={key}
-  title={TEST_HELP_TEXT[key] ?? ""}
-  onClick={() => toggleDraftOrderKey(key)}
-              disabled={!!testsDone[key]}
-              style={{
-  textAlign: "left",
-  opacity: testsDone[key] ? 0.5 : 1,
-  border: checked ? "2px solid rgba(120,200,255,0.9)" : "1px solid rgba(255,255,255,0.08)",
-  background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
-  borderRadius: 10,
-}}
-            >
-              {checked ? "✓ " : ""}
-              {tr.label}
-              <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
-                {minutes}分
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
-            {/* 生化学（1つのカラム内で3列） */}
-      <div
-  className="card"
-  style={{
-    padding: 10,
-    display: "grid",
-    gap: 8,
-    background: "#232330",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 12,
-    opacity: 1,
-    gridColumn: isPhone ? "auto" : "2 / span 2",
-    alignContent: "start",
-    minWidth: 0,
-  }}
->
-        <div style={{ fontWeight: 700 }}>生化学</div>
-
-        <div
-  style={{
-    display: "grid",
-    gridTemplateColumns: isPhone ? "1fr" : "repeat(2, minmax(0, 1fr))",
-    gap: 12,
-    alignItems: "start",
-    maxHeight: isPhone ? "58vh" : "62vh",
-    overflowY: "auto",
-    overflowX: "hidden",
-    paddingRight: 4,
-  }}
->
-          {[BLOOD_BIOCHEM_1, [...BLOOD_BIOCHEM_2, ...BLOOD_BIOCHEM_3]].map((col, colIdx) => (
-            <div key={colIdx} style={{ display: "grid", gap: 8 }}>
-              {col.map((key) => {
-                const tr = cp.tests[key];
-                const checked = isQueuedOrDrafted(key);
-                const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
-
-                return (
-                  <button
-                    key={key}
-                    title={TEST_HELP_TEXT[key] ?? ""}
-                    onClick={() => toggleDraftOrderKey(key)}
-                    disabled={!!testsDone[key]}
-                    style={{
-                      textAlign: "left",
-                      opacity: testsDone[key] ? 0.5 : 1,
-                      border: checked
-                        ? "2px solid rgba(120,200,255,0.9)"
-                        : "1px solid rgba(255,255,255,0.08)",
-                      background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
-                      borderRadius: 10,
-                    }}
-                  >
-                    {checked ? "✓ " : ""}
-                    {tr.label}
-                    <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
-                      {minutes}分
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          ))}
-        </div>
-      </div>
-
-            {/* 5列目 */}
-      <div
-        className="card"
-        style={{
-          padding: 10,
-          display: "grid",
-          gap: 8,
-          alignContent: "start",
-          background: "#232330",
-          border: "1px solid rgba(255,255,255,0.08)",
-          borderRadius: 12,
-          opacity: 1,
-        }}
-      >
-        {otherLabGroup === null ? (
-          <>
-            <div style={{ fontWeight: 700 }}>その他</div>
-
-            <button onClick={() => setOtherLabGroup("urine")}>尿検査</button>
-            <button
-  onClick={() => {
-    if (isPhone) {
-      setOtherLabGroup("infection");
-    } else {
-      setInfectionSubModalOpen(true);
-    }
-  }}
->
-  感染症
-</button>
-            <button onClick={() => setOtherLabGroup("tumor")}>腫瘍マーカー</button>
-            <button onClick={() => setOtherLabGroup("autoantibody")}>自己抗体</button>
-            <button onClick={() => setOtherLabGroup("endocrine")}>内分泌</button>
-          </>
-        ) : (
-          <>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <div style={{ fontWeight: 700 }}>
-                {otherLabGroup === "urine" && "尿検査"}
-                {otherLabGroup === "infection" && "感染症"}
-                {otherLabGroup === "tumor" && "腫瘍マーカー"}
-                {otherLabGroup === "autoantibody" && "自己抗体"}
-                {otherLabGroup === "endocrine" && "内分泌"}
-              </div>
-              <button onClick={() => setOtherLabGroup(null)}>戻る</button>
-            </div>
-
-            {otherLabGroup === "urine" && (
-              <div style={{ display: "grid", gap: 8 }}>
-                {(["UA_QUAL", "UA_SEDIMENT"] as TestKey[]).map((key) => {
-                  const tr = cp.tests[key];
-                  const checked = isQueuedOrDrafted(key);
-                  const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
-
-                  return (
-                    <button
-                      key={key}
-                      title={TEST_HELP_TEXT[key] ?? ""}
-                      onClick={() => toggleDraftOrderKey(key)}
-                      disabled={!!testsDone[key]}
-                      style={{
-                        textAlign: "left",
-                        opacity: testsDone[key] ? 0.5 : 1,
-                        border: checked
-                          ? "2px solid rgba(120,200,255,0.9)"
-                          : "1px solid rgba(255,255,255,0.08)",
-                        background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
-                        borderRadius: 10,
-                      }}
-                    >
-                      {checked ? "✓ " : ""}
-                      {tr.label}
-                      <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
-                        {minutes}分
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {otherLabGroup === "tumor" && (
-              <div
-  style={{
-    display: "grid",
-    gap: 8,
-    maxHeight: "52vh",
-    overflowY: "auto",
-    overflowX: "hidden",
-    paddingRight: 4,
-    alignContent: "start",
-  }}
->
-                {OTHER_GROUP_TUMOR.map((key) => {
-                  const tr = cp.tests[key];
-                  const checked = isQueuedOrDrafted(key);
-                  const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
-
-                  return (
-                    <button
-                      key={key}
-                      title={TEST_HELP_TEXT[key] ?? ""}
-                      onClick={() => toggleDraftOrderKey(key)}
-                      disabled={!!testsDone[key]}
-                      style={{
-                        textAlign: "left",
-                        opacity: testsDone[key] ? 0.5 : 1,
-                        border: checked
-                          ? "2px solid rgba(120,200,255,0.9)"
-                          : "1px solid rgba(255,255,255,0.08)",
-                        background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
-                        borderRadius: 10,
-                      }}
-                    >
-                      {checked ? "✓ " : ""}
-                      {tr.label}
-                      <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
-                        {minutes}分
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {otherLabGroup === "autoantibody" && (
-              <div
-  style={{
-    display: "grid",
-    gap: 8,
-    maxHeight: "52vh",
-    overflowY: "auto",
-    overflowX: "hidden",
-    paddingRight: 4,
-    alignContent: "start",
-  }}
->
-                {OTHER_GROUP_AUTOANTIBODY.map((key) => {
-                  const tr = cp.tests[key];
-                  const checked = isQueuedOrDrafted(key);
-                  const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
-
-                  return (
-                    <button
-                      key={key}
-                      title={TEST_HELP_TEXT[key] ?? ""}
-                      onClick={() => toggleDraftOrderKey(key)}
-                      disabled={!!testsDone[key]}
-                      style={{
-                        textAlign: "left",
-                        opacity: testsDone[key] ? 0.5 : 1,
-                        border: checked
-                          ? "2px solid rgba(120,200,255,0.9)"
-                          : "1px solid rgba(255,255,255,0.08)",
-                        background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
-                        borderRadius: 10,
-                      }}
-                    >
-                      {checked ? "✓ " : ""}
-                      {tr.label}
-                      <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
-                        {minutes}分
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {otherLabGroup === "endocrine" && (
-  <div
-    style={{
-      display: "grid",
-      gap: 8,
-      maxHeight: "52vh",
-      overflowY: "auto",
-      overflowX: "hidden",
-      paddingRight: 4,
-      alignContent: "start",
-    }}
-  >
-    {OTHER_GROUP_ENDOCRINE.map((key) => {
-      const tr = cp.tests[key];
-      const checked = isQueuedOrDrafted(key);
-      const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
-
-      return (
-        <button
-          key={key}
-          title={TEST_HELP_TEXT[key] ?? ""}
-          onClick={() => toggleDraftOrderKey(key)}
-          disabled={!!testsDone[key]}
-          style={{
-            textAlign: "left",
-            opacity: testsDone[key] ? 0.5 : 1,
-            border: checked
-              ? "2px solid rgba(120,200,255,0.9)"
-              : "1px solid rgba(255,255,255,0.08)",
-            background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
-            borderRadius: 10,
-          }}
-        >
-          {checked ? "✓ " : ""}
-          {tr.label}
-          <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
-            {minutes}分
-          </div>
-        </button>
-      );
-    })}
-  </div>
-)}
-{otherLabGroup === "infection" && (
-  <div
-    style={{
-      display: "grid",
-      gap: 8,
-      maxHeight: "52vh",
-      overflowY: "auto",
-      overflowX: "hidden",
-      paddingRight: 4,
-      alignContent: "start",
-    }}
-  >
-    {[
-      ...OTHER_GROUP_INFECTION_RAPID,
-      ...OTHER_GROUP_INFECTION_SENDOUT,
-    ].map((key) => {
-      const tr = cp.tests[key];
-      const checked = isQueuedOrDrafted(key);
-      const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
-      const isSendout = OTHER_GROUP_INFECTION_SENDOUT.includes(key);
-
-      return (
-        <button
-          key={key}
-          title={TEST_HELP_TEXT[key] ?? ""}
-          onClick={() => toggleDraftOrderKey(key)}
-          disabled={!!testsDone[key]}
-          style={{
-            textAlign: "left",
-            opacity: testsDone[key] ? 0.5 : 1,
-            border: checked
-              ? "2px solid rgba(120,200,255,0.9)"
-              : "1px solid rgba(255,255,255,0.08)",
-            background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
-            borderRadius: 10,
-          }}
-        >
-          {checked ? "✓ " : ""}
-          {tr.label}
-          <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
-            {minutes}分{isSendout ? " ／ 外注" : ""}
-          </div>
-        </button>
-      );
-    })}
-  </div>
-)}
-          </>
-        )}
-      </div>
-    </div>
-
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-          <button onClick={addDraftToPendingOrders} disabled={draftOrderKeys.length === 0}>
-            他の検査を追加
-          </button>
-          <button
-  onClick={() => {
-    playSe(buttonSe);
-    const merged = mergeUniqueTestKeys(pendingOrderKeys, draftOrderKeys);
-    openConfirmOrderModal(merged);
-  }}
-  disabled={mergeUniqueTestKeys(pendingOrderKeys, draftOrderKeys).length === 0}
->
-  検査実施
-</button>
-        </div>
-  </div>
-) : orderCategory === "image" ? (
-  <div
-  style={{
-    display: "grid",
-    gap: 12,
-    minHeight: 0,
-    maxHeight: isPhone ? "70vh" : "none",
-    overflowY: isPhone ? "auto" : "visible",
-    overflowX: "hidden",
-  }}
->
-    <div style={{ fontSize: 13, opacity: 0.8 }}>
-      実施したい検査項目を選択してください。
-    </div>
-
-    <div
       style={{
-        display: "grid",
-        gridTemplateColumns: modalCols3,
-        gap: 12,
-        alignItems: "start",
+        minHeight: 0,
+        overflowY: "auto",
+        overflowX: "hidden",
+        paddingRight: 4,
       }}
     >
-      {[
-        { title: "単純写真", keys: IMAGE_PLAIN_XRAY_KEYS },
-        { title: "単純CT", keys: IMAGE_PLAIN_CT_KEYS },
-        { title: "造影CT", keys: IMAGE_CONTRAST_CT_KEYS },
-      ].map((group) => (
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: modalCols4,
+          gap: 12,
+          alignItems: "start",
+        }}
+      >
+        {/* 1列目 */}
         <div
-  key={group.title}
-  className="card"
-  style={{
-    padding: 10,
-    display: "grid",
-    gap: 8,
-    background: "#232330",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 12,
-    alignContent: "start",
-    maxHeight: isPhone ? "58vh" : "none",
-    overflowY: isPhone ? "auto" : "visible",
-    overflowX: "hidden",
-    minWidth: 0,
-  }}
->
-          <div style={{ fontWeight: 700 }}>{group.title}</div>
-
-          {group.keys.map((key) => {
+          className="card"
+          style={{
+            padding: 10,
+            display: "grid",
+            gap: 8,
+            background: "#232330",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 12,
+            opacity: 1,
+          }}
+        >
+          <div style={{ fontWeight: 700 }}>血算・凝固</div>
+          {BLOOD_COLUMN_1.map((key) => {
             const tr = cp.tests[key];
-            const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
             const checked = isQueuedOrDrafted(key);
-            const contrastBlocked = isContrastCTKey(key) && !hasCreatinineResult();
-            const disabled = !!testsDone[key] || contrastBlocked;
+            const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
 
             return (
               <button
                 key={key}
-                title={
-                  contrastBlocked
-                    ? "造影CTはクレアチニン結果確認後に実施できます"
-                    : TEST_HELP_TEXT[key] ?? ""
-                }
-                onClick={() => {
-                  if (contrastBlocked) return;
-                  toggleDraftOrderKey(key);
-                }}
-                disabled={disabled}
+                title={TEST_HELP_TEXT[key] ?? ""}
+                onClick={() => toggleDraftOrderKey(key)}
+                disabled={!!testsDone[key]}
                 style={{
                   textAlign: "left",
-                  opacity: disabled ? 0.55 : 1,
+                  opacity: testsDone[key] ? 0.5 : 1,
                   border: checked
                     ? "2px solid rgba(120,200,255,0.9)"
                     : "1px solid rgba(255,255,255,0.08)",
-                  background: checked
-                    ? "rgba(70,110,180,0.35)"
-                    : "#2b2b38",
+                  background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
                   borderRadius: 10,
                 }}
               >
                 {checked ? "✓ " : ""}
                 {tr.label}
                 <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
-                  所要時間 {minutes}分
+                  {minutes}分
                 </div>
-                {contrastBlocked && (
-                  <div style={{ fontSize: 12, color: "#ffb3b3", marginTop: 4 }}>
-                    クレアチニン未確認のため実施不可
-                  </div>
-                )}
               </button>
             );
           })}
         </div>
-      ))}
+
+        {/* 生化学 */}
+        <div
+          className="card"
+          style={{
+            padding: 10,
+            display: "grid",
+            gap: 8,
+            background: "#232330",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 12,
+            opacity: 1,
+            gridColumn: isPhone ? "auto" : "2 / span 2",
+            alignContent: "start",
+            minWidth: 0,
+          }}
+        >
+          <div style={{ fontWeight: 700 }}>生化学</div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: isPhone ? "1fr" : "repeat(2, minmax(0, 1fr))",
+              gap: 12,
+              alignItems: "start",
+              maxHeight: isPhone ? "58vh" : "62vh",
+              overflowY: "auto",
+              overflowX: "hidden",
+              paddingRight: 4,
+            }}
+          >
+            {[BLOOD_BIOCHEM_1, [...BLOOD_BIOCHEM_2, ...BLOOD_BIOCHEM_3]].map((col, colIdx) => (
+              <div key={colIdx} style={{ display: "grid", gap: 8 }}>
+                {col.map((key) => {
+                  const tr = cp.tests[key];
+                  const checked = isQueuedOrDrafted(key);
+                  const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
+
+                  return (
+                    <button
+                      key={key}
+                      title={TEST_HELP_TEXT[key] ?? ""}
+                      onClick={() => toggleDraftOrderKey(key)}
+                      disabled={!!testsDone[key]}
+                      style={{
+                        textAlign: "left",
+                        opacity: testsDone[key] ? 0.5 : 1,
+                        border: checked
+                          ? "2px solid rgba(120,200,255,0.9)"
+                          : "1px solid rgba(255,255,255,0.08)",
+                        background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
+                        borderRadius: 10,
+                      }}
+                    >
+                      {checked ? "✓ " : ""}
+                      {tr.label}
+                      <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
+                        {minutes}分
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 5列目 */}
+        <div
+          className="card"
+          style={{
+            padding: 10,
+            display: "grid",
+            gap: 8,
+            alignContent: "start",
+            background: "#232330",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 12,
+            opacity: 1,
+          }}
+        >
+          {otherLabGroup === null ? (
+            <>
+              <div style={{ fontWeight: 700 }}>その他</div>
+              <button onClick={() => setOtherLabGroup("urine")}>尿検査</button>
+              <button
+                onClick={() => {
+                  if (isPhone) {
+                    setOtherLabGroup("infection");
+                  } else {
+                    setInfectionSubModalOpen(true);
+                  }
+                }}
+              >
+                感染症
+              </button>
+              <button onClick={() => setOtherLabGroup("tumor")}>腫瘍マーカー</button>
+              <button onClick={() => setOtherLabGroup("autoantibody")}>自己抗体</button>
+              <button onClick={() => setOtherLabGroup("endocrine")}>内分泌</button>
+            </>
+          ) : (
+            <>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <div style={{ fontWeight: 700 }}>
+                  {otherLabGroup === "urine" && "尿検査"}
+                  {otherLabGroup === "infection" && "感染症"}
+                  {otherLabGroup === "tumor" && "腫瘍マーカー"}
+                  {otherLabGroup === "autoantibody" && "自己抗体"}
+                  {otherLabGroup === "endocrine" && "内分泌"}
+                </div>
+                <button onClick={() => setOtherLabGroup(null)}>戻る</button>
+              </div>
+
+              {/* 中身は今のまま */}
+              {otherLabGroup === "urine" && (
+                <div style={{ display: "grid", gap: 8 }}>
+                  {(["UA_QUAL", "UA_SEDIMENT"] as TestKey[]).map((key) => {
+                    const tr = cp.tests[key];
+                    const checked = isQueuedOrDrafted(key);
+                    const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
+                    return (
+                      <button
+                        key={key}
+                        title={TEST_HELP_TEXT[key] ?? ""}
+                        onClick={() => toggleDraftOrderKey(key)}
+                        disabled={!!testsDone[key]}
+                        style={{
+                          textAlign: "left",
+                          opacity: testsDone[key] ? 0.5 : 1,
+                          border: checked
+                            ? "2px solid rgba(120,200,255,0.9)"
+                            : "1px solid rgba(255,255,255,0.08)",
+                          background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
+                          borderRadius: 10,
+                        }}
+                      >
+                        {checked ? "✓ " : ""}
+                        {tr.label}
+                        <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
+                          {minutes}分
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {otherLabGroup === "tumor" && (
+                <div style={{ display: "grid", gap: 8, maxHeight: "52vh", overflowY: "auto", overflowX: "hidden", paddingRight: 4, alignContent: "start" }}>
+                  {OTHER_GROUP_TUMOR.map((key) => {
+                    const tr = cp.tests[key];
+                    const checked = isQueuedOrDrafted(key);
+                    const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
+                    return (
+                      <button
+                        key={key}
+                        title={TEST_HELP_TEXT[key] ?? ""}
+                        onClick={() => toggleDraftOrderKey(key)}
+                        disabled={!!testsDone[key]}
+                        style={{
+                          textAlign: "left",
+                          opacity: testsDone[key] ? 0.5 : 1,
+                          border: checked
+                            ? "2px solid rgba(120,200,255,0.9)"
+                            : "1px solid rgba(255,255,255,0.08)",
+                          background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
+                          borderRadius: 10,
+                        }}
+                      >
+                        {checked ? "✓ " : ""}
+                        {tr.label}
+                        <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
+                          {minutes}分
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {otherLabGroup === "autoantibody" && (
+                <div style={{ display: "grid", gap: 8, maxHeight: "52vh", overflowY: "auto", overflowX: "hidden", paddingRight: 4, alignContent: "start" }}>
+                  {OTHER_GROUP_AUTOANTIBODY.map((key) => {
+                    const tr = cp.tests[key];
+                    const checked = isQueuedOrDrafted(key);
+                    const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
+                    return (
+                      <button
+                        key={key}
+                        title={TEST_HELP_TEXT[key] ?? ""}
+                        onClick={() => toggleDraftOrderKey(key)}
+                        disabled={!!testsDone[key]}
+                        style={{
+                          textAlign: "left",
+                          opacity: testsDone[key] ? 0.5 : 1,
+                          border: checked
+                            ? "2px solid rgba(120,200,255,0.9)"
+                            : "1px solid rgba(255,255,255,0.08)",
+                          background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
+                          borderRadius: 10,
+                        }}
+                      >
+                        {checked ? "✓ " : ""}
+                        {tr.label}
+                        <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
+                          {minutes}分
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {otherLabGroup === "endocrine" && (
+                <div style={{ display: "grid", gap: 8, maxHeight: "52vh", overflowY: "auto", overflowX: "hidden", paddingRight: 4, alignContent: "start" }}>
+                  {OTHER_GROUP_ENDOCRINE.map((key) => {
+                    const tr = cp.tests[key];
+                    const checked = isQueuedOrDrafted(key);
+                    const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
+                    return (
+                      <button
+                        key={key}
+                        title={TEST_HELP_TEXT[key] ?? ""}
+                        onClick={() => toggleDraftOrderKey(key)}
+                        disabled={!!testsDone[key]}
+                        style={{
+                          textAlign: "left",
+                          opacity: testsDone[key] ? 0.5 : 1,
+                          border: checked
+                            ? "2px solid rgba(120,200,255,0.9)"
+                            : "1px solid rgba(255,255,255,0.08)",
+                          background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
+                          borderRadius: 10,
+                        }}
+                      >
+                        {checked ? "✓ " : ""}
+                        {tr.label}
+                        <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
+                          {minutes}分
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {otherLabGroup === "infection" && (
+                <div style={{ display: "grid", gap: 8, maxHeight: "52vh", overflowY: "auto", overflowX: "hidden", paddingRight: 4, alignContent: "start" }}>
+                  {[...OTHER_GROUP_INFECTION_RAPID, ...OTHER_GROUP_INFECTION_SENDOUT].map((key) => {
+                    const tr = cp.tests[key];
+                    const checked = isQueuedOrDrafted(key);
+                    const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
+                    const isSendout = OTHER_GROUP_INFECTION_SENDOUT.includes(key);
+
+                    return (
+                      <button
+                        key={key}
+                        title={TEST_HELP_TEXT[key] ?? ""}
+                        onClick={() => toggleDraftOrderKey(key)}
+                        disabled={!!testsDone[key]}
+                        style={{
+                          textAlign: "left",
+                          opacity: testsDone[key] ? 0.5 : 1,
+                          border: checked
+                            ? "2px solid rgba(120,200,255,0.9)"
+                            : "1px solid rgba(255,255,255,0.08)",
+                          background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
+                          borderRadius: 10,
+                        }}
+                      >
+                        {checked ? "✓ " : ""}
+                        {tr.label}
+                        <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
+                          {minutes}分{isSendout ? " ／ 外注" : ""}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
     </div>
 
-    <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "flex-end",
+        gap: 10,
+        flexWrap: "wrap",
+        position: "sticky",
+        bottom: 0,
+        paddingTop: 8,
+        background: "rgba(18,20,28,0.96)",
+      }}
+    >
       <button onClick={addDraftToPendingOrders} disabled={draftOrderKeys.length === 0}>
         他の検査を追加
       </button>
       <button
-  onClick={() => {
-    playSe(buttonSe);
-    const merged = mergeUniqueTestKeys(pendingOrderKeys, draftOrderKeys);
-    openConfirmOrderModal(merged);
-  }}
-  disabled={mergeUniqueTestKeys(pendingOrderKeys, draftOrderKeys).length === 0}
->
-  検査実施
-</button>
+        onClick={() => {
+          playSe(buttonSe);
+          const merged = mergeUniqueTestKeys(pendingOrderKeys, draftOrderKeys);
+          openConfirmOrderModal(merged);
+        }}
+        disabled={mergeUniqueTestKeys(pendingOrderKeys, draftOrderKeys).length === 0}
+      >
+        検査実施
+      </button>
+    </div>
+  </div>
+) : orderCategory === "image" ? (
+  <div
+    style={{
+      display: "grid",
+      gridTemplateRows: "auto minmax(0, 1fr) auto",
+      gap: 12,
+      minHeight: 0,
+      height: isPhone ? "72vh" : "min(78vh, 900px)",
+      overflow: "hidden",
+    }}
+  >
+    <div style={{ fontSize: 13, opacity: 0.8 }}>
+      実施したい検査項目を選択してください。
+    </div>
+
+    <div
+      style={{
+        minHeight: 0,
+        overflowY: "auto",
+        overflowX: "hidden",
+        paddingRight: 4,
+      }}
+    >
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: modalCols3,
+          gap: 12,
+          alignItems: "start",
+        }}
+      >
+        {[
+          { title: "単純写真", keys: IMAGE_PLAIN_XRAY_KEYS },
+          { title: "単純CT", keys: IMAGE_PLAIN_CT_KEYS },
+          { title: "造影CT", keys: IMAGE_CONTRAST_CT_KEYS },
+        ].map((group) => (
+          <div
+            key={group.title}
+            className="card"
+            style={{
+              padding: 10,
+              display: "grid",
+              gap: 8,
+              background: "#232330",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 12,
+              alignContent: "start",
+              minWidth: 0,
+            }}
+          >
+            <div style={{ fontWeight: 700 }}>{group.title}</div>
+
+            {group.keys.map((key) => {
+              const tr = cp.tests[key];
+              const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
+              const checked = isQueuedOrDrafted(key);
+              const contrastBlocked = isContrastCTKey(key) && !hasCreatinineResult();
+              const disabled = !!testsDone[key] || contrastBlocked;
+
+              return (
+                <button
+                  key={key}
+                  title={
+                    contrastBlocked
+                      ? "造影CTはクレアチニン結果確認後に実施できます"
+                      : TEST_HELP_TEXT[key] ?? ""
+                  }
+                  onClick={() => {
+                    if (contrastBlocked) return;
+                    toggleDraftOrderKey(key);
+                  }}
+                  disabled={disabled}
+                  style={{
+                    textAlign: "left",
+                    opacity: disabled ? 0.55 : 1,
+                    border: checked
+                      ? "2px solid rgba(120,200,255,0.9)"
+                      : "1px solid rgba(255,255,255,0.08)",
+                    background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
+                    borderRadius: 10,
+                  }}
+                >
+                  {checked ? "✓ " : ""}
+                  {tr.label}
+                  <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
+                    所要時間 {minutes}分
+                  </div>
+                  {contrastBlocked && (
+                    <div style={{ fontSize: 12, color: "#ffb3b3", marginTop: 4 }}>
+                      クレアチニン未確認のため実施不可
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "flex-end",
+        gap: 10,
+        flexWrap: "wrap",
+        position: "sticky",
+        bottom: 0,
+        paddingTop: 8,
+        background: "rgba(18,20,28,0.96)",
+      }}
+    >
+      <button onClick={addDraftToPendingOrders} disabled={draftOrderKeys.length === 0}>
+        他の検査を追加
+      </button>
+      <button
+        onClick={() => {
+          playSe(buttonSe);
+          const merged = mergeUniqueTestKeys(pendingOrderKeys, draftOrderKeys);
+          openConfirmOrderModal(merged);
+        }}
+        disabled={mergeUniqueTestKeys(pendingOrderKeys, draftOrderKeys).length === 0}
+      >
+        検査実施
+      </button>
     </div>
   </div>
 ) : (
