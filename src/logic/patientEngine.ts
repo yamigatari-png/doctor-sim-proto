@@ -8483,27 +8483,34 @@ const investmentResultAsk =
     "成績どう",
   ]);
 
-  const investmentMethodDetailAsk = includesAny(normalized, [
-  "投資の手法",
-  "好きな投資の手法",
-  "投資の手法は何",
-  "どういう手法",
-  "どういう投資",
-  "どんな手法",
-  "どんな投資",
-  "どう投資",
-  "どんなやり方",
-]);
+ const investmentMethodDetailAsk =
+  lastPatientTopic === "investment" &&
+  includesAny(normalized, [
+    "投資の手法",
+    "好きな投資の手法",
+    "投資の手法は何",
+    "どういう手法",
+    "どういう投資",
+    "どんな手法",
+    "どんな投資",
+    "どう投資",
+    "どんなやり方",
+  ]);
 
-const valueGrowthAsk = includesAny(normalized, [
-  "バリュー株投資かグロース株投資か",
-  "バリュー株投資",
-  "グロース株投資",
-  "バリュー株",
-  "グロース株",
-  "バリュー投資",
-  "グロース投資",
-]);
+const valueGrowthAsk =
+  lastPatientTopic === "investment" &&
+  includesAny(normalized, [
+    "バリュー株投資かグロース株投資か",
+    "バリュー株投資",
+    "グロース株投資",
+    "バリュー株",
+    "グロース株",
+    "バリュー投資",
+    "グロース投資",
+    "どちらが好き",
+    "どっちが好き",
+    "バリューかグロース",
+  ]);
 
 const oscillatorAsk = includesAny(normalized, [
   "オシレーター指標",
