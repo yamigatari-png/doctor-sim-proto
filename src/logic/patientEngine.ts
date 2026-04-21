@@ -9393,7 +9393,7 @@ const vtuberWatchAsk =
 
   const kasumiAoTalk =
   lastPatientTopic === "tv_youtube" &&
-  includesAny(normalized, ["香住蒼", "かすみそう", "かすみ蒼"]);
+  includesAny(normalized, ["香住蒼","香住", "かすみそう", "かすみ蒼"]);
 
 const waiwaiTalk =
   lastPatientTopic === "tv_youtube" &&
@@ -9418,6 +9418,41 @@ const kanoEikoTalk =
 const nobamanTalk =
   lastPatientTopic === "tv_youtube" &&
   includesAny(normalized, ["のばまん", "のばまんゲームス"]);
+
+  const kasumiAoKnowAsk =
+  lastPatientTopic === "tv_youtube" &&
+  includesAny(normalized, ["香住蒼", "かすみあお", "かすみ蒼"]) &&
+  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"]);
+
+const waiwaiKnowAsk =
+  lastPatientTopic === "tv_youtube" &&
+  includesAny(normalized, ["わいわい"]) &&
+  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"]);
+
+const ozekiGameKnowAsk =
+  lastPatientTopic === "tv_youtube" &&
+  includesAny(normalized, ["大関ゲーム"]) &&
+  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"]);
+
+const nobamanKnowAsk =
+  lastPatientTopic === "tv_youtube" &&
+  includesAny(normalized, ["のばまん"]) &&
+  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"]);
+
+const karasumaKnowAsk =
+  lastPatientTopic === "tv_youtube" &&
+  includesAny(normalized, ["からすまa", "からすま", "クソゲーハンター"]) &&
+  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"]);
+
+const kyabetsuKnowAsk =
+  lastPatientTopic === "tv_youtube" &&
+  includesAny(normalized, ["キャベツの人", "きゃべつの人", "キャベツ"]) &&
+  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"]);
+
+const eikoKnowAsk =
+  lastPatientTopic === "tv_youtube" &&
+  includesAny(normalized, ["狩野英孝", "狩野", "eiko", "eiko!go!!"]) &&
+  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"]);
 
 const mangaTalk = includesAny(normalized, [
   "マンガ",
@@ -9453,9 +9488,13 @@ const streamerVideoAsk =
   includesAny(normalized, [
     "知ってる",
     "知ってますか",
+    "知ってます",
+    "知ってる？",
+    "知ってます？",
     "見たことある",
+    "見たことある？",
     "見ますか",
-    "見てる",
+    "見ます？",
   ]) &&
   !includesAny(normalized, [
     "長谷川式",
@@ -14709,7 +14748,7 @@ if (streamerWhoAsk) {
 
   if (nextStreamer === "kasumi_ao") {
     return replyWith(
-      "香住蒼って知ってます？ちょっとマイナーっすけど、声がいいんすよね。演じ分けもすごくて、最近の推しですね。",
+      "香住蒼って知ってます？声がいいんすよね。演じ分けもすごくて、最近の推しですね。",
       stats,
       withTopic(flags, "tv_youtube", "香住蒼の話", {
         next_streamer_pick: "kasumi_ao",
@@ -14783,6 +14822,105 @@ if (streamerWhoAsk) {
       internalEvents
     );
   }
+}
+
+if (kasumiAoKnowAsk) {
+  return replyWithYesNo(
+    normalized,
+    "yes",
+    pickOne([
+      "知ってますよ。最近好きになったんですよね。声がいいし、演じ分けうまいんですよね。",
+      "はい、知ってます。あの声と空気感が好きなんです。",
+      "知ってます。最近の推しですね。ゲーム実況で色んな役を演じ分けるの好きなんですよ。",
+    ]),
+    stats,
+    withTopic(flags, "tv_youtube", "香住蒼を知っていて推しとして見ている", {
+      next_streamer_pick: "kasumi_ao",
+    }),
+    internalEvents
+  );
+}
+
+if (waiwaiKnowAsk) {
+  return replyWithYesNo(
+    normalized,
+    "yes",
+    "知ってますよ。わいわいさんいいっすよね。友達と集まってゲームしてる感じがして、見てて落ち着くんですよ。",
+    stats,
+    withTopic(flags, "tv_youtube", "わいわいを知っていて好き", {
+      next_streamer_pick: "waiwai",
+    }),
+    internalEvents
+  );
+}
+
+if (ozekiGameKnowAsk) {
+  return replyWithYesNo(
+    normalized,
+    "yes",
+    "知ってます。大関ゲーム、あのーから始まる感じがもう好きなんですよ。ショートもつい見ちゃいます。",
+    stats,
+    withTopic(flags, "tv_youtube", "大関ゲームを知っていて好き", {
+      next_streamer_pick: "ozeki_game",
+    }),
+    internalEvents
+  );
+}
+
+if (nobamanKnowAsk) {
+  return replyWithYesNo(
+    normalized,
+    "yes",
+    "知ってます。のばまんって、よくあんな無茶な発想思いつくなって感心するんですよね。結果ちゃんと面白いのが凄いですよね。",
+    stats,
+    withTopic(flags, "tv_youtube", "のばまんを知っていて好き", {
+      next_streamer_pick: "nobaman",
+    }),
+    internalEvents
+  );
+}
+
+if (karasumaKnowAsk) {
+  return replyWithYesNo(
+    normalized,
+    "yes",
+    "知ってますよ。からすまA好きです。クソゲーってこんなに面白く語れるんだって思わされますよね。",
+    stats,
+    withTopic(flags, "tv_youtube", "からすまAを知っていて好き", {
+      next_streamer_pick: "kusoge_hunter",
+    }),
+    internalEvents
+  );
+}
+
+if (kyabetsuKnowAsk) {
+  return replyWithYesNo(
+    normalized,
+    "yes",
+    "知ってます。キャベツの人、あの声クセになりますよね。語り口も面白いし、ちゃんと自分の目で見て話してる感じが好きです。",
+    stats,
+    withTopic(flags, "tv_youtube", "キャベツの人を知っていて好き", {
+      next_streamer_pick: "kyabetsu",
+    }),
+    internalEvents
+  );
+}
+
+if (eikoKnowAsk) {
+  return replyWithYesNo(
+    normalized,
+    "yes",
+    pickOne([
+      "知ってますよ。狩野英孝、めっちゃ面白いじゃないですか。あの天然っぽさでちゃんと笑わせてくるの強いです。",
+      "はい、知ってます。ゲーム実況も好きです。次何するのかわくわくして、ついつい見続けちゃうんですよね。",
+      "知ってます。EIKO!GO!!の感じいいっすよね。あのテンションとリアクション、つい見ちゃいます。",
+    ]),
+    stats,
+    withTopic(flags, "tv_youtube", "狩野英孝を知っていて好き", {
+      next_streamer_pick: "eiko",
+    }),
+    internalEvents
+  );
 }
 
 if (kasumiAoTalk) {
