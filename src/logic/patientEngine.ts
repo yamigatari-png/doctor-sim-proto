@@ -56,6 +56,7 @@ type TopicKey =
   | "tv_youtube"
   | "honeytrap_detail"
   | "girlfriend_detail"
+  | "woman_preference"
   | "generic_sick"
   | "marshmallow_talk"
   | "funny_story"
@@ -5948,7 +5949,7 @@ const celebritySpecificAsk = includesAny(normalized, ["鈴木良平"]);
 const pastStupidAsk = includesAny(normalized, ["バカだなと思う行動"]);
 
 const typeOfWomanCelebrityAsk =
-  lastPatientTopic === "girlfriend_detail" &&
+  lastPatientTopic === "woman_preference" &&
   includesAny(normalized, [
     "芸能人でいうと",
     "芸能人で言うと",
@@ -5961,7 +5962,7 @@ const typeOfWomanCelebrityAsk =
   ]);
 
   const typeOfWomanCelebrityTsukkomiAsk =
-  lastPatientTopic === "girlfriend_detail" &&
+  lastPatientTopic === "woman_preference" &&
   includesAny(normalized, [
     "誰それ",
     "知らない",
@@ -5974,13 +5975,42 @@ const typeOfWomanCelebrityAsk =
   ]);
 
 const typeOfWomanCelebrityDeepAsk =
-  lastPatientTopic === "girlfriend_detail" &&
+  lastPatientTopic === "woman_preference" &&
   includesAny(normalized, [
     "どこがいい",
     "どこが好き",
     "何がいい",
     "なんで好き",
     "どういうところ",
+  ]);
+
+  const bakemonogatariTsukkomiAsk =
+  lastPatientTopic === "woman_preference" &&
+  includesAny(normalized, [
+    "化物語",
+    "見てない",
+    "知らない",
+    "どんな話",
+    "何それ",
+  ]);
+
+const nishioishinTsukkomiAsk =
+  lastPatientTopic === "woman_preference" &&
+  includesAny(normalized, [
+    "西尾維新",
+    "誰それ",
+    "作者誰",
+    "作家",
+  ]);
+
+const boobsTsukkomiAsk =
+  lastPatientTopic === "woman_preference" &&
+  includesAny(normalized, [
+    "最強の武器",
+    "何が武器",
+    "武器って何",
+    "おっぱい",
+    "胸",
   ]);
 
 // 症状の横断まとめ
@@ -7789,7 +7819,7 @@ if (typeOfWomanAsk) {
   return replyWith(
     "落ち着いてる人の方がいいっすね。",
     stats,
-    withTopic(flags, "girlfriend_detail", "好みの女性のタイプは落ち着いてる人"),
+    withTopic(flags, "woman_preference", "好みの女性のタイプは落ち着いてる人"),
     internalEvents
   );
 }
@@ -7798,7 +7828,7 @@ if (typeOfWomanCelebrityAsk) {
   return replyWith(
     "えー、例えば、羽川翼とか。",
     stats,
-    withTopic(flags, "girlfriend_detail", "好みの女性像を芸能人イメージで少し具体化"),
+    withTopic(flags, "woman_preference", "好みの女性像をアニメキャラで具体化"),
     internalEvents
   );
 }
@@ -7806,12 +7836,64 @@ if (typeOfWomanCelebrityAsk) {
 if (typeOfWomanCelebrityTsukkomiAsk) {
   return replyWith(
     pickOne([
-      "いやいや。羽川さんはパーフェクトヒロインですからね！普段、落ち着いてるのに、秘めた思いを吐き出すシーンとか最高なんですから。",
+      "いやいや。羽川さん知ってますよね！アニメの。俺、めっちゃ好きなんですよ。",
+      "羽川翼ですよ！つばさキャットも可です。化物語、見てないんですか？",
+      "西尾維新の小説に出てくるキャラです。最強の武器を持った女の子ですから。",
+    ]),
+    stats,
+    withTopic(flags, "woman_preference", "好みの女性像として羽川翼を挙げてオタク話に入る"),
+    internalEvents
+  );
+}
+
+if (bakemonogatariTsukkomiAsk) {
+  return replyWith(
+    pickOne([
+      "化物語はセリフが秀逸で、キャラの掛け合いが言葉遊びもあってめちゃくちゃ面白いんですよ。",
+      "すごい独特の世界観なんですけど、キャラが濃くて面白いんですよ。",
+      "そもそもキャラの名前からクセがあって、でも一人一人が主人公になる深さがあるんですよね。",
+    ]),
+    stats,
+    withTopic(flags, "girlfriend_detail", "化物語の説明と羽川の位置づけ"),
+    internalEvents
+  );
+}
+
+if (nishioishinTsukkomiAsk) {
+  return replyWith(
+    pickOne([
+      "ちょっと独特な言い回し多い作家で、それがハマるとめっちゃ面白いんですよ。",
+      "会話のテンポとか言葉遊びが特徴の人で、キャラもクセ強いからハマる人はどハマリしますよ。",
+      "ものすごい沢山の本があって、例えばジャンプで連載してためだかボックスも西尾先生です。",
+    ]),
+    stats,
+    withTopic(flags, "girlfriend_detail", "西尾維新の特徴を軽く説明"),
+    internalEvents
+  );
+}
+
+if (boobsTsukkomiAsk) {
+  return replyWith(
+    pickOne([
+      "神作画っす！",
+      "この世の美がそこにあります。",
+      "あの揺れには神が宿ってます。",
+    ]),
+    stats,
+    withTopic(flags, "girlfriend_detail", "見た目ネタから内面評価に戻す"),
+    internalEvents
+  );
+}
+
+if (typeOfWomanCelebrityDeepAsk) {
+  return replyWith(
+    pickOne([
+      "羽川さんはパーフェクトヒロインですからね！普段、落ち着いてるのに、秘めた思いを吐き出すシーンとか最高なんですから。",
       "可愛いだけじゃなく、めちゃくちゃ頭がいいし、あの最強の武器がもう最高っす！",
       "一途に好きな人を思い続けるいじらしさが、守りたくなしますよね。",
     ]),
     stats,
-    withTopic(flags, "girlfriend_detail", "アニメ例を現実の性格に言い換える"),
+    withTopic(flags, "girlfriend_detail", "羽川翼のどこが好きかを具体化する"),
     internalEvents
   );
 }
@@ -8440,7 +8522,6 @@ const investmentTypeAsk =
   includesAny(normalized, [
     "何やってる",
     "何に投資",
-    "株",
     "nisa",
     "新nisa",
     "投資信託",
@@ -12878,28 +12959,6 @@ if (travelStyleAsk) {
   );
 }
 
-  if (investmentTalk) {
-    return replyWith(
-      pickOne([
-        "投資は一応やってます。株とかそのへんっす。でも、めっちゃ儲かってるとかじゃ全然ないっす。",
-        "NISAとかそのへんは一応触ってます。興味はあるけどガチ勢ではないです。",
-        "投資はやってますけど、なかなか難しいっすよね。",
-      ]),
-      stats,
-      withTopic(flags, "investment", "投資を少しやる"),
-      internalEvents
-    );
-  }
-
-  if (investmentTypeAsk) {
-  return replyWith(
-    "普通にNISAとかそのへん中心です。なかなか勝てないっすけど",
-    stats,
-    withTopic(flags, "investment", "投資は比較的無難にやっている"),
-    internalEvents
-  );
-}
-
 if (investmentOnlyNisaAsk) {
   return replyWith(
     "基本はそのへんです。大きくは張ってないっすけど。",
@@ -12961,6 +13020,29 @@ if (valueGrowthAsk) {
     internalEvents
   );
 }
+
+if (investmentTalk) {
+    return replyWith(
+      pickOne([
+        "投資は一応やってます。株とかそのへんっす。でも、めっちゃ儲かってるとかじゃ全然ないっす。",
+        "NISAとかそのへんは一応触ってます。興味はあるけどガチ勢ではないです。",
+        "投資はやってますけど、なかなか難しいっすよね。",
+      ]),
+      stats,
+      withTopic(flags, "investment", "投資を少しやる"),
+      internalEvents
+    );
+  }
+
+  if (investmentTypeAsk) {
+  return replyWith(
+    "普通にNISAとかそのへん中心です。なかなか勝てないっすけど",
+    stats,
+    withTopic(flags, "investment", "投資は比較的無難にやっている"),
+    internalEvents
+  );
+}
+
 
 if (oscillatorAsk) {
   return replyWith(
