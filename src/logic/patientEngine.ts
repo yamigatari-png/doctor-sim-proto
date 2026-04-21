@@ -3989,23 +3989,38 @@ const fatherTalk = includesAny(normalized, [
   "お父様はどんな人",
   "父親はどんな人",
 ]);
- const fatherInfoSourceAsk = includesAny(normalized, [
-  "誰から聞いた",
-  "どなたから聞いた",
-  "誰に聞いた",
-  "どうやって知った",
-  "誰から亡くなったと聞いた",
-  "どうやってお父さんがなくなってることを知った",
-  "どうやって父がなくなってることを知った",
-  "どうやって父親がなくなってることを知った",
-  "なぜお父さんがなくなったことを知ってる",
-  "なぜ父がなくなったことを知ってる",
-  "なぜ父親がなくなったことを知ってる",
-  "どうして知ってる",
-  "なぜ知ってる",
-  "死んだことを知ってる",
-  "死んだって",
-]);
+ const fatherInfoSourceAsk =
+  lastPatientTopic === "father_distance" &&
+  includesAny(normalized, [
+    "なぜ亡くなった",
+    "なんで亡くなった",
+    "どうして亡くなった",
+    "なぜ死んだ",
+    "なんで死んだ",
+    "どうして死んだ",
+    "誰から聞いた",
+    "どうやって知った",
+    "何で知った",
+    "なぜ知ってる",
+    "なんで知ってる",
+    "どうして知ってる",
+    "死んだって誰から聞いた",
+    "亡くなったって誰から聞いた",
+    "どなたから聞いた",
+    "誰に聞いた",
+    "誰から亡くなったと聞いた",
+    "どうやってお父さんがなくなってることを知った",
+    "どうやって父がなくなってることを知った",
+    "どうやって父親がなくなってることを知った",
+    "なぜお父さんがなくなったことを知ってる",
+    "なぜ父がなくなったことを知ってる",
+    "なぜ父親がなくなったことを知ってる",
+    "どうして知ってる",
+    "なぜ知ってる",
+    "死んだことを知ってる",
+    "死んだって",
+    "なぜ亡くなったのを知ってる",
+  ]);
 
 const fatherDeathAsk =
   !fatherInfoSourceAsk &&
@@ -8409,6 +8424,118 @@ const investmentResultAsk =
     "成績どう",
   ]);
 
+  const investmentMethodDetailAsk = includesAny(normalized, [
+  "投資の手法",
+  "好きな投資の手法",
+  "投資の手法は何",
+  "どういう手法",
+  "どういう投資",
+  "どんな手法",
+  "どんな投資",
+  "どう投資",
+  "どんなやり方",
+]);
+
+const valueGrowthAsk = includesAny(normalized, [
+  "バリュー株投資かグロース株投資か",
+  "バリュー株投資",
+  "グロース株投資",
+  "バリュー株",
+  "グロース株",
+  "バリュー投資",
+  "グロース投資",
+]);
+
+const oscillatorAsk = includesAny(normalized, [
+  "オシレーター指標",
+  "オシレーター",
+  "rsi",
+  "macd",
+  "テクニカル指標",
+  "テクニカル",
+]);
+
+const equityRatioAsk = includesAny(normalized, [
+  "自己資本比率は重要",
+  "自己資本比率は重要ですか",
+  "自己資本比率気にする",
+  "自己資本比率は見る",
+  "自己資本比率",
+]);
+
+const investmentDeepFollowAsk =
+  lastPatientTopic === "investment" &&
+  includesAny(normalized, [
+    "詳しく",
+    "具体的に",
+    "たとえば",
+    "例えば",
+    "どういうこと",
+    "どんな感じ",
+  ]);
+
+  const shareholderBenefitAsk = includesAny(normalized, [
+  "株主優待",
+  "優待",
+  "優待目当て",
+]);
+
+const dividendAsk = includesAny(normalized, [
+  "配当",
+  "配当金",
+  "高配当",
+  "配当狙い",
+]);
+
+const indexAsk = includesAny(normalized, [
+  "インデックス",
+  "インデックス投資",
+  "指数連動",
+  "sp500",
+  "s&p500",
+  "オルカン",
+  "全世界株",
+]);
+
+const stopLossAsk = includesAny(normalized, [
+  "損切り",
+  "ロスカット",
+  "損切りする",
+  "損切りできる",
+]);
+
+const fxAsk = includesAny(normalized, [
+  "fx",
+  "為替",
+  "ドル円",
+  "ユーロ円",
+  "ポンド円",
+]);
+
+const cryptoAsk = includesAny(normalized, [
+  "仮想通貨",
+  "暗号資産",
+  "ビットコイン",
+  "btc",
+  "イーサ",
+  "eth",
+]);
+
+const dayTradeAsk = includesAny(normalized, [
+  "デイトレ",
+  "デイトレード",
+  "短期売買",
+  "スキャル",
+]);
+
+const leverageAsk = includesAny(normalized, [
+  "レバレッジ",
+  "レバ",
+  "信用取引",
+  "何倍",
+  "何倍レバ",
+]);
+
   const snsTalk = includesAny(normalized, ["sns", "インスタ", "instagram", "自撮り", "映え"]);
   const friendTalk = includesAny(normalized, ["友達", "親友", "イツメン", "仲良い", "女友達", "同期"]);
 
@@ -8725,6 +8852,23 @@ const spicyForTasteAsk =
     "俳優",
     "女優",
     "タレント",
+  ]);
+
+  const soccerPlayerLikePointAsk =
+  lastPatientTopic === "soccer_like" &&
+  includesAny(normalized, [
+    "その選手の好きなところ",
+    "その選手のどこが好き",
+    "その人の好きなところ",
+    "その人のどこが好き",
+    "何が好き",
+    "どこが好き",
+    "ロナウドの好きなところ",
+    "ルーニーの好きなところ",
+    "デブライネの好きなところ",
+    "サラーの好きなところ",
+    "ケインの好きなところ",
+    "ソンの好きなところ",
   ]);
 
   const lifestyleSmallTalk = includesAny(normalized, [
@@ -10194,7 +10338,22 @@ const addressAsk = includesAny(normalized, [
   "どこに住んでます",
   "どこ住み",
   "どこに住んでいる",
+  "家はどこ",
+  "どこ住み",
+  "どこに住んでる",
+  "住まいは",
+  "家どこ",
 ]);
+
+const busyPriorityAsk =
+  includesAny(normalized, [
+    "普段忙しい",
+    "普段忙しいですか",
+    "普段は忙しい",
+    "仕事忙しい",
+    "普段、忙しい",
+  ]) &&
+  lastPatientTopic !== "work_anxiety";
 
 const hobbyAsk = includesAny(normalized, [
   "趣味",
@@ -10777,6 +10936,15 @@ if (addressAsk) {
     "詳しい住所まではあれですけど、この近くで一人暮らししてます。",
     stats,
     withTopic(flags, "living_status", "この近くで一人暮らし"),
+    internalEvents
+  );
+}
+
+if (busyPriorityAsk) {
+  return replyWith(
+    "まぁそれなりに忙しいですね。。",
+    stats,
+    withTopic(flags, "generic_sick", "生活の話題"),
     internalEvents
   );
 }
@@ -12702,6 +12870,175 @@ if (investmentResultAsk) {
   );
 }
 
+if (investmentMethodDetailAsk) {
+  return replyWith(
+    pickOne([
+      "やっぱNISAでしょ。あれですよ、税金とかそのへんで得なんですよね、たしか。",
+      "今の時代NISAですよね。積み立てってのがね、リスク分散できますし。",
+      "まぁインスピレーション大事ですかね。今はNISAがビンビンきてます。",
+    ]),
+    stats,
+    withTopic(flags, "investment", "投資手法はかなりふわっとしている"),
+    internalEvents
+  );
+}
+
+if (valueGrowthAsk) {
+  return replyWith(
+    pickOne([
+      "その、あれですよ。うん、あれです、あれ。はいはいはいはい。知ってますよ。",
+      "え、今そこ聞きます？ まいったなー。投資は安く買って高く売るのが基本っすよね。",
+      "バリューを評価してますよ、俺は。バリューしか勝たんです。",
+    ]),
+    stats,
+    withTopic(flags, "investment", "バリュー株とグロース株の違いはよく分かっていない"),
+    internalEvents
+  );
+}
+
+if (oscillatorAsk) {
+  return replyWith(
+    pickOne([
+      "はいはいはいはい。それっすね。分かりますよ！あれ、すごいっすよね。ねー、ほんと。",
+      "俺ってけっこうインスピレーション大事にしてますからね。次、高くなるぞとか安くなるぞってなんとなく分かるっすよ。",
+      "データだけ見てても資産は増えないっすよ。",
+    ]),
+    stats,
+    withTopic(flags, "investment", "オシレーターなどの指標はほぼ見ていない"),
+    internalEvents
+  );
+}
+
+if (equityRatioAsk) {
+  return replyWith(
+    pickOne([
+      "え？あー、自己資本比率っすよね。重要っすよ。高いといいんすもんね。",
+      "見ようと思えばいつでも見れますよ。まぁ、ちゃんと毎回見てるわけじゃないですね。",
+      "あー、あれっすね。俺、昨日は比率100%超えてました。",
+    ]),
+    stats,
+    withTopic(flags, "investment", "自己資本比率の重要性は何となく分かるが深くは見ていない"),
+    internalEvents
+  );
+}
+
+if (investmentDeepFollowAsk) {
+  return replyWith(
+    pickOne([
+      "あーすいません。熱上がってきたかも。",
+      "ゴホっ、ゴホっ。咳やばいっす。え、何でしたっけ？",
+      "なんか今日ってやけに湿度高くないっすか。ぼーっとしちゃいますね。",
+    ]),
+    stats,
+    withTopic(flags, "investment", "投資の理解は浅いが触ってはいる"),
+    internalEvents
+  );
+}
+
+if (shareholderBenefitAsk) {
+  return replyWith(
+    pickOne([
+      "優待はテンション上がりますよね。めっちゃ得した気になります。",
+      "あれいいっすよね。そのために投資してるんじゃないっすか。",
+      "俺は優待ありきで株を買ってますね。",
+    ]),
+    stats,
+    withTopic(flags, "investment", "株主優待は雰囲気で好感を持っている"),
+    internalEvents
+  );
+}
+
+if (dividendAsk) {
+  return replyWith(
+    pickOne([
+      "配当は欲しいに決まってますよ。不労所得最高っす。",
+      "高配当って響きいいっすよね。なんか勝ったって感じがして。",
+      "配当あるから株持ってるとこありますよね。",
+    ]),
+    stats,
+    withTopic(flags, "investment", "配当はなんとなく好印象"),
+    internalEvents
+  );
+}
+
+if (indexAsk) {
+  return replyWith(
+    pickOne([
+      "インデックスって、なんか強いイメージですよね。",
+      "あれ買っとけばまぁ間違いないっすよね。",
+      "インデックスやってる人って一味違ってみえますよね。",
+    ]),
+    stats,
+    withTopic(flags, "investment", "インデックス投資は無難で強そうだと思っている"),
+    internalEvents
+  );
+}
+
+if (stopLossAsk) {
+  return replyWith(
+    pickOne([
+      "損切りができないようじゃ二流っすね。",
+      "損切りなんか簡単すよ。負けそうな時はやればいいんで。",
+      "損切りは大事っすね。早くしないとダメっすよ。",
+    ]),
+    stats,
+    withTopic(flags, "investment", "損切りは必要だと分かっているが苦手そう"),
+    internalEvents
+  );
+}
+
+if (fxAsk) {
+  return replyWith(
+    pickOne([
+      "FXって、なんか怖いんですよね。場合によっては破産するって",
+      "為替って変動大きくて怖いっすよね。あえて手出ししないのも、また勇気ですね。",
+      "FXは気になってはいるんですけどねー、さすがに怖いっす。",
+    ]),
+    stats,
+    withTopic(flags, "investment", "FXは詳しくないが雰囲気で語る"),
+    internalEvents
+  );
+}
+
+if (cryptoAsk) {
+  return replyWith(
+    pickOne([
+      "仮想通貨って夢ありますよね。どこで手に入るんですかね。",
+      "ビットコインは知ってますよ。暗号資産ですよね。どこらへんが暗号なんすかね。",
+      "仮想通貨は気になるんですけど、波の激しさにちょっとビビります。",
+    ]),
+    stats,
+    withTopic(flags, "investment", "仮想通貨は夢があると思っている"),
+    internalEvents
+  );
+}
+
+if (dayTradeAsk) {
+  return replyWith(
+    pickOne([
+      "デイトレって、めちゃくちゃ頭の回転速くないと無理そうじゃないですか。",
+      "あれできる人すごいっすよね。自分は見てるだけで疲れそうです。",
+      "デイトレは、ああいうのは才能ある人がやるイメージです。",
+    ]),
+    stats,
+    withTopic(flags, "investment", "デイトレはすごいものだと思っている"),
+    internalEvents
+  );
+}
+
+if (leverageAsk) {
+  return replyWith(
+    pickOne([
+      "レバレッジって、あれですよね。破産とかしちゃうヤツっすよね。",
+      "レバかける人って自信あるなって思いますよ。",
+      "俺がレバレッジなんかやったら食い物にされて終わりっすよ。",
+    ]),
+    stats,
+    withTopic(flags, "investment", "レバレッジは強そうだが怖いと思っている"),
+    internalEvents
+  );
+}
+
   if (snsAccountAsk) {
   return replyWith(
     pickOne([
@@ -13822,14 +14159,71 @@ if (lastPatientTopic === "soccer_like" && soccerBestCounterAsk) {
     defense: Math.max(0, stats.defense - 2),
   };
 
+  const celebrityReplies = [
+    {
+      reply:
+        "芸能人じゃないっすけど、サッカーのプレミアの選手はめっちゃ好きで。クリスティアーノ・ロナウドとか、ウェイン・ルーニーとかは普通に語れますね。",
+      named_players: "ronaldo_rooney",
+    },
+    {
+      reply:
+        "芸能人はあんま見ないですけど、サッカーのほうは見てて。ケビン・デ・ブライネとかモハメド・サラーとか、ああいう選手はやっぱすごいですよね。",
+      named_players: "debruyne_salah",
+    },
+    {
+      reply:
+        "芸能人よりサッカーっすね。ハリー・ケインとかソン・フンミンとか、プレミアのスター選手は普通に好きです。",
+      named_players: "kane_son",
+    },
+  ];
+
+  const picked =
+    celebrityReplies[Math.floor(Math.random() * celebrityReplies.length)];
+
   return replyWith(
-    pickOne([
-      "芸能人じゃないっすけど、サッカーのプレミアの選手はめっちゃ好きで。クリスティアーノ・ロナウドとか、ウェイン・ルーニーとかは普通に語れますね。",
-      "芸能人はあんま見ないですけど、サッカーのほうは見てて。ケビン・デ・ブライネとかモハメド・サラーとか、ああいう選手はやっぱすごいですよね。",
-      "芸能人よりサッカーっすね。ハリー・ケインとかソン・フンミンとか、プレミアのスター選手は普通に好きです。",
-    ]),
+    picked.reply,
     stats,
-    withTopic(flags, "soccer_like", "芸能人話題からサッカーへ逸れる"),
+    withTopic(flags, "soccer_like", "芸能人よりプレミア選手の話", {
+      soccer_named_players: picked.named_players,
+    }),
+    internalEvents
+  );
+}
+
+if (soccerPlayerLikePointAsk) {
+  const namedPlayers = getStringFlag(flags, "soccer_named_players");
+
+  if (namedPlayers === "ronaldo_rooney") {
+    return replyWith(
+      "ロナウドはあの理不尽な決定力と華があるところっすね。ルーニーは点も取れるし下がって作れるし、泥くさいこともできる万能感が好きです。",
+      stats,
+      withTopic(flags, "soccer_like", "ロナウドの決定力とルーニーの万能感が好き"),
+      internalEvents
+    );
+  }
+
+  if (namedPlayers === "debruyne_salah") {
+    return replyWith(
+      "デ・ブライネは配球の精度がエグいですし、サラーはあのスピードで決め切る感じがやっぱりすごいです。",
+      stats,
+      withTopic(flags, "soccer_like", "デブライネの配球とサラーの決定力が好き"),
+      internalEvents
+    );
+  }
+
+  if (namedPlayers === "kane_son") {
+    return replyWith(
+      "ケインは決めるだけじゃなくて下がって組み立てられるのがすごいですし、ソンはスピードと一発で仕留める感じが怖いんすよね。",
+      stats,
+      withTopic(flags, "soccer_like", "ケインの万能性とソンのスピードが好き"),
+      internalEvents
+    );
+  }
+
+  return replyWith(
+    "プレミアの選手って、結局ちゃんと結果を出しつつ個性もあるのがいいんですよね。見てて分かりやすくすごい選手が好きです。",
+    stats,
+    withTopic(flags, "soccer_like", "プレミアのスター選手の個性と結果が好き"),
     internalEvents
   );
 }
