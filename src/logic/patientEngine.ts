@@ -1299,6 +1299,27 @@ const concreteExampleAsk =
     "何系",
   ]);
 
+  const contextFollowUpAsk =
+  lastPatientTopic !== "" &&
+  includesAny(normalized, [
+    "どんなの",
+    "どんなの見てる",
+    "どんなのみてる",
+    "何が好き",
+    "なにが好き",
+    "どれが好き",
+    "何がおすすめ",
+    "なにがおすすめ",
+    "おすすめは",
+    "おすすめある",
+    "どの動画が好き",
+    "どの動画好き",
+    "何の動画が好き",
+    "何の動画好き",
+    "動画は何が好き",
+    "どんな動画",
+  ]);
+
     const sexualJokeTalk =
     sexWorkAsk ||
     virginTalk ||
@@ -3787,6 +3808,147 @@ if (toiletEmbarrassingAsk) {
   if (isAccuse) fire({ type: "ACCUSATION" });
   if (isPrivacyCare) fire({ type: "PRIVACY_CARE" });
   if (isPrivacyIntrusive) fire({ type: "SEXWORK_PROBE" });
+
+  if (contextFollowUpAsk) {
+  const detail = getStringFlag(flags, "last_patient_detail");
+  const nextStreamer = getStringFlag(flags, "next_streamer_pick");
+
+  // -------- tv_youtube --------
+  if (lastPatientTopic === "tv_youtube") {
+    if (detail.includes("香住蒼") || nextStreamer === "kasumi_ao") {
+      return replyWith(
+        pickOne([
+          "基本、声を聴きに行ってる感じっす。キャラ多く出てくる『ダンガンロンパ』とかおすすめですね。",
+          "やっぱ演じ分けが見えるやつが好きですね。複数キャラが出る実況はかなり見ます。",
+          "雑談もいいですけど、ゲーム実況で役が切り替わる感じが好きなんですよね。",
+        ]),
+        stats,
+        withTopic(flags, "tv_youtube", "香住蒼の動画の好みを具体化", {
+          next_streamer_pick: "kasumi_ao",
+        }),
+        internalEvents
+      );
+    }
+
+    if (detail.includes("わいわい") || nextStreamer === "waiwai") {
+      return replyWith(
+        pickOne([
+          "ベタですけど、『Kenshi』ですね。もうずっと『○○のおいたん来たよー』を待っちゃいますよ。",
+          "長めの実況でも見れますね。友達と一緒にゲームしてる感じがいいんですよ。",
+          "リアクションが出るやつが好きです。空気で笑えるのが強いですね。",
+        ]),
+        stats,
+        withTopic(flags, "tv_youtube", "わいわいの動画の好みを具体化", {
+          next_streamer_pick: "waiwai",
+        }),
+        internalEvents
+      );
+    }
+
+    if (detail.includes("きゃべつの人") || detail.includes("キャベツの人") || nextStreamer === "kyabetsu") {
+      return replyWith(
+        pickOne([
+          "『なんか良さげなニュース動画』ですね。アサクリも面白かったですけど。",
+          "ニュースっぽいのを面白く話してくれるやつが好きですね。",
+          "語り口がいいんで、テーマが気になったらそのまま見ちゃいます。",
+        ]),
+        stats,
+        withTopic(flags, "tv_youtube", "キャベツの人の動画の好みを具体化", {
+          next_streamer_pick: "kyabetsu",
+        }),
+        internalEvents
+      );
+    }
+
+    if (detail.includes("からすまA") || detail.includes("クソゲーハンター") || nextStreamer === "kusoge_hunter") {
+      return replyWith(
+        pickOne([
+          "『ちびまる子ちゃん お小遣い大作戦』ですかね。マジで面白かったです。",
+          "やっぱクソゲーを引いた時の語りが好きですね。何見てもだいたい面白いです。",
+          "バグとか理不尽さをちゃんと面白さに変える回は強いですね。",
+        ]),
+        stats,
+        withTopic(flags, "tv_youtube", "からすまAの動画の好みを具体化", {
+          next_streamer_pick: "kusoge_hunter",
+        }),
+        internalEvents
+      );
+    }
+
+    if (detail.includes("大関ゲーム") || nextStreamer === "ozeki_game") {
+      return replyWith(
+        pickOne([
+          "ショート動画どれもいいからなぁ。どれって言えないなぁ。",
+          "短いのを次々見ちゃいますね。あのテンポがちょうどいいんですよ。",
+          "ちょいちょい見返したくなるタイプですね。ショートとの相性が良すぎます。",
+        ]),
+        stats,
+        withTopic(flags, "tv_youtube", "大関ゲームの動画の好みを具体化", {
+          next_streamer_pick: "ozeki_game",
+        }),
+        internalEvents
+      );
+    }
+
+    if (detail.includes("狩野英孝") || nextStreamer === "kano_eiko") {
+      return replyWith(
+        pickOne([
+          "マイクラ楽しそうにプレイしてるの見てると、自分もやりたくなりますね。",
+          "ホラーとかでビビりながら進むやつも好きです。リアクションが強いんですよね。",
+          "EIKO!GO!!のテンションが出る回はだいたい見ちゃいます。",
+        ]),
+        stats,
+        withTopic(flags, "tv_youtube", "狩野英孝の動画の好みを具体化", {
+          next_streamer_pick: "kano_eiko",
+        }),
+        internalEvents
+      );
+    }
+
+    if (detail.includes("のばまん") || nextStreamer === "nobaman") {
+      return replyWith(
+        pickOne([
+          "中世の戦争で弓をマシンガンみたいにするやつとか、ズルして町の権力者になって好き放題やるやつとか好きです。",
+          "発想がぶっ飛んでる回が好きですね。ちゃんと結果まで面白いのがいいです。",
+          "普通にやらないで、変な遊び方する回が好きです。見てて笑うんですよね。",
+        ]),
+        stats,
+        withTopic(flags, "tv_youtube", "のばまんの動画の好みを具体化", {
+          next_streamer_pick: "nobaman",
+        }),
+        internalEvents
+      );
+    }
+  }
+
+  // -------- soccer --------
+  if (lastPatientTopic === "soccer_like" || lastPatientTopic === "soccer_tactics") {
+    return replyWith(
+      pickOne([
+        "例えば、サッカーのプレミアの試合とかユナイテッド絡みはやっぱ見ますね。",
+        "例えば、試合そのものもですけど、ハイライトとか戦術の話も好きです。",
+        "例えば、スポーツバーでサッカーのプレミア見て盛り上がるみたいなのはかなり好きです。",
+      ]),
+      stats,
+      withTopic(flags, "soccer_like", "サッカー話を具体化"),
+      internalEvents
+    );
+  }
+
+  // -------- food --------
+  if (lastPatientTopic === "food_preference") {
+    return replyWith(
+      pickOne([
+        "例えば、家系とか豚骨みたいな、ちゃんとパンチあるやつが好きです。",
+        "例えば、今日は無理ですけど、ラーメンならこってり寄りがテンション上がります。",
+        "例えば、重ためのやつですね。あっさりも食べますけど、気分上がるのは濃いほうです。",
+      ]),
+      stats,
+      withTopic(flags, "food_preference", "食の好みを具体化"),
+      internalEvents
+    );
+  }
+}
 
   if (concreteExampleAsk) {
   switch (lastPatientTopic as TopicKey) {
@@ -9391,68 +9553,236 @@ const vtuberWatchAsk =
     "youtube",
   ]);
 
-  const kasumiAoTalk =
+const kasumiAoTalk =
   lastPatientTopic === "tv_youtube" &&
-  includesAny(normalized, ["香住蒼","香住", "かすみそう", "かすみ蒼"]);
+  includesAny(normalized, ["香住蒼", "香住", "かすみそう", "かすみ蒼"]) &&
+  !includesAny(normalized, [
+    "動画",
+    "どの動画",
+    "何の動画",
+    "何が好き",
+    "どれが好き",
+    "おすすめ",
+    "どんなの",
+    "どんな動画",
+    "見てる",
+    "みてる",
+  ]);
 
 const waiwaiTalk =
   lastPatientTopic === "tv_youtube" &&
-  includesAny(normalized, ["わいわい", "yy", "おいたん"]);
+  includesAny(normalized, ["わいわい", "yy", "おいたん"])&&
+  !includesAny(normalized, [
+    "動画",
+    "どの動画",
+    "何の動画",
+    "何が好き",
+    "どれが好き",
+    "おすすめ",
+    "どんなの",
+    "どんな動画",
+    "見てる",
+    "みてる",
+  ]);
 
 const kyabetsuTalk =
   lastPatientTopic === "tv_youtube" &&
-  includesAny(normalized, ["きゃべつの人", "キャベツの人", "きゃべつ", "キャベツ"]);
+  includesAny(normalized, ["きゃべつの人", "キャベツの人", "きゃべつ", "キャベツ"])&&
+  !includesAny(normalized, [
+    "動画",
+    "どの動画",
+    "何の動画",
+    "何が好き",
+    "どれが好き",
+    "おすすめ",
+    "どんなの",
+    "どんな動画",
+    "見てる",
+    "みてる",
+  ]);
 
 const kusogeHunterTalk =
   lastPatientTopic === "tv_youtube" &&
-  includesAny(normalized, ["からすまa", "からすま", "クソゲーハンター", "くそげーはんたー"]);
+  includesAny(normalized, ["からすまa", "からすま", "クソゲーハンター", "くそげーはんたー"])&&
+  !includesAny(normalized, [
+    "動画",
+    "どの動画",
+    "何の動画",
+    "何が好き",
+    "どれが好き",
+    "おすすめ",
+    "どんなの",
+    "どんな動画",
+    "見てる",
+    "みてる",
+  ]);
 
 const ozekiGameTalk =
   lastPatientTopic === "tv_youtube" &&
-  includesAny(normalized, ["大関ゲーム", "おおぜきゲーム", "大関"]);
+  includesAny(normalized, ["大関ゲーム", "おおぜきゲーム", "大関"])&&
+  !includesAny(normalized, [
+    "動画",
+    "どの動画",
+    "何の動画",
+    "何が好き",
+    "どれが好き",
+    "おすすめ",
+    "どんなの",
+    "どんな動画",
+    "見てる",
+    "みてる",
+  ]);
 
 const kanoEikoTalk =
   lastPatientTopic === "tv_youtube" &&
-  includesAny(normalized, ["狩野英孝", "えいこうちゃん", "eiko", "eiko go"]);
+  includesAny(normalized, ["狩野英孝", "えいこうちゃん", "eiko", "eiko go"])&&
+  !includesAny(normalized, [
+    "動画",
+    "どの動画",
+    "何の動画",
+    "何が好き",
+    "どれが好き",
+    "おすすめ",
+    "どんなの",
+    "どんな動画",
+    "見てる",
+    "みてる",
+  ]);
 
 const nobamanTalk =
   lastPatientTopic === "tv_youtube" &&
-  includesAny(normalized, ["のばまん", "のばまんゲームス"]);
+  includesAny(normalized, ["のばまん", "のばまんゲームス"])&&
+  !includesAny(normalized, [
+    "動画",
+    "どの動画",
+    "何の動画",
+    "何が好き",
+    "どれが好き",
+    "おすすめ",
+    "どんなの",
+    "どんな動画",
+    "見てる",
+    "みてる",
+  ]);
 
   const kasumiAoKnowAsk =
   lastPatientTopic === "tv_youtube" &&
   includesAny(normalized, ["香住蒼", "かすみあお", "かすみ蒼"]) &&
-  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"]);
+  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"])&&
+  !includesAny(normalized, [
+    "動画",
+    "どの動画",
+    "何の動画",
+    "何が好き",
+    "どれが好き",
+    "おすすめ",
+    "どんなの",
+    "どんな動画",
+    "見てる",
+    "みてる",
+  ]);
 
 const waiwaiKnowAsk =
   lastPatientTopic === "tv_youtube" &&
   includesAny(normalized, ["わいわい"]) &&
-  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"]);
+  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"])&&
+  !includesAny(normalized, [
+    "動画",
+    "どの動画",
+    "何の動画",
+    "何が好き",
+    "どれが好き",
+    "おすすめ",
+    "どんなの",
+    "どんな動画",
+    "見てる",
+    "みてる",
+  ]);
 
 const ozekiGameKnowAsk =
   lastPatientTopic === "tv_youtube" &&
   includesAny(normalized, ["大関ゲーム"]) &&
-  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"]);
+  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"])&&
+  !includesAny(normalized, [
+    "動画",
+    "どの動画",
+    "何の動画",
+    "何が好き",
+    "どれが好き",
+    "おすすめ",
+    "どんなの",
+    "どんな動画",
+    "見てる",
+    "みてる",
+  ]);
 
 const nobamanKnowAsk =
   lastPatientTopic === "tv_youtube" &&
   includesAny(normalized, ["のばまん"]) &&
-  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"]);
+  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"])&&
+  !includesAny(normalized, [
+    "動画",
+    "どの動画",
+    "何の動画",
+    "何が好き",
+    "どれが好き",
+    "おすすめ",
+    "どんなの",
+    "どんな動画",
+    "見てる",
+    "みてる",
+  ]);
 
 const karasumaKnowAsk =
   lastPatientTopic === "tv_youtube" &&
   includesAny(normalized, ["からすまa", "からすま", "クソゲーハンター"]) &&
-  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"]);
+  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"])&&
+  !includesAny(normalized, [
+    "動画",
+    "どの動画",
+    "何の動画",
+    "何が好き",
+    "どれが好き",
+    "おすすめ",
+    "どんなの",
+    "どんな動画",
+    "見てる",
+    "みてる",
+  ]);
 
 const kyabetsuKnowAsk =
   lastPatientTopic === "tv_youtube" &&
   includesAny(normalized, ["キャベツの人", "きゃべつの人", "キャベツ"]) &&
-  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"]);
+  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"])&&
+  !includesAny(normalized, [
+    "動画",
+    "どの動画",
+    "何の動画",
+    "何が好き",
+    "どれが好き",
+    "おすすめ",
+    "どんなの",
+    "どんな動画",
+    "見てる",
+    "みてる",
+  ]);
 
 const eikoKnowAsk =
   lastPatientTopic === "tv_youtube" &&
   includesAny(normalized, ["狩野英孝", "狩野", "eiko", "eiko!go!!"]) &&
-  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"]);
+  includesAny(normalized, ["知ってる", "知ってますか", "知ってる？", "知ってます？"])&&
+  !includesAny(normalized, [
+    "動画",
+    "どの動画",
+    "何の動画",
+    "何が好き",
+    "どれが好き",
+    "おすすめ",
+    "どんなの",
+    "どんな動画",
+    "見てる",
+    "みてる",
+  ]);
 
 const kasumiAoDirectKnowAsk =
   includesAny(normalized, ["香住蒼", "香住", "かすみそう", "かすみ蒼", "かすみあお"]) &&
@@ -9505,7 +9835,9 @@ const streamerVideoAsk =
   lastPatientTopic === "tv_youtube" &&
   includesAny(normalized, [
     "どの動画が好き",
+    "どの動画好き",
     "何の動画が好き",
+    "何の動画好き",
     "おすすめ動画",
     "どれが好き",
     "何がおすすめ",
