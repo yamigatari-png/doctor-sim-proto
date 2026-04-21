@@ -5947,9 +5947,41 @@ const bodyMeasureAsk = includesAny(normalized, ["スリーサイズ"]);
 const celebritySpecificAsk = includesAny(normalized, ["鈴木良平"]);
 const pastStupidAsk = includesAny(normalized, ["バカだなと思う行動"]);
 
-// =========================
-// 追加：未実装だった自然文・深掘り
-// =========================
+const typeOfWomanCelebrityAsk =
+  lastPatientTopic === "girlfriend_detail" &&
+  includesAny(normalized, [
+    "芸能人でいうと",
+    "芸能人で言うと",
+    "有名人でいうと",
+    "有名人で言うと",
+    "女優でいうと",
+    "女優で言うと",
+    "タレントでいうと",
+    "タレントで言うと",
+  ]);
+
+  const typeOfWomanCelebrityTsukkomiAsk =
+  lastPatientTopic === "girlfriend_detail" &&
+  includesAny(normalized, [
+    "誰それ",
+    "知らない",
+    "羽川翼って誰",
+    "アニメじゃん",
+    "現実で言うと",
+    "芸能人じゃないじゃん",
+    "実在で言うと",
+    "本物で言うと",
+  ]);
+
+const typeOfWomanCelebrityDeepAsk =
+  lastPatientTopic === "girlfriend_detail" &&
+  includesAny(normalized, [
+    "どこがいい",
+    "どこが好き",
+    "何がいい",
+    "なんで好き",
+    "どういうところ",
+  ]);
 
 // 症状の横断まとめ
 const otherSymptomsAsk = includesAny(normalized, [
@@ -7754,7 +7786,34 @@ if (gameAsk) {
 }
 
 if (typeOfWomanAsk) {
-  return replyWith("落ち着いてる人の方が合うと思います。", stats, flags, internalEvents);
+  return replyWith(
+    "落ち着いてる人の方がいいっすね。",
+    stats,
+    withTopic(flags, "girlfriend_detail", "好みの女性のタイプは落ち着いてる人"),
+    internalEvents
+  );
+}
+
+if (typeOfWomanCelebrityAsk) {
+  return replyWith(
+    "えー、例えば、羽川翼とか。",
+    stats,
+    withTopic(flags, "girlfriend_detail", "好みの女性像を芸能人イメージで少し具体化"),
+    internalEvents
+  );
+}
+
+if (typeOfWomanCelebrityTsukkomiAsk) {
+  return replyWith(
+    pickOne([
+      "いやいや。羽川さんはパーフェクトヒロインですからね！普段、落ち着いてるのに、秘めた思いを吐き出すシーンとか最高なんですから。",
+      "可愛いだけじゃなく、めちゃくちゃ頭がいいし、あの最強の武器がもう最高っす！",
+      "一途に好きな人を思い続けるいじらしさが、守りたくなしますよね。",
+    ]),
+    stats,
+    withTopic(flags, "girlfriend_detail", "アニメ例を現実の性格に言い換える"),
+    internalEvents
+  );
 }
 
 if (lgbtAsk) {
@@ -9246,7 +9305,7 @@ const vtuberWatchAsk =
 
   const kasumiAoTalk =
   lastPatientTopic === "tv_youtube" &&
-  includesAny(normalized, ["香住蒼", "かすみあお", "かすみ蒼"]);
+  includesAny(normalized, ["香住蒼", "かすみそう", "かすみ蒼"]);
 
 const waiwaiTalk =
   lastPatientTopic === "tv_youtube" &&
@@ -14502,7 +14561,7 @@ if (vtuberTalk || gameStreamingTalk) {
     pickOne([
       "配信は普通に見ます。好きになったら追っちゃいますね。",
       "Vとかゲーム配信はよく見ますよ。何をやってるかよりもキャラが好きになれるかどうかっすね。",
-      "見ますよ。ガチ勢ってほどじゃないですけど。",
+      "見ますよ。最近は香住蒼って配信者にはまってますね。",
     ]),
     stats,
     withTopic(flags, "tv_youtube", "Vtuberやゲーム配信は見ることがある"),
