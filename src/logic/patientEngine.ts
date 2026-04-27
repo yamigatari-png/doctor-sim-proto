@@ -416,13 +416,20 @@ function isSmallTalk(normalized: string): boolean {
 function isRudeTalk(normalized: string): boolean {
   return includesAny(normalized, [
     "お前",
+    "おまえ",
     "てめえ",
+    "てめぇ",
     "きさま",
     "貴様",
     "どっか行け",
+    "どっかいけ",
     "帰れ",
     "ばか",
     "バカ",
+    "バーカ",
+    "バ～カ",
+    "ば～か",
+    "ばーか",
     "馬鹿",
     "あほ",
     "アホ",
@@ -2157,6 +2164,20 @@ const funnyStoryContinueAsk =
     "笑",
     "w",
     "ｗ",
+    "今も会ったりする",
+    "今も会う",
+    "今も会ったりする",
+"今も会ったりするの",
+"今も会ってる",
+"今でも会う",
+"今でも会ってる",
+"なんだそれ",
+"なんだそれは",
+"なんだよそれ",
+"何だそれ",
+"やるね",
+"やるじゃん",
+"なかなかやるね",
   ]);
 
   const funnyStoryPersonFollowUpAsk =
@@ -2202,6 +2223,21 @@ const funnyStoryContinueAsk =
     "うける",
     "マジか",
     "まじか",
+    "今も会ったりする",
+"今も会ったりするの",
+"今も会う",
+"今でも会う",
+"今でも会ってる",
+"今も付き合いある",
+"今も連絡取る",
+"今も連絡とる",
+"なんだそれ",
+"なんだそれは",
+"なんだよそれ",
+"何だそれ",
+"やるね",
+"やるじゃん",
+"なかなかやるね",
   ]);
 
 const scaryStoryAsk = includesAny(normalized, [
@@ -4078,6 +4114,74 @@ const chiefComplaintAsk =
   "どうしたの？",
   ]);
 
+const fatherDvAlcoholWhenAsk = includesAny(normalized, [
+  "父はいつから暴力",
+  "お父さんはいつから暴力",
+  "お父様はいつから暴力",
+  "父親はいつから暴力",
+  "父の暴力はいつから",
+  "お父さんの暴力はいつから",
+  "お父様の暴力はいつから",
+  "父親の暴力はいつから",
+  "父のdvはいつから",
+  "お父さんのdvはいつから",
+  "お父様のdvはいつから",
+  "父親のdvはいつから",
+  "父の酒はいつから",
+  "お父さんの酒はいつから",
+  "お父様の酒はいつから",
+  "父親の酒はいつから",
+  "そのdvやお酒はいつから",
+  "その暴力やお酒はいつから",
+
+  "いつから荒れてた",
+  "いつから荒れてたんですか",
+  "いつから家で荒れてた",
+  "いつから家で荒れてたんですか",
+  "いつから怒鳴ってた",
+  "いつから怒鳴ってたんですか",
+  "いつから怒鳴ったり荒れてた",
+  "いつから怒鳴ったり荒れてたんですか",
+  "いつから怒鳴ったり家で荒れてた",
+  "いつから怒鳴ったり家で荒れてたんですか",
+
+  "お父さんはいつから荒れてた",
+  "お父さんはいつから荒れてたんですか",
+  "お父さんはいつから家で荒れてた",
+  "お父さんはいつから家で荒れてたんですか",
+  "お父さんはいつから怒鳴ってた",
+  "お父さんはいつから怒鳴ってたんですか",
+  "お父さんはいつから怒鳴ったり荒れてた",
+  "お父さんはいつから怒鳴ったり荒れてたんですか",
+
+  "父はいつから荒れてた",
+  "父はいつから荒れてたんですか",
+  "父はいつから怒鳴ってた",
+  "父はいつから怒鳴ってたんですか",
+  "父はいつから怒鳴ったり荒れてた",
+  "父はいつから怒鳴ったり荒れてたんですか",
+
+  "いつから暴力",
+"いつから暴力を",
+"いつから暴力を受けてた",
+"暴力はいつから",
+"暴力をいつから",
+]);
+
+  if (
+  fatherDvAlcoholWhenAsk &&
+  lastPatientTopic === "father_distance"
+) {
+  return replyWith(
+    "そこは自分が小さかったので、いつからかまでは分からないです。母からは昔から荒れたり怒鳴ったりして大変だったと聞いてます。",
+    stats,
+    withTopic(flags, "father_distance", "父がいつから荒れていたかは不明だが昔から大変だったと聞いている", {
+      father_dv_known: true,
+    }),
+    internalEvents
+  );
+}
+
   const durationAsk =
   lastPatientTopic !== "father_distance" &&
   includesAny(normalized, [
@@ -4262,6 +4366,13 @@ const fatherRelationAsk = includesAny(normalized, [
   "お酒を飲むとどうなってた",
   "かなり飲んでた",
   "相当飲んでた",
+  "パパとの関係",
+"パパとはどんな関係",
+"パパとは",
+"パパと仲良い",
+"パパと仲悪い",
+"パパについて",
+"パパはどんな人",
 ]);
 const fatherEstrangedReasonAsk = includesAny(normalized, [
   "なぜ父は疎遠",
@@ -4353,52 +4464,50 @@ const fatherDivorceReasonAsk = includesAny(normalized, [
   "なんで両親は離婚",
 ]);
 
-const fatherDvAlcoholWhenAsk = includesAny(normalized, [
-  "父はいつから暴力",
-  "お父さんはいつから暴力",
-  "お父様はいつから暴力",
-  "父親はいつから暴力",
-  "父の暴力はいつから",
-  "お父さんの暴力はいつから",
-  "お父様の暴力はいつから",
-  "父親の暴力はいつから",
-  "父のdvはいつから",
-  "お父さんのdvはいつから",
-  "お父様のdvはいつから",
-  "父親のdvはいつから",
-  "父の酒はいつから",
-  "お父さんの酒はいつから",
-  "お父様の酒はいつから",
-  "父親の酒はいつから",
-  "そのdvやお酒はいつから",
-  "その暴力やお酒はいつから",
+  const fatherDvSelfAsk =
+  lastPatientTopic === "father_distance" &&
+  includesAny(normalized, [
+    "あなたも暴力",
+    "あなたも暴力を受けてた",
+    "あなたも暴力受けてた",
+    "あなたも暴力を受けていた",
+    "あなたも殴られた",
+    "あなたも叩かれた",
 
-  "いつから荒れてた",
-  "いつから荒れてたんですか",
-  "いつから家で荒れてた",
-  "いつから家で荒れてたんですか",
-  "いつから怒鳴ってた",
-  "いつから怒鳴ってたんですか",
-  "いつから怒鳴ったり荒れてた",
-  "いつから怒鳴ったり荒れてたんですか",
-  "いつから怒鳴ったり家で荒れてた",
-  "いつから怒鳴ったり家で荒れてたんですか",
+    "君も暴力",
+    "君も暴力を受けてた",
+    "君も殴られた",
 
-  "お父さんはいつから荒れてた",
-  "お父さんはいつから荒れてたんですか",
-  "お父さんはいつから家で荒れてた",
-  "お父さんはいつから家で荒れてたんですか",
-  "お父さんはいつから怒鳴ってた",
-  "お父さんはいつから怒鳴ってたんですか",
-  "お父さんはいつから怒鳴ったり荒れてた",
-  "お父さんはいつから怒鳴ったり荒れてたんですか",
+    "自分も暴力",
+    "自分も暴力を受けてた",
+    "自分も殴られた",
 
-  "父はいつから荒れてた",
-  "父はいつから荒れてたんですか",
-  "父はいつから怒鳴ってた",
-  "父はいつから怒鳴ってたんですか",
-  "父はいつから怒鳴ったり荒れてた",
-  "父はいつから怒鳴ったり荒れてたんですか",
+    "本人も暴力",
+    "暴力受けてた",
+    "暴力受けてたの",
+    "暴力受けていた",
+    "暴力受けてた？",
+    "暴力受けてたの？",
+
+    "殴られてた",
+    "叩かれてた",
+    "やられてた",
+  ]);
+
+  const fatherAlcoholAsk = includesAny(normalized, [
+  "お父さんはお酒",
+  "お父さんは飲酒",
+  "お父さんはお酒飲んでいた",
+  "お父さんはお酒を飲んでいた",
+  "お父さんは酒飲んでた",
+  "お父さんは酒を飲んでた",
+  "父はお酒",
+  "父はお酒を飲んでた",
+  "父親はお酒",
+  "父親はお酒を飲んでた",
+  "父は飲酒",
+  "父親は飲酒",
+  "酒豪だった",
 ]);
 
 const fatherDrinkingSymptomsAsk = includesAny(normalized, [
@@ -4410,6 +4519,26 @@ const fatherDrinkingSymptomsAsk = includesAny(normalized, [
   "ふらついてた",
   "嘔吐",
   "ふらつき",
+]);
+
+const fatherHeavyAlcoholAsk = includesAny(normalized, [
+  "お父さんはすごいお酒飲んでた",
+  "お父さんはすごいお酒を飲んでた",
+  "お父さんはすごい酒飲んでた",
+  "お父さんはすごい酒を飲んでた",
+  "父はすごいお酒飲んでた",
+  "父はすごいお酒を飲んでた",
+  "父親はすごいお酒飲んでた",
+  "父親はすごいお酒を飲んでた",
+  "父はかなり飲んでた",
+  "父親はかなり飲んでた",
+  "お父さんはかなり飲んでた",
+  "お父さんは酒癖悪かった",
+  "父は酒癖悪かった",
+  "父親は酒癖悪かった",
+  "お父さんは酒乱",
+  "父は酒乱",
+  "父親は酒乱",
 ]);
 
 const fatherAlcoholSeenDirectlyAsk = includesAny(normalized, [
@@ -4608,6 +4737,22 @@ const fatherDeathFeelingAsk =
     "そのときどう感じた",
     "悲しかった",
     "ショックだった",
+  ]);
+
+  const fatherDistanceGeneralFollowUpAsk =
+  lastPatientTopic === "father_distance" &&
+  includesAny(normalized, [
+    "どういうこと",
+    "どういう意味",
+    "詳しく",
+    "もう少し",
+    "なんで関わってない",
+    "なぜ関わってない",
+    "どうして関わってない",
+    "ほとんど関わってないって",
+    "関わってないって",
+    "知らないって",
+    "疎遠って",
   ]);
 
 const fatherImplicitFollowUp =
@@ -5351,6 +5496,10 @@ const moneySupportIntentAsk =
   "がん家系",
   "癌家系",
   "家系",
+  "親族",
+  "身内",
+  "家系",
+  "パパ",
 ]);
 
   const fatherCancerFamilyAsk = includesAny(normalized, [
@@ -5622,7 +5771,7 @@ const otherPremierClubAsk =
       });
 
       return replyWith(
-        "母から詳しく聞いたわけじゃないですけど、本当に嫌なヤツだったみたいです。怒鳴ったり、家で荒れることがあって。母が俺を連れて家を出たんです。",
+        "母から詳しく聞いたわけじゃないですけど、本当に嫌なヤツだったみたいです。怒鳴ったり、家で荒れることがあって。母が俺を連れて家を出たんです。俺が子供の頃は良い父親だったんですけどね……",
         stats,
         withTopic(flags, "father_distance", "父の離婚理由は酒・怒鳴り・家庭内トラブル"),
         internalEvents
@@ -5725,7 +5874,16 @@ const otherPremierClubAsk =
     internalEvents
   );
 }
-  
+
+if (fatherDistanceGeneralFollowUpAsk) {
+  return replyWith(
+    "父は小さい頃に離婚して、その後はほとんど会ってないです。母から少し聞いたくらいで、自分にはあまり記憶がないんです。",
+    stats,
+    withTopic(flags, "father_distance", "父は幼少期に離婚後ほぼ会っておらず、情報源は母"),
+    internalEvents
+  );
+}
+
 if (fatherWhyAngryAsk) {
   flags = mergeFlags(flags, {
     father_alcohol_known: true,
@@ -5767,7 +5925,7 @@ if (fatherWhyAngryAsk) {
     });
 
     return replyWith(
-      "自分が直接はっきり覚えてるわけじゃないですけど、母からは荒れたり怒鳴ったりして大変だったと聞いてます。暴力っぽいこともあったみたいです。",
+      "子供だからちゃんとは覚えてないですけど、母からは荒れたり怒鳴ったりして大変だったと聞いてます。暴力っぽいこともあったみたいです。",
       stats,
       withTopic(flags, "father_distance", "父には怒鳴りや暴力があった可能性"),
       internalEvents
@@ -5786,15 +5944,6 @@ if (fatherWhyAngryAsk) {
       internalEvents
     );
   }
-
-  if (fatherDvAlcoholWhenAsk) {
-  return replyWith(
-    "そこは自分が小さかったので、いつからかまでは分からないです。母からは昔から荒れたり怒鳴ったりして大変だったと聞いてます。",
-    stats,
-    withTopic(flags, "father_distance", "父がいつから荒れていたかは不明だが昔から大変だったと聞いている"),
-    internalEvents
-  );
-}
 
 if (fatherAlcoholSeenDirectlyAsk) {
   flags = setFlag(flags, "father_alcohol_direct_seen_denied", true);
@@ -5832,6 +5981,52 @@ if (fatherAlcoholSeenDirectlyAsk) {
       internalEvents
     );
   }
+
+  if (fatherHeavyAlcoholAsk) {
+  flags = mergeFlags(flags, {
+    father_alcohol_known: true,
+    father_dv_known: true,
+
+    // father_truth 診断導線に必要
+    father_symptom_headache: true,
+    father_symptom_unsteady: true,
+    father_symptom_vomit: true,
+
+    // 演出・文脈用
+    father_alcohol_direct_seen_denied: true,
+    father_alcohol_inference_revealed: true,
+  });
+
+  flags = updateFatherDiagReady(flags);
+
+  return replyWith(
+    "いや、飲んでる姿は見てないっすけど……ふらついたり、吐いたり、頭を痛がったりしてましたよ。それってお酒以外あるんすか？",
+    stats,
+    withTopic(flags, "father_distance", "父は飲酒ではなく神経症状だった可能性", {}),
+    internalEvents
+  );
+}
+
+if (fatherAlcoholAsk) {
+  flags = mergeFlags(flags, {
+    father_alcohol_known: true,
+    father_dv_known: true,
+    father_symptom_headache: true,
+    father_symptom_unsteady: true,
+    father_symptom_vomit: true,
+    father_alcohol_direct_seen_denied: true,
+    father_alcohol_inference_revealed: true,
+  });
+
+  flags = updateFatherDiagReady(flags);
+
+  return replyWith(
+    "いや、飲んでる姿は見てないっすけど……ふらついたり、吐いたり、頭を痛がったりしてましたよ。それってお酒以外あるんすか？",
+    stats,
+    withTopic(flags, "father_distance", "父は飲酒ではなく神経症状だった可能性", {}),
+    internalEvents
+  );
+}
 
   if (fatherDrinkingSymptomsAsk) {
   flags = mergeFlags(flags, {
@@ -6090,6 +6285,21 @@ flags = mergeFlags(flags, {
   smalltalk_streak: nextSmalltalkStreak,
   medical_talk_streak: nextMedicalTalkStreak,
 });
+
+const fatherPersonalityChangeContextAsk =
+  lastPatientTopic === "father_distance" &&
+  includesAny(normalized, [
+    "なんで性格かわった",
+    "なんで性格変わった",
+    "なぜ性格かわった",
+    "なぜ性格変わった",
+    "どうして性格かわった",
+    "どうして性格変わった",
+    "性格かわったのかな",
+    "性格変わったのかな",
+    "性格がかわった理由",
+    "性格が変わった理由",
+  ]);
 
   // =========================
   // よくある問診（個別分岐）
@@ -6460,6 +6670,20 @@ const medicalHistoryThisTimeWorstAsk =
     "今までで一番しんどい",
     "似たことあった",
   ]);
+
+  if (fatherPersonalityChangeContextAsk) {
+  flags = setFlag(flags, "father_symptom_personality_change", true);
+  flags = updateFatherDiagReady(flags);
+
+  return replyWith(
+    "お酒じゃないっすか？母は別人みたいになったって言ってましたけど。",
+    stats,
+    withTopic(flags, "father_distance", "父に性格変化あり", {
+      father_symptom_personality_change: true,
+    }),
+    internalEvents
+  );
+}
 
 if (ageAsk) {
   return replyWith("28歳です。", stats, withTopic(flags, "generic_sick", "28歳"), internalEvents);
@@ -10510,6 +10734,7 @@ const soccerBestCounterAsk = includesAny(normalized, [
     "母",
     "兄弟",
     "姉妹",
+    "親族",
   ]) &&
   includesAny(normalized, [
     "周り",
@@ -10768,7 +10993,14 @@ const familyBigDiseaseAsk = includesAny(normalized, [
   "家族で病気に罹患している人は",
   "ご家族に病気",
   "家族に病気",
-  "家族で病気"
+  "家族で病気",
+  "親族で病気がある方はいますか",
+"親族で病気がある人はいますか",
+"親族に病気がある方はいますか",
+"親族に病気がある人はいますか",
+"親族で病気",
+"親族に病気",
+"親族の方",
 ]);
 
 const familyRelationAsk = includesAny(normalized, [
@@ -12389,6 +12621,17 @@ if (fatherDivorceReasonAsk) {
     "本当に嫌なヤツだったんですよ。",
     stats,
     withTopic(flags, "father_distance", "父の離婚理由は未開示"),
+    internalEvents
+  );
+}
+
+if (fatherDvSelfAsk) {
+  return replyWith(
+    "子供でしたけど殴られたの覚えてますよ。あいつ、殴っておいて急に謝ってきて、こんなことしたくないって……急に性格変わったみたいに。",
+    stats,
+    withTopic(flags, "father_distance", "本人も父から暴力を受けていた可能性", {
+      father_dv_known: true,
+    }),
     internalEvents
   );
 }
