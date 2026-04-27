@@ -4800,6 +4800,20 @@ const girlfriendFeelingAsk =
     "何に惹かれた",
   ]);
 
+  const marriageNextConfirmAsk =
+  lastPatientTopic === "girlfriend_distance" &&
+  includesAny(normalized, [
+    "次って結婚",
+    "次は結婚",
+    "次の話って結婚",
+    "次の話は結婚",
+    "次って結婚てこと",
+    "次って結婚ってこと",
+    "次って結婚のこと",
+    "結婚ってこと",
+    "結婚の話ってこと",
+  ]);
+
   const marriageWillingnessAsk =
   (lastPatientTopic === "girlfriend_distance" || lastPatientTopic === "girlfriend_marriage") &&
   includesAny(normalized, [
@@ -4958,6 +4972,19 @@ const girlfriendDetailAsk =
   "浮気してるんですか",
   "浮気してるでしょ",
   "浮気してますよね",
+
+  "他に女いるんじゃない",
+"他に女いる",
+"他の女いるんじゃない",
+"別の女いるんじゃない",
+
+"浮気してんの",
+"浮気してるの",
+"浮気してる",
+"浮気してたの",
+"浮気してた",
+"浮気してるよね",
+"浮気してるだろ",
 ]);
 
 const affairRealInterestAsk =
@@ -13099,6 +13126,15 @@ if (otherPartnerTalk) {
       heard_other_partner: true,
       scam_route_unlocked: true,
     }),
+    internalEvents
+  );
+}
+
+if (marriageNextConfirmAsk) {
+  return replyWith(
+    "まあ、そういうことっすね。結婚とか将来の話をされると、ちょっと重いんすよね。",
+    stats,
+    withTopic(flags, "girlfriend_marriage", "彼女から結婚や将来の話をされて負担に感じている"),
     internalEvents
   );
 }
