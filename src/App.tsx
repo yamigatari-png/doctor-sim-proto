@@ -4285,8 +4285,8 @@ overflowX: "hidden",
           display: "grid",
           gridTemplateColumns: isPhone
   ? "1fr"
-  : "170px minmax(0,1fr) minmax(0,1fr) 170px",
-          gap: 12,
+  : "170px minmax(430px, 1fr) 150px",
+gap: 8,
           alignItems: "start",
         }}
       >
@@ -4352,7 +4352,7 @@ overflowX: "hidden",
     border: "1px solid rgba(255,255,255,0.08)",
     borderRadius: 12,
     opacity: 1,
-    gridColumn: isPhone ? "auto" : "2 / span 2",
+    gridColumn: isPhone ? "auto" : "2",
     alignContent: "start",
     minWidth: 0,
   }}
@@ -4409,19 +4409,20 @@ overflowX: "hidden",
         </div>
 
         {/* 5列目 */}
-        <div
-          className="card"
-          style={{
-            padding: 10,
-            display: "grid",
-            gap: 8,
-            alignContent: "start",
-            background: "#232330",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 12,
-            opacity: 1,
-          }}
-        >
+<div
+  className="card"
+  style={{
+    padding: 10,
+    display: "grid",
+    gap: 8,
+    alignContent: "start",
+    background: "#232330",
+    border: "1px solid rgba(255,255,255,0.08)",
+    borderRadius: 12,
+    opacity: 1,
+    gridColumn: isPhone ? "auto" : "3",
+  }}
+>
           {otherLabGroup === null ? (
             <>
               <div style={{ fontWeight: 700 }}>その他</div>
