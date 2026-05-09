@@ -4279,7 +4279,7 @@ overflowX: "hidden",
           display: "grid",
           gridTemplateColumns: isPhone
   ? "1fr"
-  : "170px 430px 150px",
+  : "170px 390px 150px",
 gap: 8,
 justifyContent: "start",
           alignItems: "start",
@@ -4357,8 +4357,8 @@ justifyContent: "start",
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: isPhone ? "1fr" : "repeat(2, 200px)",
-              gap: 8,
+              gridTemplateColumns: isPhone ? "1fr" : "repeat(2, 185px)",
+              gap: 6,
               alignItems: "start",
               maxHeight: isPhone ? "58vh" : "62vh",
               overflowY: "auto",
@@ -4421,21 +4421,42 @@ justifyContent: "start",
           {otherLabGroup === null ? (
             <>
               <div style={{ fontWeight: 700 }}>その他</div>
-              <button onClick={() => setOtherLabGroup("urine")}>尿検査</button>
               <button
-                onClick={() => {
-                  if (isPhone) {
-                    setOtherLabGroup("infection");
-                  } else {
-                    setInfectionSubModalOpen(true);
-                  }
-                }}
-              >
-                感染症
-              </button>
-              <button onClick={() => setOtherLabGroup("tumor")}>腫瘍マーカー</button>
-              <button onClick={() => setOtherLabGroup("autoantibody")}>自己抗体</button>
-              <button onClick={() => setOtherLabGroup("endocrine")}>内分泌</button>
+  style={{
+    width: 110,
+    justifySelf: "start",
+  }}
+  onClick={() => setOtherLabGroup("urine")}
+>
+  尿検査
+</button>
+              <button
+  style={{
+    width: 110,
+    justifySelf: "start",
+  }}
+  onClick={() => {
+    if (isPhone) {
+      setOtherLabGroup("infection");
+    } else {
+      setInfectionSubModalOpen(true);
+    }
+  }}
+>
+  感染症
+</button>
+              <button style={{
+  width: 110,
+  justifySelf: "start",
+}} onClick={() => setOtherLabGroup("tumor")}>腫瘍マーカー</button>
+              <button style={{
+  width: 110,
+  justifySelf: "start",
+}} onClick={() => setOtherLabGroup("autoantibody")}>自己抗体</button>
+              <button style={{
+  width: 110,
+  justifySelf: "start",
+}} onClick={() => setOtherLabGroup("endocrine")}>内分泌</button>
             </>
           ) : (
             <>
