@@ -4343,19 +4343,20 @@ overflowX: "hidden",
 
         {/* 生化学 */}
         <div
-          className="card"
-          style={{
-            padding: 10,
-            display: "grid",
-            gap: 8,
-            background: "#232330",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 12,
-            opacity: 1,
-            alignContent: "start",
-            minWidth: 0,
-          }}
-        >
+  className="card"
+  style={{
+    padding: 10,
+    display: "grid",
+    gap: 8,
+    background: "#232330",
+    border: "1px solid rgba(255,255,255,0.08)",
+    borderRadius: 12,
+    opacity: 1,
+    gridColumn: isPhone ? "auto" : "2 / span 2",
+    alignContent: "start",
+    minWidth: 0,
+  }}
+>
           <div style={{ fontWeight: 700 }}>生化学</div>
 
           <div
