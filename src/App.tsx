@@ -4314,6 +4314,8 @@ overflowX: "hidden",
                 onClick={() => toggleDraftOrderKey(key)}
                 disabled={!!testsDone[key]}
                 style={{
+                  width: 160,
+                  maxWidth: "100%",
                   textAlign: "left",
                   opacity: testsDone[key] ? 0.5 : 1,
                   cursor: testsDone[key] ? "not-allowed" : "help",
