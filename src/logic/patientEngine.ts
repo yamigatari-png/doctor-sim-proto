@@ -361,6 +361,39 @@ function isMedicalTalk(normalized: string): boolean {
     "今日はどうしました",
     "今日はどうされました",
     "主訴は",
+    "具合",
+"具合悪い",
+"体調",
+"体調悪い",
+"しんどい",
+"だるい",
+"倦怠感",
+"何日前",
+"何日くらい",
+"症状",
+"症状は",
+"悪いところ",
+"痛いところ",
+"困っていること",
+"一番つらい",
+"一番辛い",
+"一番困る",
+"眠れる",
+"寝れてる",
+"尿",
+"便",
+"吐いた",
+"吐いてる",
+"ゼーゼー",
+"ヒューヒュー",
+"息が苦しい",
+"息苦しい",
+"動くと苦しい",
+"横になると苦しい",
+"夜悪い",
+"朝悪い",
+"悪化",
+"改善",
   ]);
 }
 
@@ -406,7 +439,6 @@ function isSmallTalk(normalized: string): boolean {
     "休日",
     "ユーチューバー",
     "甘い",
-    "辛い",
     "お酒",
     "コーヒー",
     "食べ物",
@@ -461,6 +493,9 @@ function isRudeTalk(normalized: string): boolean {
     "折るぞ",
     "目潰す",
     "ちぎるぞ",
+    "カス",
+    "ふーん",
+    "ふ～ん",
   ]);
 }
 
@@ -834,6 +869,21 @@ const specificConditionAsk =
     "体調",
   ]);
 
+  const otherMedicalConcernAsk =
+  isMedicalTalk(lastPatientTopic) &&
+  includesAny(normalized, [
+    "他になにかありますか",
+    "他に何かありますか",
+    "他になにかある",
+    "他に何かある",
+    "ほかになにかありますか",
+    "ほかに何かありますか",
+    "他に症状ありますか",
+    "他の症状ありますか",
+    "他に気になることありますか",
+    "他に困っていることありますか",
+  ]);
+
   const apologyTalk = includesAny(normalized, [
   "すいません",
   "すみません",
@@ -1002,6 +1052,15 @@ if (!specificConditionAsk && genericConditionGreeting) {
   );
 }
 
+if (otherMedicalConcernAsk) {
+  return replyWith(
+    "熱、咳、痰の他にはだるさがあるくらいです。",
+    stats,
+    withTopic(flags, "general_severity", "他の症状として痰と倦怠感あり、強い息苦しさなし"),
+    internalEvents
+  );
+}
+
 if (scaryStoryNotScaryTsukkomi) {
   return replyWith(
     pickOne([
@@ -1159,6 +1218,11 @@ const lostTrackOfTimeAsk = includesAny(normalized, [
   "大変でしたね",
   "おつらいですね",
   "お辛いですね",
+  "お辛い",
+"おつらい",
+"辛そう",
+"つらそう",
+"しんどそう",
 ]);
 
   const isSummary = includesAny(normalized, ["つまり", "要するに", "まとめると"]);
@@ -1396,6 +1460,17 @@ const sweatTalk = includesAny(normalized, [
   "服ぬれてるよ",
 ]);
   
+const faceRedTalk = includesAny(normalized, [
+  "顔赤い",
+  "顔赤いよ",
+  "顔が赤い",
+  "顔が赤いよ",
+  "顔真っ赤",
+  "顔真っ赤だよ",
+  "赤くない",
+  "顔赤くなってる",
+]);
+
   const smellReassureTalk =
   lastPatientTopic === "general_severity" &&
   includesAny(normalized, [
@@ -3450,7 +3525,7 @@ if (marshmallowAsk) {
     if (sexualJokeTalk && sexualJokeCount >= 5) {
     stats = {
       ...stats,
-      trust: Math.max(0, stats.trust - 5),
+      trust: Math.max(0, stats.trust - 3),
       validation: Math.max(0, stats.validation - 5),
       defense: Math.min(100, stats.defense + 5),
     };
@@ -4112,6 +4187,14 @@ const chiefComplaintAsk =
   "どうしたの",
   "どうした？",
   "どうしたの？",
+  "具合が悪いところはないか",
+"具合が悪いところはないですか",
+"具合悪いところはないか",
+"具合悪いところはないですか",
+"どこか具合悪い",
+"どこか具合が悪い",
+"具合悪いところ",
+"具合が悪いところ",
   ]);
 
 const fatherDvAlcoholWhenAsk = includesAny(normalized, [
@@ -6301,13 +6384,6 @@ if (deepSmallTalk) {
   nextSmalltalkStreak += 1;
 }
 
-if (nextSmalltalkStreak === 3) {
-  stats = {
-    ...stats,
-    trust: Math.max(0, stats.trust - 5),
-  };
-}
-
 flags = mergeFlags(flags, {
   smalltalk_streak: nextSmalltalkStreak,
   medical_talk_streak: nextMedicalTalkStreak,
@@ -6749,6 +6825,15 @@ if (recentGameAsk) {
   );
 }
 
+if (faceRedTalk) {
+  return replyWith(
+    "熱っぽくて……。汗も出てるし、すいません、臭いっすよね。",
+    stats,
+    withTopic(flags, "general_severity", "発熱と発汗を自覚し匂いを気にしている"),
+    internalEvents
+  );
+}
+
 if (sweatTalk) {
   return replyWith(
     pickOne([
@@ -6786,7 +6871,7 @@ if (smellReassureTalk) {
 if (smellInsultTalk) {
   stats = {
     ...stats,
-    trust: Math.max(0, stats.trust - 10),
+    trust: Math.max(0, stats.trust - 5),
     validation: Math.max(0, stats.validation - 5),
     defense: Math.min(100, stats.defense + 10),
   };
@@ -10466,6 +10551,16 @@ const soccerInviteAsk =
     "一緒にサッカーしよう",
     "今度フットサルしよう",
     "フットサルしよう",
+    "一緒にサッカーしよう",
+    "一緒にサッカーやろう",
+    "一緒にフットサルしよう",
+    "一緒にフットサルやろう",
+    "サッカーしよう",
+    "サッカーやろう",
+    "フットサルしよう",
+    "フットサルやろう",
+    "今度サッカー",
+    "今度フットサル",
   ]);
 
 const recentHardTimeAsk = includesAny(normalized, [
@@ -10602,11 +10697,25 @@ const coffeeTeaAsk = includesAny(normalized, [
   "ブラック",
 ]);
 
-const spicyAsk = includesAny(normalized, [
-  "辛いの",
-  "辛いもの",
-  "激辛",
-]);
+const spicyAsk =
+  includesAny(normalized, [
+    "辛いもの",
+    "辛い食べ物",
+    "辛い料理",
+    "激辛",
+    "蒙古タンメン",
+    "ココイチ",
+    "何辛",
+    "辛さ",
+  ]) &&
+  !includesAny(normalized, [
+    "お辛い",
+    "つらい",
+    "辛そう",
+    "しんどい",
+    "苦しい",
+    "大変",
+  ]);
 
 // 恋愛観・価値観
 const lovePhilosophyAsk =
@@ -10802,6 +10911,21 @@ const soccerBestCounterAsk = includesAny(normalized, [
     "常用薬",
     "薬飲んでる",
     "服薬",
+    "薬飲みました",
+"薬飲んだ",
+"薬は飲んだ",
+"何か飲んだ",
+"市販薬飲んだ",
+"解熱剤飲んだ",
+"風邪薬飲んだ",
+
+"いつも飲んでる薬",
+"いつも飲んでいる薬",
+"普段飲んでる薬",
+"普段飲んでいる薬",
+"定期薬",
+"内服薬",
+"常用薬",
   ]);
 
   const allergyAsk = includesAny(normalized, [
@@ -11461,8 +11585,7 @@ const travelCompanionAsk =
 if (familyRelationAsk) {
   if (
     !getBooleanFlag(flags, "father_route_unlocked") &&
-    stats.trust >= 51 &&
-    stats.defense <= 40 &&
+    stats.defense <= 41 &&
     getBooleanFlag(flags, "father_family_history_asked")
   ) {
     flags = setFlag(flags, "father_route_unlocked", true);
@@ -11484,8 +11607,7 @@ if (familyRelationAsk) {
 
   if (
     !getBooleanFlag(flags, "father_route_unlocked") &&
-    stats.trust >= 51 &&
-    stats.defense <= 40
+    stats.defense <= 41
   ) {
     flags = setFlag(flags, "father_route_unlocked", true);
   }
@@ -11512,14 +11634,12 @@ if (fatherCurrentStatusAsk) {
   // =========================
   // fatherルート開放
   // 条件:
-  // trust >= 51
-  // defense <= 40
+  // defense <= 41
   // 家族歴を含む家族のことを聞く
   // =========================
   if (
   !getBooleanFlag(flags, "father_route_unlocked") &&
-  stats.trust >= 51 &&
-  stats.defense <= 40 &&
+  stats.defense <= 41 &&
   (
     familyHistoryTalk ||
     familyBigDiseaseAsk ||
@@ -11543,13 +11663,11 @@ if (fatherCurrentStatusAsk) {
   // =========================
   // 詐欺ルート開放
   // 条件:
-  // defense <= 35
-  // validation >= 60
+  // defense <= 41
   // =========================
   if (
   !Boolean((flags as any).scam_route_unlocked) &&
-  stats.defense <= 35 &&
-  stats.validation >= 60
+  stats.defense <= 41 
 ) {
   stats = {
     ...stats,
@@ -12142,13 +12260,13 @@ if (soreThroatAsk && rhinorrheaAsk) {
     const reply = pickReplyByCount(
       repeated.askCount,
       [
-        "普段飲んでる薬はないっす。",
+        "特に飲んでる薬はないっす。",
         "常用薬は特にないです。市販薬も今回は飲んでないっす。",
-        "薬は普段飲んでないです。サプリとかも特にないっす。",
+        "薬は何も飲んでないです。サプリとかも特にないっす。",
       ],
       [
-        "普段飲んでる薬はないっす。",
-        "常用薬なしっす。",
+        "飲んでる薬はないっす。",
+        "薬なしっす。",
       ]
     );
     return replyWith(
