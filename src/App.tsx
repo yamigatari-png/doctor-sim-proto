@@ -855,12 +855,6 @@ const modalCols3 = isPhone
   ? "repeat(2, minmax(0, 1fr))"
   : "repeat(3, minmax(0, 1fr))";
 
-const modalCols4 = isPhone
-  ? "1fr"
-  : isTablet
-  ? "repeat(2, minmax(0, 1fr))"
-  : "repeat(4, minmax(0, 1fr))";
-
 const [audioUnlocked, setAudioUnlocked] = useState(false);
 const [splashPhase, setSplashPhase] = useState<"logo" | "notice">("logo");
 const [splashLogoVisible, setSplashLogoVisible] = useState(true);
@@ -4285,8 +4279,9 @@ overflowX: "hidden",
           display: "grid",
           gridTemplateColumns: isPhone
   ? "1fr"
-  : "170px minmax(430px, 1fr) 150px",
+  : "170px 430px 150px",
 gap: 8,
+justifyContent: "start",
           alignItems: "start",
         }}
       >
@@ -4362,8 +4357,8 @@ gap: 8,
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: isPhone ? "1fr" : "repeat(2, minmax(0, 1fr))",
-              gap: 12,
+              gridTemplateColumns: isPhone ? "1fr" : "repeat(2, 200px)",
+              gap: 8,
               alignItems: "start",
               maxHeight: isPhone ? "58vh" : "62vh",
               overflowY: "auto",
