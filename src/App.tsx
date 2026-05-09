@@ -4283,7 +4283,9 @@ overflowX: "hidden",
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: modalCols4,
+          gridTemplateColumns: isPhone
+  ? "1fr"
+  : "170px minmax(0,1fr) minmax(0,1fr) 170px",
           gap: 12,
           alignItems: "start",
         }}
@@ -4350,7 +4352,6 @@ overflowX: "hidden",
             border: "1px solid rgba(255,255,255,0.08)",
             borderRadius: 12,
             opacity: 1,
-            gridColumn: isPhone ? "auto" : "2 / span 2",
             alignContent: "start",
             minWidth: 0,
           }}
