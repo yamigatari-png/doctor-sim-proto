@@ -4308,29 +4308,28 @@ overflowX: "hidden",
             const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
 
             return (
-              <div key={key} title={TEST_HELP_TEXT[key] ?? ""}>
-  <button
-    onClick={() => toggleDraftOrderKey(key)}
-    disabled={!!testsDone[key]}
-    style={{
-      width: "100%",
-      textAlign: "left",
-      opacity: testsDone[key] ? 0.5 : 1,
-      border: checked
-        ? "2px solid rgba(120,200,255,0.9)"
-        : "1px solid rgba(255,255,255,0.08)",
-      background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
-      borderRadius: 10,
-      cursor: testsDone[key] ? "not-allowed" : "help",
-    }}
-  >
-    {checked ? "✓ " : ""}
-    {tr.label}
-    <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
-      {minutes}分
-    </div>
-  </button>
-</div>
+              <button
+                key={key}
+                title={TEST_HELP_TEXT[key] ?? ""}
+                onClick={() => toggleDraftOrderKey(key)}
+                disabled={!!testsDone[key]}
+                style={{
+                  textAlign: "left",
+                  opacity: testsDone[key] ? 0.5 : 1,
+                  cursor: testsDone[key] ? "not-allowed" : "help",
+                  border: checked
+                    ? "2px solid rgba(120,200,255,0.9)"
+                    : "1px solid rgba(255,255,255,0.08)",
+                  background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
+                  borderRadius: 10,
+                }}
+              >
+                {checked ? "✓ " : ""}
+                {tr.label}
+                <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
+                  {minutes}分
+                </div>
+              </button>
             );
           })}
         </div>
@@ -4373,14 +4372,15 @@ overflowX: "hidden",
                   const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
 
                   return (
-                    <div key={key} title={TEST_HELP_TEXT[key] ?? ""}>
-                   <button
+                    <button
                       key={key}
+                      title={TEST_HELP_TEXT[key] ?? ""}
                       onClick={() => toggleDraftOrderKey(key)}
                       disabled={!!testsDone[key]}
                       style={{
                         textAlign: "left",
                         opacity: testsDone[key] ? 0.5 : 1,
+                        cursor: testsDone[key] ? "not-allowed" : "help",
                         border: checked
                           ? "2px solid rgba(120,200,255,0.9)"
                           : "1px solid rgba(255,255,255,0.08)",
@@ -4394,7 +4394,6 @@ overflowX: "hidden",
                         {minutes}分
                       </div>
                     </button>
-                    </div>
                   );
                 })}
               </div>
@@ -4463,14 +4462,15 @@ overflowX: "hidden",
                     const checked = isQueuedOrDrafted(key);
                     const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
                     return (
-                      <div key={key} title={TEST_HELP_TEXT[key] ?? ""}>
-                     <button
+                      <button
                         key={key}
+                        title={TEST_HELP_TEXT[key] ?? ""}
                         onClick={() => toggleDraftOrderKey(key)}
                         disabled={!!testsDone[key]}
                         style={{
                           textAlign: "left",
                           opacity: testsDone[key] ? 0.5 : 1,
+                          cursor: testsDone[key] ? "not-allowed" : "help",
                           border: checked
                             ? "2px solid rgba(120,200,255,0.9)"
                             : "1px solid rgba(255,255,255,0.08)",
@@ -4484,7 +4484,6 @@ overflowX: "hidden",
                           {minutes}分
                         </div>
                       </button>
-                      </div>
                     );
                   })}
                 </div>
@@ -4497,14 +4496,15 @@ overflowX: "hidden",
                     const checked = isQueuedOrDrafted(key);
                     const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
                     return (
-                      <div key={key} title={TEST_HELP_TEXT[key] ?? ""}>
-                     <button
+                      <button
                         key={key}
+                        title={TEST_HELP_TEXT[key] ?? ""}
                         onClick={() => toggleDraftOrderKey(key)}
                         disabled={!!testsDone[key]}
                         style={{
                           textAlign: "left",
                           opacity: testsDone[key] ? 0.5 : 1,
+                          cursor: testsDone[key] ? "not-allowed" : "help",
                           border: checked
                             ? "2px solid rgba(120,200,255,0.9)"
                             : "1px solid rgba(255,255,255,0.08)",
@@ -4518,7 +4518,6 @@ overflowX: "hidden",
                           {minutes}分
                         </div>
                       </button>
-                      </div>
                     );
                   })}
                 </div>
@@ -4531,14 +4530,15 @@ overflowX: "hidden",
                     const checked = isQueuedOrDrafted(key);
                     const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
                     return (
-                      <div key={key} title={TEST_HELP_TEXT[key] ?? ""}>
-                     <button
+                      <button
                         key={key}
+                        title={TEST_HELP_TEXT[key] ?? ""}
                         onClick={() => toggleDraftOrderKey(key)}
                         disabled={!!testsDone[key]}
                         style={{
                           textAlign: "left",
                           opacity: testsDone[key] ? 0.5 : 1,
+                          cursor: testsDone[key] ? "not-allowed" : "help",
                           border: checked
                             ? "2px solid rgba(120,200,255,0.9)"
                             : "1px solid rgba(255,255,255,0.08)",
@@ -4552,7 +4552,6 @@ overflowX: "hidden",
                           {minutes}分
                         </div>
                       </button>
-                      </div>
                     );
                   })}
                 </div>
@@ -4565,14 +4564,15 @@ overflowX: "hidden",
                     const checked = isQueuedOrDrafted(key);
                     const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
                     return (
-                      <div key={key} title={TEST_HELP_TEXT[key] ?? ""}>
-                     <button
+                      <button
                         key={key}
+                        title={TEST_HELP_TEXT[key] ?? ""}
                         onClick={() => toggleDraftOrderKey(key)}
                         disabled={!!testsDone[key]}
                         style={{
                           textAlign: "left",
                           opacity: testsDone[key] ? 0.5 : 1,
+                          cursor: testsDone[key] ? "not-allowed" : "help",
                           border: checked
                             ? "2px solid rgba(120,200,255,0.9)"
                             : "1px solid rgba(255,255,255,0.08)",
@@ -4586,7 +4586,6 @@ overflowX: "hidden",
                           {minutes}分
                         </div>
                       </button>
-                      </div>
                     );
                   })}
                 </div>
@@ -4601,14 +4600,15 @@ overflowX: "hidden",
                     const isSendout = OTHER_GROUP_INFECTION_SENDOUT.includes(key);
 
                     return (
-                      <div key={key} title={TEST_HELP_TEXT[key] ?? ""}>
-                     <button
+                      <button
                         key={key}
+                        title={TEST_HELP_TEXT[key] ?? ""}
                         onClick={() => toggleDraftOrderKey(key)}
                         disabled={!!testsDone[key]}
                         style={{
                           textAlign: "left",
                           opacity: testsDone[key] ? 0.5 : 1,
+                          cursor: testsDone[key] ? "not-allowed" : "help",
                           border: checked
                             ? "2px solid rgba(120,200,255,0.9)"
                             : "1px solid rgba(255,255,255,0.08)",
@@ -4622,7 +4622,6 @@ overflowX: "hidden",
                           {minutes}分{isSendout ? " ／ 外注" : ""}
                         </div>
                       </button>
-                      </div>
                     );
                   })}
                 </div>
@@ -4823,9 +4822,9 @@ overflowX: "hidden",
         const disabled = !!testsDone[key];
 
         return (
-          <div key={key} title={TEST_HELP_TEXT[key] ?? ""}>
-  <button
+          <button
   key={key}
+  title={TEST_HELP_TEXT[key] ?? ""}
   onClick={() => toggleDraftOrderKey(key)}
   disabled={disabled}
   style={{
@@ -4833,6 +4832,7 @@ overflowX: "hidden",
     justifySelf: "stretch",
     textAlign: "left",
     opacity: disabled ? 0.5 : 1,
+    cursor: testsDone[key] ? "not-allowed" : "help",
     border: checked
       ? "2px solid rgba(120,200,255,0.9)"
       : "1px solid rgba(255,255,255,0.08)",
@@ -4846,7 +4846,6 @@ overflowX: "hidden",
               所要時間 {minutes}分
             </div>
           </button>
-          </div>
         );
       })}
     </div>
@@ -4938,14 +4937,15 @@ overflowX: "hidden",
                   const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
 
                   return (
-                    <div key={key} title={TEST_HELP_TEXT[key] ?? ""}>
-                   <button
+                    <button
                       key={key}
+                      title={TEST_HELP_TEXT[key] ?? ""}
                       onClick={() => toggleDraftOrderKey(key)}
                       disabled={!!testsDone[key]}
                       style={{
                         textAlign: "left",
                         opacity: testsDone[key] ? 0.5 : 1,
+                        cursor: testsDone[key] ? "not-allowed" : "help",
                         border: checked
                           ? "2px solid rgba(120,200,255,0.9)"
                           : "1px solid rgba(255,255,255,0.08)",
@@ -4959,7 +4959,6 @@ overflowX: "hidden",
                         {minutes}分
                       </div>
                     </button>
-                     </div>
                   );
                 })}
               </div>
@@ -4986,14 +4985,15 @@ overflowX: "hidden",
                   const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
 
                   return (
-                    <div key={key} title={TEST_HELP_TEXT[key] ?? ""}>
-                   <button
+                    <button
                       key={key}
+                      title={TEST_HELP_TEXT[key] ?? ""}
                       onClick={() => toggleDraftOrderKey(key)}
                       disabled={!!testsDone[key]}
                       style={{
                         textAlign: "left",
                         opacity: testsDone[key] ? 0.5 : 1,
+                        cursor: testsDone[key] ? "not-allowed" : "help",
                         border: checked
                           ? "2px solid rgba(120,200,255,0.9)"
                           : "1px solid rgba(255,255,255,0.08)",
@@ -5007,7 +5007,6 @@ overflowX: "hidden",
                         {minutes}分 ／ 外注
                       </div>
                     </button>
-                    </div>
                   );
                 })}
               </div>
@@ -5033,14 +5032,15 @@ overflowX: "hidden",
                   const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
 
                   return (
-                    <div key={key} title={TEST_HELP_TEXT[key] ?? ""}>
-                   <button
+                    <button
                       key={key}
+                      title={TEST_HELP_TEXT[key] ?? ""}
                       onClick={() => toggleDraftOrderKey(key)}
                       disabled={!!testsDone[key]}
                       style={{
                         textAlign: "left",
                         opacity: testsDone[key] ? 0.5 : 1,
+                        cursor: testsDone[key] ? "not-allowed" : "help",
                         border: checked
                           ? "2px solid rgba(120,200,255,0.9)"
                           : "1px solid rgba(255,255,255,0.08)",
@@ -5054,7 +5054,6 @@ overflowX: "hidden",
                         {minutes}分 ／ 外注
                       </div>
                     </button>
-                    </div>
                   );
                 })}
               </div>
@@ -5066,6 +5065,8 @@ overflowX: "hidden",
     playSe(buttonSe);
     addDraftToPendingOrders();
     setInfectionSubModalOpen(false);
+    setOrderModalOpen(true);
+    setOrderCategory("blood");
   }}
 >
   戻る
@@ -5110,14 +5111,15 @@ overflowX: "hidden",
                   const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
 
                   return (
-                    <div key={key} title={TEST_HELP_TEXT[key] ?? ""}>
-                   <button
+                    <button
                       key={key}
+                      title={TEST_HELP_TEXT[key] ?? ""}
                       onClick={() => toggleDraftOrderKey(key)}
                       disabled={!!testsDone[key]}
                       style={{
                         textAlign: "left",
                         opacity: testsDone[key] ? 0.5 : 1,
+                        cursor: testsDone[key] ? "not-allowed" : "help",
                         border: checked
                           ? "2px solid rgba(120,200,255,0.9)"
                           : "1px solid rgba(255,255,255,0.08)",
@@ -5131,7 +5133,6 @@ overflowX: "hidden",
                         {minutes}分
                       </div>
                     </button>
-                    </div>
                   );
                 })}
               </div>
@@ -5154,14 +5155,15 @@ overflowX: "hidden",
                   const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
 
                   return (
-                    <div key={key} title={TEST_HELP_TEXT[key] ?? ""}>
-                   <button
+                    <button
                       key={key}
+                      title={TEST_HELP_TEXT[key] ?? ""}
                       onClick={() => toggleDraftOrderKey(key)}
                       disabled={!!testsDone[key]}
                       style={{
                         textAlign: "left",
                         opacity: testsDone[key] ? 0.5 : 1,
+                        cursor: testsDone[key] ? "not-allowed" : "help",
                         border: checked
                           ? "2px solid rgba(120,200,255,0.9)"
                           : "1px solid rgba(255,255,255,0.08)",
@@ -5175,7 +5177,6 @@ overflowX: "hidden",
                         {minutes}分
                       </div>
                     </button>
-                    </div>
                   );
                 })}
               </div>
@@ -5198,14 +5199,15 @@ overflowX: "hidden",
                   const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
 
                   return (
-                    <div key={key} title={TEST_HELP_TEXT[key] ?? ""}>
-                  <button
+                    <button
                       key={key}
+                      title={TEST_HELP_TEXT[key] ?? ""}
                       onClick={() => toggleDraftOrderKey(key)}
                       disabled={!!testsDone[key]}
                       style={{
                         textAlign: "left",
                         opacity: testsDone[key] ? 0.5 : 1,
+                        cursor: testsDone[key] ? "not-allowed" : "help",
                         border: checked
                           ? "2px solid rgba(120,200,255,0.9)"
                           : "1px solid rgba(255,255,255,0.08)",
@@ -5219,7 +5221,6 @@ overflowX: "hidden",
                         {minutes}分
                       </div>
                     </button>
-                     </div>
                   );
                 })}
               </div>
