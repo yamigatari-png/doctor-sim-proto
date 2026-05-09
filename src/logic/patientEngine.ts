@@ -205,6 +205,9 @@ const AGGRESSIVE_WORDS = [
   "さっさと",
   "どっか行け",
   "帰れ",
+  "帰って",
+  "じゃま",
+  "邪魔",
   "は？",
   "ばか",
   "バカ",
@@ -250,6 +253,16 @@ const AGGRESSIVE_WORDS = [
   "つまんね",
   "つまんねー",
   "おもしろくない",
+  "寝てたらなおる",
+  "寝たらなおる",
+  "寝てたら治る",
+  "寝たら治る",
+  "しらんけど",
+  "知らんけど",
+  "何しに来た",
+  "なにしにきた",
+  "なにしに来た",
+  "何しにきた",
 ];
 
 function detectAggression(normalized: string): boolean {
@@ -842,6 +855,19 @@ const otsukareGreeting = includesAny(normalized, [
 
 const genkiAsk = normalized === "元気ですか";
 
+const shortRudeTalk = [
+  "で？",
+  "だから？",
+  "だからなに？",
+  "だから何？",
+  "へー",
+  "へえ",
+  "へぇ",
+  "帰れば",
+  "家で寝てな",
+  "家で寝てろ",
+].includes(normalized);
+
 const genericConditionGreeting =
   lastPatientTopic === "" &&
   includesAny(normalized, [
@@ -1080,7 +1106,7 @@ if (scaryStoryNotScaryTsukkomi) {
 }
 
 // 暴言は最優先で処理する
-if ((aggressive || rudeTalk) && !medicalWorstContext) {
+if ((aggressive || rudeTalk || shortRudeTalk) && !medicalWorstContext) {
   fire({ type: "AGGRESSIVE" });
 
     stats = {
@@ -1527,6 +1553,72 @@ const schoolClubAsk = includesAny(normalized, [
   "学生時代の部活は",
 ]);
 
+const iAmYourFatherAsk = includesAny(normalized, [
+  "私が父だ",
+  "私がお前の父だ",
+  "私がお父さんだ",
+  "俺がお前の父だ",
+]);
+
+const fatherMemoryAsk = includesAny(normalized, [
+  "父との記憶",
+  "父との思い出",
+  "お父さんとの記憶",
+  "お父さんとの思い出",
+  "父親との記憶",
+  "父親との思い出",
+]);
+
+const riajuuReactionAsk = includesAny(normalized, [
+  "リア充ですね",
+  "リア充だね",
+  "充実してますね",
+]);
+
+const datePlaceAsk =
+  (
+    lastPatientTopic === "girlfriend_detail" ||
+    lastPatientTopic === "girlfriend_distance" ||
+    lastPatientTopic === "girlfriend_marriage" ||
+    lastPatientTopic === "honeytrap_detail"
+  ) &&
+  includesAny(normalized, [
+    "デートはどこへ",
+    "デートどこ行く",
+    "デートはどこ",
+    "どこへデート",
+    "どこにデート",
+  ]);
+
+const soccerLikeReactionAsk = includesAny(normalized, [
+  "サッカーお好きなんですね",
+  "サッカー好きなんですね",
+  "サッカーがお好きなんですね",
+  "サッカー好きなんだね",
+]);
+
+const soccerPlaySelfAsk = includesAny(normalized, [
+  "サッカーはご自身でもされるんですか",
+  "サッカーは自分でもする",
+  "サッカー自分でもする",
+  "今もサッカーする",
+  "今でもサッカーする",
+  "サッカーやってる",
+  "サッカーしてる",
+]);
+
+const soccerTournamentAsk =
+  lastPatientTopic === "soccer_like" &&
+  includesAny(normalized, [
+    "大会には出た",
+    "大会出た",
+    "大会は出た",
+    "試合には出た",
+    "試合出てた",
+    "公式戦出た",
+    "大会とか出た",
+  ]);
+
 const soccerCaptainAsk =
   lastPatientTopic === "soccer_like" &&
   includesAny(normalized, [
@@ -1665,6 +1757,94 @@ const workAsk = includesAny(normalized, [
   "職業は",
 ]);
 
+const dayOffAsk = includesAny(normalized, [
+  "今日は休み",
+  "今日休み",
+  "仕事休み",
+  "今日は仕事休み",
+]);
+
+const favoriteTypeAsk = includesAny(normalized, [
+  "好きなタイプ",
+  "好みのタイプ",
+  "どんな人がタイプ",
+  "どんな女性がタイプ",
+]);
+
+const caretakerAsk = includesAny(normalized, [
+  "面倒を見てくれる人",
+  "看病してくれる人",
+  "世話してくれる人",
+  "家で見てくれる人",
+  "誰か見てくれる",
+]);
+
+const girlfriendKindAsk =
+  lastPatientTopic === "girlfriend_detail" ||
+  lastPatientTopic === "girlfriend_distance" ||
+  lastPatientTopic === "girlfriend_marriage";
+
+const girlfriendKindFollowAsk =
+  girlfriendKindAsk &&
+  includesAny(normalized, [
+    "彼女優しい",
+    "彼女さん優しい",
+    "優しいですね",
+    "いい彼女",
+    "いい子ですね",
+  ]);
+
+const girlfriendMarriageReactionAsk =
+  girlfriendKindAsk &&
+  includesAny(normalized, [
+    "結婚ねぇ",
+    "結婚ねえ",
+    "結婚かぁ",
+    "結婚かあ",
+    "結婚ですか",
+    "結婚なんですね",
+    "結婚の話ですか",
+  ]);
+
+const personalWorryAsk = includesAny(normalized, [
+  "悩みはありますか",
+  "悩みありますか",
+  "何か悩み",
+  "なにか悩み",
+  "困ってることありますか",
+  "困っていることありますか",
+]);
+
+const drinkWaterInstructionAsk = includesAny(normalized, [
+  "水を飲んでください",
+  "水分をとってください",
+  "水分取ってください",
+  "水分摂ってください",
+  "お水飲んでください",
+  "飲み物飲んでください",
+]);
+
+const medicinePrescriptionTalk = includesAny(normalized, [
+  "お薬出しておきます",
+  "薬出しておきます",
+  "薬を出しておきます",
+  "お薬出します",
+  "薬出します",
+  "処方します",
+  "処方しておきます",
+]);
+
+const livingAloneLonelyFollowAsk =
+  lastPatientTopic === "living_status" &&
+  includesAny(normalized, [
+    "寂しいですね",
+    "さみしいですね",
+    "寂しくない",
+    "さみしくない",
+    "一人だと寂しい",
+    "一人暮らし寂しい",
+  ]);
+
 const lotteryAsk = includesAny(normalized, [
   "宝くじは買う",
   "宝くじ買う",
@@ -1742,6 +1922,30 @@ const movieOtherFollowAsk =
     "最近見た映画",
     "スターウォーズ以外",
   ]);
+
+  const goingOutLikeAsk = includesAny(normalized, [
+  "外出は好き",
+  "外出好き",
+  "出かけるの好き",
+  "お出かけ好き",
+]);
+
+const whereGoOutAsk = includesAny(normalized, [
+  "どこにでかけますか",
+  "どこに出かけますか",
+  "どこ行くことが多い",
+  "よくどこ行く",
+  "外出するならどこ",
+]);
+
+const goOutInviteAsk = includesAny(normalized, [
+  "今度一緒にでかけよう",
+  "今度一緒に出かけよう",
+  "一緒にでかけよう",
+  "一緒に出かけよう",
+  "今度どこか行こう",
+  "一緒にどこか行こう",
+]);
 
 const commuteAsk = includesAny(normalized, [
   "通勤は電車",
@@ -2400,6 +2604,81 @@ const afterlifeWhyScaryAsk =
     "何が怖い",
   ]);
 
+  if (soccerPlaySelfAsk) {
+  return replyWith(
+    "昔はやってました。中学も高校もサッカー部です。今はフットサルですね。",
+    stats,
+    withTopic(flags, "soccer_like", "昔はサッカー部、今は見る方が多い", {
+      talked_soccer: true,
+    }),
+    internalEvents
+  );
+}
+
+if (soccerTournamentAsk) {
+  return replyWith(
+    "高校までは大会に出てました。今はもう出てないです。フットサルは趣味ですね。",
+    stats,
+    withTopic(flags, "soccer_like", "高校までは大会経験あり、今は出ていない", {
+      talked_soccer: true,
+    }),
+    internalEvents
+  );
+}
+
+if (iAmYourFatherAsk) {
+  return replyWith(
+    "ダースベーダー？",
+    stats,
+    withTopic(flags, "funny_story", "スターウォーズ風の父ネタに反応"),
+    internalEvents
+  );
+}
+
+if (fatherMemoryAsk) {
+  return replyWith(
+    "あまり思い出したくないですね。暴力ふるってくるような奴でしたし。",
+    stats,
+    withTopic(flags, "father_distance", "父との記憶は暴力があり思い出したくない", {
+      father_route_unlocked: true,
+      father_dv_known: true,
+    }),
+    internalEvents
+  );
+}
+
+if (riajuuReactionAsk) {
+  return replyWith(
+    "えー、どうなんですかねー。",
+    stats,
+    withTopic(flags, "daily_life", "リア充と言われて曖昧に返す"),
+    internalEvents
+  );
+}
+
+if (datePlaceAsk) {
+  return replyWith(
+    "いろんなとこ行きますよ。この間は沖縄旅行行きましたし。……あ、あれは彼女じゃないか。",
+    stats,
+    withTopic(flags, "honeytrap_detail", "彼女以外との沖縄旅行を口走る", {
+      scam_route_unlocked: true,
+      heard_other_partner: true,
+    }),
+    internalEvents
+  );
+}
+
+if (soccerLikeReactionAsk) {
+  return replyWith(
+    "好きですね。昔は自分でもやってましたし、今もフットサルやってますよ。",
+    stats,
+    withTopic(flags, "soccer_like", "サッカーが好きで昔は自分でもやっていた", {
+      talked_soccer: true,
+    }),
+    internalEvents
+  );
+}
+
   if (schoolClubAsk) {
   return replyWith(
     "中学も高校もサッカーです。",
@@ -2511,6 +2790,33 @@ if (movieOtherFollowAsk) {
     ]),
     stats,
     withTopic(flags, "daily_life", "映画は世界観重視で見る"),
+    internalEvents
+  );
+}
+
+if (goingOutLikeAsk) {
+  return replyWith(
+    "体調いい時は外に出るの好きですね。",
+    stats,
+    withTopic(flags, "daily_life", "外出は嫌いではない"),
+    internalEvents
+  );
+}
+
+if (whereGoOutAsk) {
+  return replyWith(
+    "近場だと買い物とかですかね。あとはメシ食いにいったり。",
+    stats,
+    withTopic(flags, "daily_life", "外出先は買い物・食事"),
+    internalEvents
+  );
+}
+
+if (goOutInviteAsk) {
+  return replyWith(
+    "機会があればぜひ。まず治してからっすね。",
+    stats,
+    withTopic(flags, "daily_life", "外出の誘いには前向きだが体調優先"),
     internalEvents
   );
 }
@@ -3436,6 +3742,8 @@ const genericDrinkOfferAsk =
     "飲み物いりますか",
     "何か飲みますか",
     "なにか飲みますか",
+    "水飲む",
+    "水飲みます",
   ]);
 
 const drinkOfferAsk =
@@ -6211,7 +6519,7 @@ if (lastPatientTopic === "soccer_like" && (followUp || tacticsTalk) && sbTalk) {
 
 if (lastPatientTopic === "soccer_like" && (followUp || tacticsTalk)) {
   return replyWith(
-    "見るだけでも、SBの立ち位置とか上がるタイミングは気にして見ちゃいます。中に絞るのか、外を回るのか、そのへんで結構変わるじゃないですか。",
+    "見るだけでも、サイドバックの立ち位置とか上がるタイミングは気にして見ちゃいます。中に絞るのか、外を回るのか、そのへんで結構変わるじゃないですか。",
     stats,
     withTopic(flags, "soccer_tactics", "SB視点で立ち位置と上がるタイミングを見る"),
     internalEvents
@@ -6220,7 +6528,7 @@ if (lastPatientTopic === "soccer_like" && (followUp || tacticsTalk)) {
 
 if (lastPatientTopic === "soccer_tactics" && (followUp || positionDetailTalk || positionTalk)) {
   return replyWith(
-    "基本は右サイドバックっす。たまにサイドハーフっぽく前めで出ることはありましたけど、一番しっくりくるのはやっぱSBでした。",
+    "基本は右サイドバックっす。たまにサイドハーフっぽく前めで出ることはありましたけど、一番しっくりくるのはやっぱサイドバックでした。",
     stats,
     withTopic(flags, "soccer_position_detail", "基本は右SBで、ときどき前めもやった"),
     internalEvents
@@ -6956,6 +7264,87 @@ if (drinkOfferAsk) {
     "大丈夫っす。",
     stats,
     withTopic(flags, "oral_intake", "飲み物はもう大丈夫"),
+    internalEvents
+  );
+}
+
+if (dayOffAsk) {
+  return replyWith(
+    "仕事はあったんですけど、休んできました。",
+    stats,
+    withTopic(flags, "work_anxiety", "仕事はあったが体調不良で休んだ"),
+    internalEvents
+  );
+}
+
+if (favoriteTypeAsk) {
+  return replyWith(
+    "美人系よりかわいい系ですかね。今の彼女、美人系ですが、ちょっとキツいとこあって。やっぱ優しい人がいいっすね。",
+    stats,
+    withTopic(flags, "woman_preference", "好きなタイプは優しい人だが詰められるのは苦手"),
+    internalEvents
+  );
+}
+
+if (caretakerAsk) {
+  return replyWith(
+    "彼女はいます。会社の同期で、付き合って2年です。",
+    stats,
+    withTopic(flags, "girlfriend_detail", "彼女がいる"),
+    internalEvents
+  );
+}
+
+if (girlfriendMarriageReactionAsk) {
+  return replyWith(
+    "まだ早いと思うんすよ。毎日のように言われると、別の人の方がいいのかなぁって思っちゃいます。",
+    stats,
+    withTopic(flags, "girlfriend_marriage", "結婚の話を毎日のようにされて負担"),
+    internalEvents
+  );
+}
+
+if (personalWorryAsk) {
+  return replyWith(
+    "彼女が結婚の話ばかりで。別の人の方がいいのかなぁって思っちゃいます。",
+    stats,
+    withTopic(flags, "girlfriend_marriage", "悩みは彼女との結婚話"),
+    internalEvents
+  );
+}
+
+if (girlfriendKindFollowAsk) {
+  return replyWith(
+    "優しいんですけど、最近は結婚の話ばかりで、ちょっと疲れるんです。",
+    stats,
+    withTopic(flags, "girlfriend_marriage", "彼女は優しいが結婚の話が負担"),
+    internalEvents
+  );
+}
+
+if (drinkWaterInstructionAsk) {
+  return replyWith(
+    "ありがとうございます。少し飲みます。",
+    stats,
+    withTopic(flags, "oral_intake", "水分摂取を促されて飲む"),
+    internalEvents
+  );
+}
+
+if (medicinePrescriptionTalk) {
+  return replyWith(
+    "ありがとうございます。で、診断は何なんですか？",
+    stats,
+    withTopic(flags, "medications", "薬の説明後に診断を気にする"),
+    internalEvents
+  );
+}
+
+if (livingAloneLonelyFollowAsk) {
+  return replyWith(
+    "いやー、意外と気楽ですよ。全部自分のペースでできるんで。",
+    stats,
+    withTopic(flags, "living_status", "一人暮らしは寂しいより気楽"),
     internalEvents
   );
 }
@@ -10557,8 +10946,10 @@ const soccerInviteAsk =
     "一緒にフットサルやろう",
     "サッカーしよう",
     "サッカーやろう",
+    "サッカーしようぜ",
     "フットサルしよう",
     "フットサルやろう",
+    "フットサルしようぜ",
     "今度サッカー",
     "今度フットサル",
   ]);
@@ -10677,6 +11068,16 @@ const moneyValueAsk = includesAny(normalized, [
   "何にお金使う",
   "お金で困った",
   "金使い",
+]);
+
+const hangoverAsk = includesAny(normalized, [
+  "二日酔いでは",
+  "二日酔いじゃない",
+  "二日酔いじゃないですか",
+  "二日酔いではない",
+  "酒飲みすぎ",
+  "飲みすぎでは",
+  "昨日飲みすぎた",
 ]);
 
 // 食以外の嗜好
@@ -10926,6 +11327,7 @@ const soccerBestCounterAsk = includesAny(normalized, [
 "定期薬",
 "内服薬",
 "常用薬",
+"服用",
   ]);
 
   const allergyAsk = includesAny(normalized, [
@@ -11165,6 +11567,21 @@ const familyRelationAsk = includesAny(normalized, [
   "家族について教えて",
   "ご家族について教えて",
 ]);
+
+const familyHardshipEmpathyAsk =
+  (
+    lastPatientTopic === "father_distance" ||
+    lastPatientTopic === "mother_relation" ||
+    lastPatientTopic === "family_structure"
+  ) &&
+  includesAny(normalized, [
+    "苦労したんだね",
+    "苦労したんですね",
+    "大変だったんだね",
+    "大変だったんですね",
+    "つらかったんだね",
+    "辛かったんだね",
+  ]);
 
 const livingEnvironmentAsk = includesAny(normalized, [
   "生活環境",
@@ -11499,13 +11916,13 @@ if (makeupAsk) {
   ])
 : favoritePlayerTalk || favoritePlayerTypoTalk
 ? pickOne([
-    "好きな選手で言うと、まずハキミっすね。SBなのに試合を動かせる感じがあるのがすごいです。",
-    "テオ・エルナンデスみたいな、運べて前に出ていけるSBはやっぱ見てて面白いです。",
-    "アーノルドみたいな配球できるタイプも好きです。守備だけじゃなくて、持った時に違い出せるSBは見ちゃいます。",
-    "ワン＝ビサカみたいな対人の強さあるSBも好きです。派手すぎなくても、1対1で止める感じはやっぱいいです。",
+    "好きな選手で言うと、まずハキミっすね。サイドバックなのに試合を動かせる感じがあるのがすごいです。",
+    "テオ・エルナンデスみたいな、運べて前に出ていけるサイドバックはやっぱ見てて面白いです。",
+    "アーノルドみたいな配球できるタイプも好きです。守備だけじゃなくて、持った時に違い出せるサイドバックは見ちゃいます。",
+    "ワン＝ビサカみたいな対人の強さあるサイドバックも好きです。派手すぎなくても、1対1で止める感じはやっぱいいです。",
   ])
 : sbTalk
-? "高校のときは右サイドバックっす。オーバーラップ好きでした。守るだけのSBより、ちゃんと攻撃参加するほうが好きっす。"
+? "高校のときは右サイドバックっす。オーバーラップ好きでした。守るだけのサイドバックより、ちゃんと攻撃参加するほうが好きっす。"
 : positionTalk
 ? "やってたのは右サイドバックっす。守備だけじゃなくて、前に出る余地があるのが好きでした。"
 : jleagueTalk
@@ -11515,17 +11932,17 @@ if (makeupAsk) {
   ])
     : favoritePlayerTalk || favoritePlayerTypoTalk
 ? pickOne([
-    "好きな選手で言うと、まずハキミっすね。SBなのに試合を動かせる感じがマジで感動しかないっす。",
-    "テオ・エルナンデスみたいな、運べて前に出ていけるSBはやっぱ見てて面白いです。",
-    "アーノルドみたいな配球できるタイプも好きです。守備だけじゃなくて、持った時に違い出せるSBは見ちゃいます。",
-    "ワン＝ビサカみたいな対人の強さあるSBも好きです。派手すぎなくても、1対1で止める感じはやっぱいいです。",
+    "好きな選手で言うと、まずハキミっすね。サイドバックなのに試合を動かせる感じがマジで感動しかないっす。",
+    "テオ・エルナンデスみたいな、運べて前に出ていけるサイドバックはやっぱ見てて面白いです。",
+    "アーノルドみたいな配球できるタイプも好きです。守備だけじゃなくて、持った時に違い出せるサイドバックは見ちゃいます。",
+    "ワン＝ビサカみたいな対人の強さあるサイドバックも好きです。派手すぎなくても、1対1で止める感じはやっぱいいです。",
   ])
     : worldCupTalk
     ? "ワールドカップは見ます。クラブと違って短期決戦なんで、噛み合った時の勢いとか、守備の締まり方とか見るの好きです。"
     : pickOne([
-        "サッカーはかなり好きっす。ユナイテッドとプレミア中心っすね。右SBだったんでそのへんの話は好きです。",
+        "サッカーはかなり好きっす。ユナイテッドとプレミア中心っすね。右サイドバックだったんでそのへんの話は好きです。",
         "サッカー好きっす。見るのもやるのも好きですね。",
-        "サッカーの話は普通に好きっす。SBの立ち位置とか上下動とか結構見ちゃいます。",
+        "サッカーの話は普通に好きっす。サイドバックの立ち位置とか上下動とか結構見ちゃいます。",
       ]);
     
 const soccerTopic =
@@ -12520,7 +12937,7 @@ if (familyKnowsCurrentIllnessAsk) {
       "好きな選手はいますけど、どっちかというとポジションで見ちゃいます。SBの立ち位置とか上がるタイミングとか。",
     ]),
     stats,
-    withTopic(flags, "soccer_like", "好きな選手の話。SBやサイドの選手を見る"),
+    withTopic(flags, "soccer_like", "好きな選手の話。サイドバックやサイドの選手を見る"),
     internalEvents
   );
 }
@@ -12559,9 +12976,9 @@ if (futsalTalk) {
   });
     return replyWith(
       pickOne([
-        "サッカーはかなり好きっす。ユナイテッドとプレミア中心っすね。右SBだったんでそのへんの話は好きです。",
+        "サッカーはかなり好きっす。ユナイテッドとプレミア中心っすね。右サイドバックだったんでそのへんの話は好きです。",
         "サッカー好きっす。見るのもやるのも好きでした。今日は体調悪いですけど、その話は乗れます。",
-        "サッカーの話は普通に好きっす。SBの立ち位置とか上下動とか結構見ちゃいます。",
+        "サッカーの話は普通に好きっす。サイドバックの立ち位置とか上下動とか結構見ちゃいます。",
       ]),
       stats,
       withTopic(flags, "soccer_like", "サッカーとSB談義"),
@@ -12741,6 +13158,15 @@ if (otherPremierClubAsk) {
     "小さい頃に離婚してから、ほとんど関わりがなかったからです。",
     stats,
     withTopic(flags, "father_distance", "父と疎遠になった理由は離婚後の断絶"),
+    internalEvents
+  );
+}
+
+if (familyHardshipEmpathyAsk) {
+  return replyWith(
+    "ありがとうございます。でも本当に苦労したのは母だと思います。父は嫌な奴でしたから。",
+    stats,
+    withTopic(flags, "father_distance", "父との家庭環境について共感された"),
     internalEvents
   );
 }
@@ -16165,6 +16591,15 @@ if (moneyValueAsk) {
     ]),
     stats,
     withTopic(flags, "investment", "金銭感覚は中庸"),
+    internalEvents
+  );
+}
+
+if (hangoverAsk) {
+  return replyWith(
+    "昨日も今日も飲んでませんよ。",
+    stats,
+    withTopic(flags, "general_severity", "二日酔いは否定"),
     internalEvents
   );
 }

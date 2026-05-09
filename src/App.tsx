@@ -1958,7 +1958,7 @@ function submitOrders(keys: TestKey[]) {
 
   const nextStats: Stats = {
     ...stats,
-    condition: Math.max(0, stats.condition - 10),
+    condition: Math.max(0, stats.condition - 6),
   };
 
   setTestsDone((prev) => {
@@ -2098,7 +2098,7 @@ function queuePatientEndingLines(lines: string[], onDone: () => void) {
 
   const nextStats: Stats = {
     ...out.stats,
-    condition: Math.max(0, out.stats.condition - 5),
+    condition: Math.max(0, out.stats.condition - 4),
   };
 
   let nextFlags = out.flags;
