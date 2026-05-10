@@ -4279,7 +4279,8 @@ overflowX: "hidden",
           display: "grid",
           gridTemplateColumns: isPhone
   ? "1fr"
-  : "170px 390px 110px",
+  : "170px 390px 130px",
+  columnGap: 14,
 gap: 8,
 justifyContent: "center",
           alignItems: "start",
@@ -4425,7 +4426,7 @@ justifyContent: "center",
               <div style={{ fontWeight: 700 }}>その他</div>
               <button
   style={{
-    width: 110,
+    width: 120,
     justifySelf: "start",
   }}
   onClick={() => setOtherLabGroup("urine")}
@@ -4434,7 +4435,7 @@ justifyContent: "center",
 </button>
               <button
   style={{
-    width: 100,
+    width: 120,
     justifySelf: "start",
   }}
   onClick={() => {
@@ -4448,15 +4449,15 @@ justifyContent: "center",
   感染症
 </button>
               <button style={{
-  width: 100,
+  width: 120,
   justifySelf: "start",
 }} onClick={() => setOtherLabGroup("tumor")}>腫瘍マーカー</button>
               <button style={{
-  width: 100,
+  width: 120,
   justifySelf: "start",
 }} onClick={() => setOtherLabGroup("autoantibody")}>自己抗体</button>
               <button style={{
-  width: 100,
+  width: 120,
   justifySelf: "start",
 }} onClick={() => setOtherLabGroup("endocrine")}>内分泌</button>
             </>
@@ -4711,7 +4712,12 @@ justifyContent: "center",
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: modalCols3,
+          gridTemplateColumns: isPhone
+  ? "1fr"
+  : "repeat(3, 210px)",
+justifyContent: "center",
+columnGap: 12,
+rowGap: 12,
           gap: 12,
           alignItems: "start",
         }}
@@ -4733,6 +4739,8 @@ justifyContent: "center",
               borderRadius: 12,
               alignContent: "start",
               minWidth: 0,
+              width: "100%",
+              minHeight: 62,
             }}
           >
             <div style={{ fontWeight: 700 }}>{group.title}</div>
