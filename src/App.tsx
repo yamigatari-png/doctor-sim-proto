@@ -4279,9 +4279,9 @@ overflowX: "hidden",
           display: "grid",
           gridTemplateColumns: isPhone
   ? "1fr"
-  : "170px 390px 150px",
+  : "170px 390px 110px",
 gap: 8,
-justifyContent: "start",
+justifyContent: "center",
           alignItems: "start",
         }}
       >
@@ -4411,6 +4411,8 @@ justifyContent: "start",
     display: "grid",
     gap: 8,
     alignContent: "start",
+    width: "fit-content",
+    justifyItems: "start",
     background: "#232330",
     border: "1px solid rgba(255,255,255,0.08)",
     borderRadius: 12,
@@ -4432,7 +4434,7 @@ justifyContent: "start",
 </button>
               <button
   style={{
-    width: 110,
+    width: 100,
     justifySelf: "start",
   }}
   onClick={() => {
@@ -4446,15 +4448,15 @@ justifyContent: "start",
   感染症
 </button>
               <button style={{
-  width: 110,
+  width: 100,
   justifySelf: "start",
 }} onClick={() => setOtherLabGroup("tumor")}>腫瘍マーカー</button>
               <button style={{
-  width: 110,
+  width: 100,
   justifySelf: "start",
 }} onClick={() => setOtherLabGroup("autoantibody")}>自己抗体</button>
               <button style={{
-  width: 110,
+  width: 100,
   justifySelf: "start",
 }} onClick={() => setOtherLabGroup("endocrine")}>内分泌</button>
             </>
@@ -4939,149 +4941,133 @@ justifyContent: "start",
 
   {/* スクロールはここだけ */}
   <div
+  style={{
+    minHeight: 0,
+    overflowY: "auto",
+    overflowX: "hidden",
+    paddingRight: 4,
+  }}
+>
+  <div
     style={{
-      minHeight: 0,
-      overflowY: "auto",
-      overflowX: "hidden",
-      paddingRight: 4,
+      display: "grid",
+      gap: 14,
+      alignItems: "start",
     }}
   >
+    {/* 迅速・院内結果あり */}
     <div
+      className="card"
       style={{
+        padding: 12,
         display: "grid",
-        gridTemplateColumns: modalCols3,
-        gap: 12,
-        alignItems: "start",
+        gap: 8,
+        background: "#232330",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: 12,
       }}
     >
-                <div style={{ fontWeight: 800 }}>迅速・院内結果あり</div>
-                {OTHER_GROUP_INFECTION_RAPID.map((key) => {
-                  const tr = cp.tests[key];
-                  const checked = isQueuedOrDrafted(key);
-                  const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
+      <div style={{ fontWeight: 800 }}>迅速・院内結果あり</div>
 
-                  return (
-                    <button
-                      key={key}
-                      title={TEST_HELP_TEXT[key] ?? ""}
-                      onClick={() => toggleDraftOrderKey(key)}
-                      disabled={!!testsDone[key]}
-                      style={{
-                        textAlign: "left",
-                        opacity: testsDone[key] ? 0.5 : 1,
-                        cursor: testsDone[key] ? "not-allowed" : "help",
-                        border: checked
-                          ? "2px solid rgba(120,200,255,0.9)"
-                          : "1px solid rgba(255,255,255,0.08)",
-                        background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
-                        borderRadius: 10,
-                      }}
-                    >
-                      {checked ? "✓ " : ""}
-                      {tr.label}
-                      <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
-                        {minutes}分
-                      </div>
-                    </button>
-                  );
-                })}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: isPhone ? "1fr" : "repeat(3, 1fr)",
+          gap: 10,
+          alignItems: "stretch",
+        }}
+      >
+        {OTHER_GROUP_INFECTION_RAPID.map((key) => {
+          const tr = cp.tests[key];
+          const checked = isQueuedOrDrafted(key);
+          const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
+
+          return (
+            <button
+              key={key}
+              title={TEST_HELP_TEXT[key] ?? ""}
+              onClick={() => toggleDraftOrderKey(key)}
+              disabled={!!testsDone[key]}
+              style={{
+                minHeight: 58,
+                textAlign: "left",
+                opacity: testsDone[key] ? 0.5 : 1,
+                cursor: testsDone[key] ? "not-allowed" : "help",
+                border: checked
+                  ? "2px solid rgba(120,200,255,0.9)"
+                  : "1px solid rgba(255,255,255,0.08)",
+                background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
+                borderRadius: 10,
+              }}
+            >
+              {checked ? "✓ " : ""}
+              {tr.label}
+              <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
+                {minutes}分
               </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
 
-              {/* 中央：外注 前半 */}
-              <div
-  className="card"
-  style={{
-    padding: 12,
-    display: "grid",
-    gap: 8,
-    maxHeight: isPhone ? "58vh" : "none",
-    overflowY: isPhone ? "auto" : "visible",
-    overflowX: "hidden",
-  }}
->
-                <div style={{ fontWeight: 800 }}>外注</div>
-                {OTHER_GROUP_INFECTION_SENDOUT.slice(
-                  0,
-                  Math.ceil(OTHER_GROUP_INFECTION_SENDOUT.length / 2)
-                ).map((key) => {
-                  const tr = cp.tests[key];
-                  const checked = isQueuedOrDrafted(key);
-                  const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
+    {/* 外注 */}
+    <div
+      className="card"
+      style={{
+        padding: 12,
+        display: "grid",
+        gap: 8,
+        background: "#232330",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: 12,
+      }}
+    >
+      <div style={{ fontWeight: 800 }}>外注</div>
 
-                  return (
-                    <button
-                      key={key}
-                      title={TEST_HELP_TEXT[key] ?? ""}
-                      onClick={() => toggleDraftOrderKey(key)}
-                      disabled={!!testsDone[key]}
-                      style={{
-                        textAlign: "left",
-                        opacity: testsDone[key] ? 0.5 : 1,
-                        cursor: testsDone[key] ? "not-allowed" : "help",
-                        border: checked
-                          ? "2px solid rgba(120,200,255,0.9)"
-                          : "1px solid rgba(255,255,255,0.08)",
-                        background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
-                        borderRadius: 10,
-                      }}
-                    >
-                      {checked ? "✓ " : ""}
-                      {tr.label}
-                      <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
-                        {minutes}分 ／ 外注
-                      </div>
-                    </button>
-                  );
-                })}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: isPhone ? "1fr" : "repeat(3, 1fr)",
+          gap: 10,
+          alignItems: "stretch",
+        }}
+      >
+        {OTHER_GROUP_INFECTION_SENDOUT.map((key) => {
+          const tr = cp.tests[key];
+          const checked = isQueuedOrDrafted(key);
+          const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
+
+          return (
+            <button
+              key={key}
+              title={TEST_HELP_TEXT[key] ?? ""}
+              onClick={() => toggleDraftOrderKey(key)}
+              disabled={!!testsDone[key]}
+              style={{
+                minHeight: 58,
+                textAlign: "left",
+                opacity: testsDone[key] ? 0.5 : 1,
+                cursor: testsDone[key] ? "not-allowed" : "help",
+                border: checked
+                  ? "2px solid rgba(120,200,255,0.9)"
+                  : "1px solid rgba(255,255,255,0.08)",
+                background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
+                borderRadius: 10,
+              }}
+            >
+              {checked ? "✓ " : ""}
+              {tr.label}
+              <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
+                {minutes}分 ／ 外注
               </div>
-
-              {/* 右：外注 後半 */}
-              <div
-  className="card"
-  style={{
-    padding: 12,
-    display: "grid",
-    gap: 8,
-    maxHeight: isPhone ? "58vh" : "none",
-    overflowY: isPhone ? "auto" : "visible",
-    overflowX: "hidden",
-  }}
->
-                <div style={{ fontWeight: 800, opacity: 0 }}>外注</div>
-                {OTHER_GROUP_INFECTION_SENDOUT.slice(
-                  Math.ceil(OTHER_GROUP_INFECTION_SENDOUT.length / 2)
-                ).map((key) => {
-                  const tr = cp.tests[key];
-                  const checked = isQueuedOrDrafted(key);
-                  const minutes = TEST_TURNAROUND_MINUTES[key] ?? tr.minutes;
-
-                  return (
-                    <button
-                      key={key}
-                      title={TEST_HELP_TEXT[key] ?? ""}
-                      onClick={() => toggleDraftOrderKey(key)}
-                      disabled={!!testsDone[key]}
-                      style={{
-                        textAlign: "left",
-                        opacity: testsDone[key] ? 0.5 : 1,
-                        cursor: testsDone[key] ? "not-allowed" : "help",
-                        border: checked
-                          ? "2px solid rgba(120,200,255,0.9)"
-                          : "1px solid rgba(255,255,255,0.08)",
-                        background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
-                        borderRadius: 10,
-                      }}
-                    >
-                      {checked ? "✓ " : ""}
-                      {tr.label}
-                      <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>
-                        {minutes}分 ／ 外注
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</div>
             
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
               <button
