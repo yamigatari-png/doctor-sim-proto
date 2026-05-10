@@ -4279,9 +4279,8 @@ overflowX: "hidden",
           display: "grid",
           gridTemplateColumns: isPhone
   ? "1fr"
-  : "170px 390px 130px",
-  columnGap: 14,
-gap: 8,
+  : "180px 390px 160px",
+columnGap: 18,
 justifyContent: "center",
           alignItems: "start",
         }}
@@ -4295,7 +4294,7 @@ justifyContent: "center",
             gap: 8,
             gridTemplateColumns: "160px",
             justifyContent: "start",
-            width: "fit-content",
+            width: "100%",
             background: "#232330",
             border: "1px solid rgba(255,255,255,0.08)",
             borderRadius: 12,
@@ -4426,7 +4425,7 @@ justifyContent: "center",
               <div style={{ fontWeight: 700 }}>その他</div>
               <button
   style={{
-    width: 120,
+    width: 140,
     justifySelf: "start",
   }}
   onClick={() => setOtherLabGroup("urine")}
@@ -4435,7 +4434,7 @@ justifyContent: "center",
 </button>
               <button
   style={{
-    width: 120,
+    width: 140,
     justifySelf: "start",
   }}
   onClick={() => {
@@ -4449,15 +4448,15 @@ justifyContent: "center",
   感染症
 </button>
               <button style={{
-  width: 120,
+  width: 140,
   justifySelf: "start",
 }} onClick={() => setOtherLabGroup("tumor")}>腫瘍マーカー</button>
               <button style={{
-  width: 120,
+  width: 140,
   justifySelf: "start",
 }} onClick={() => setOtherLabGroup("autoantibody")}>自己抗体</button>
               <button style={{
-  width: 120,
+  width: 140,
   justifySelf: "start",
 }} onClick={() => setOtherLabGroup("endocrine")}>内分泌</button>
             </>
@@ -4503,6 +4502,7 @@ justifyContent: "center",
                             : "1px solid rgba(255,255,255,0.08)",
                           background: checked ? "rgba(70,110,180,0.35)" : "#2b2b38",
                           borderRadius: 10,
+                           width: 140,
                         }}
                       >
                         {checked ? "✓ " : ""}
@@ -4517,7 +4517,7 @@ justifyContent: "center",
               )}
 
               {otherLabGroup === "tumor" && (
-                <div style={{ display: "grid", gap: 8, maxHeight: "52vh", overflowY: "auto", overflowX: "hidden", paddingRight: 4, alignContent: "start" }}>
+                <div style={{ display: "grid", gap: 8, maxHeight: "52vh", overflowY: "auto", overflowX: "hidden", paddingRight: 4, width: 140, alignContent: "start" }}>
                   {OTHER_GROUP_TUMOR.map((key) => {
                     const tr = cp.tests[key];
                     const checked = isQueuedOrDrafted(key);
@@ -4551,7 +4551,7 @@ justifyContent: "center",
               )}
 
               {otherLabGroup === "autoantibody" && (
-                <div style={{ display: "grid", gap: 8, maxHeight: "52vh", overflowY: "auto", overflowX: "hidden", paddingRight: 4, alignContent: "start" }}>
+                <div style={{ display: "grid", gap: 8, maxHeight: "52vh", overflowY: "auto", overflowX: "hidden", paddingRight: 4, width: 140, alignContent: "start" }}>
                   {OTHER_GROUP_AUTOANTIBODY.map((key) => {
                     const tr = cp.tests[key];
                     const checked = isQueuedOrDrafted(key);
@@ -4585,7 +4585,7 @@ justifyContent: "center",
               )}
 
               {otherLabGroup === "endocrine" && (
-                <div style={{ display: "grid", gap: 8, maxHeight: "52vh", overflowY: "auto", overflowX: "hidden", paddingRight: 4, alignContent: "start" }}>
+                <div style={{ display: "grid", gap: 8, maxHeight: "52vh", overflowY: "auto", overflowX: "hidden", paddingRight: 4, width: 140, alignContent: "start" }}>
                   {OTHER_GROUP_ENDOCRINE.map((key) => {
                     const tr = cp.tests[key];
                     const checked = isQueuedOrDrafted(key);
@@ -4963,6 +4963,27 @@ rowGap: 12,
       alignItems: "start",
     }}
   >
+    <div
+  style={{
+    display: "flex",
+    justifyContent: "flex-end",
+    marginTop: 0,
+    marginBottom: 4,
+  }}
+>
+  <button
+    onClick={() => {
+      playSe(buttonSe);
+      addDraftToPendingOrders();
+      setInfectionSubModalOpen(false);
+      setOrderModalOpen(true);
+      setOrderCategory("blood");
+    }}
+  >
+    戻る
+  </button>
+</div>
+
     {/* 迅速・院内結果あり */}
     <div
       className="card"
@@ -5076,20 +5097,6 @@ rowGap: 12,
     </div>
   </div>
 </div>
-            
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-              <button
-  onClick={() => {
-    playSe(buttonSe);
-    addDraftToPendingOrders();
-    setInfectionSubModalOpen(false);
-    setOrderModalOpen(true);
-    setOrderCategory("blood");
-  }}
->
-  戻る
-</button>
-            </div>
           </div>
         </Modal>
       )}
